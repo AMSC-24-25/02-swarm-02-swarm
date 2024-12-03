@@ -1,10 +1,12 @@
 #include "Swarm.hpp"
 
 
-    Swarm::Swarm(vector<Particle>& particles) {
-       this-> particles = particles;
-      this->  minimus = particles[0].bestFitness;
+    Swarm::Swarm(vector<Particle>& particles_, vector<double> lower_, vector<double> upper_) {
+      particles = particles_;
+      minimus = particles[0].bestFitness;
       bestGlobalPosition = particles[0].bestLocalPosition;
+      lower = lower_;
+      upper = upper_;
     }
 
     double Swarm::findbestFitness() {

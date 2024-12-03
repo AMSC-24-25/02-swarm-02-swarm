@@ -17,11 +17,9 @@ public:
     vector<double> velocity;    // Velocità attuale
     vector<double> bestLocalPosition; // Miglior posizione personale
     double bestFitness;         // Miglior fitness personale (f(bestLocalpostion)
-    vector<double> lower;
-    vector<double> upper;
     int dimensions;
 
-    Particle(int dimensions, vector<double> lowerBound, vector<double> upperBound);
+    Particle(int dimensions, vector<double>& lower, vector<double>& upper);
     void update(vector<double>& globalBestPosition);
 
 

@@ -8,8 +8,10 @@ class Swarm{
   public:
     vector<Particle> particles;
     vector<double> bestGlobalPosition;
+    vector<double> lower;
+    vector<double> upper;
     double minimus;
-    Swarm(vector<Particle>& particles);
+    Swarm(vector<Particle>& particles, vector<double> lower_, vector<double> upper_);
 
     double findbestFitness();
 

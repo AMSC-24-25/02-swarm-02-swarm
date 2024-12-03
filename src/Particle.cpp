@@ -2,20 +2,22 @@
 
 
 
-Particle::Particle(int dimensions, vector<double> lowerBound, vector<double> upperBound) {
-    this->dimensions = dimensions;
-    lower= lowerBound;
-    upper = upperBound;
-    std::cout<<lower.size()<<" "<<upper.size()<<" "<<dimensions<<std::endl;
+Particle::Particle(int dimensions_, vector<double>& lower, vector<double>& upper) {
+    dimensions = dimensions_;
     bestFitness = numeric_limits<double>::infinity();
+    vector<double> position_(dimensions);
+    vector<double> velocity_(dimensions);
+    vector<double> bestLocalPosition_(dimensions);
+
 
     for (int i = 0; i < dimensions; ++i) {
-        position.push_back(lower[i] + static_cast<double>(rand()) / RAND_MAX * (upper[i] - lower[i]));
-        velocity.push_back((static_cast<double>(rand()) / RAND_MAX * 2 - 1) * (upper[i] - lower[i]) * 0.1);
-        bestLocalPosition.push_back(position[i]);
-        std::cout<<position[i]<<" "<<velocity[i]<<std::endl;
-        std::cout<<upper[i]<<" "<<lower[i]<<std::endl;
+        position_[i] = (lower[i] + static_cast<double>(rand()) / RAND_MAX * (upper[i] - lower[i]));
+        velocity_[i] = ((static_cast<double>(rand()) / RAND_MAX * 2 - 1) * (upper[i] - lower[i]) * 0.1);
+        bestLocalPosition_[i] = (position_[i]);
     }
+    position = position_;
+    velocity = velocity_;
+    bestLocalPosition = bestLocalPosition_;
 }
     
 void Particle::update(vector<double>& globalBestPosition) {
