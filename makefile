@@ -5,18 +5,25 @@ DEBUGFLAGS=-O0 -g
 OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native
 
 SRCS = $(wildcard src/*.cpp)
-OBJS = $(patsubst src/%.cpp, build/%.o, $(SRCS))
+DEBUG_OBJS = $(patsubst src/%.cpp, build/debug-%.o, $(SRCS))
+RELEASE_OBJS = $(patsubst src/%.cpp, build/release-%.o, $(SRCS))
 
-all: main
+all: debug
 
-main: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) -o build/$@ $^
+debug: $(DEBUG_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(DEBUGFLAGS) -o build/main $^
 
-build/%.o: src/%.cpp
-	$(CXX) $(CXXFLAGS) -c $(INCLUDE) -o $@ $^
+release: $(RELEASE_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) -o build/main $^
+
+build/debug-%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $(INCLUDE) -o $@ $^
+
+build/release-%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(OPTFLAGS) -c $(INCLUDE) -o $@ $^
 
 format:
 	clang-format --style=file -i src/*.cpp include/*.hpp
 
 clean:
-	rm -rf build
+	rm -rf build/*
