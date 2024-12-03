@@ -3,15 +3,12 @@
 
 #include <vector>
 
-using namespace std;
+class ObjectiveFunction {
+   public:
+	double sum;
+	ObjectiveFunction();
 
-class ObjectiveFunction{
-    public:
-    double sum;
-    ObjectiveFunction();
-
-    double getValueFunction(const vector<double>& position);
-
+	double getValueFunction(const std::vector<double>& position);
 };
 
 #endif
