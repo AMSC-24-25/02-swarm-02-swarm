@@ -1,17 +1,19 @@
 CXX=g++
-INCLUDE = -I ./include
+INCLUDE=-I./include
+CXXFLAGS=-Wall -Wextra -Wpedantic -Wshadow -Werror
+DEBUGFLAGS=-O0 -g
+OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native
 
-SRCS  = $(wildcard src/*.cpp)
-OBJS = $(patsubst src/%.cpp, build/objects/%.o, $(SRCS))
+SRCS = $(wildcard src/*.cpp)
+OBJS = $(patsubst src/%.cpp, build/%.o, $(SRCS))
 
 all: main
 
 main: $(OBJS)
-	$(CXX) $(INCLUDE) -o build/executors/$@ $^
+	$(CXX) $(CXXFLAGS) $(INCLUDE) -o build/$@ $^
 
-build/objects%.o: src/%.cpp
-	$(CXX) -c $(INCLUDE) -o $@ $^
-
+build/%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $(INCLUDE) -o $@ $^
 
 clean:
-	rm -f *.o main
+	rm -rf build
