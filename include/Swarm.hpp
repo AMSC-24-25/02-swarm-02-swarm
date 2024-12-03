@@ -11,7 +11,7 @@ class Swarm {
 	std::vector<double> bestGlobalPosition;
 	std::vector<double> lower;
 	std::vector<double> upper;
-	double minimus;
+	double minimum;
 	Swarm(std::vector<Particle>& particles, std::vector<double> lower_,
 		  std::vector<double> upper_);
 

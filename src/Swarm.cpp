@@ -5,7 +5,7 @@
 Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_,
 			 std::vector<double> upper_) {
 	particles = particles_;
-	minimus = particles[0].bestFitness;
+	minimum = particles[0].bestFitness;
 	bestGlobalPosition = particles[0].bestLocalPosition;
 	lower = lower_;
 	upper = upper_;
@@ -13,12 +13,12 @@ Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_,
 
 double Swarm::findbestFitness() {
 	for (size_t i = 0; i < particles.size(); ++i) {
-		if (particles[i].bestFitness < minimus) {
-			minimus = particles[i].bestFitness;
+		if (particles[i].bestFitness < minimum) {
+			minimum = particles[i].bestFitness;
 			bestGlobalPosition = particles[i].position;
 		}
 	}
-	return minimus;
+	return minimum;
 }
 
 void Swarm::updateParticles() {
