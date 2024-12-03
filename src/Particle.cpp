@@ -1,6 +1,7 @@
 #include <vector>
 #include <limits>
 #include <random>
+#include <algorithm>
 
 #include "Particle.hpp"
 
@@ -30,17 +31,21 @@ Particle::Particle(int dimensions_, std::vector<double>& lower,
 	bestLocalPosition = bestLocalPosition_;
 }
 
-void Particle::update(std::vector<double>& globalBestPosition) {
+void Particle::update(std::vector<double>& globalBestPosition,
+					  const std::vector<double>& lower,
+					  const std::vector<double>& upper) {
 	for (int i = 0; i < dimensions; ++i) {
-		velocity[i] = velocity[i] * (0.4) +
-					  (0.6) * (bestLocalPosition[i] - position[i]) +
-					  (0.5) * (globalBestPosition[i] - position[i]);
-		// sistemare quando esce da lower/upper bound
-		position[i] = position[i] + velocity[i];
+		velocity[i] = velocity[i] * 0.4 +
+					  0.6 * (bestLocalPosition[i] - position[i]) +
+					  0.5 * (globalBestPosition[i] - position[i]);
+
+		// solid "sticky" bounds, when a particle reaches a boundary, it sticks
+		// to it
+		position[i] = std::clamp(position[i] + velocity[i], lower[i], upper[i]);
 	}
-	double newValueOfFunction = ObjectiveFunction().getValueFunction(position);
-	if (newValueOfFunction < bestFitness) {
-		bestFitness = newValueOfFunction;
+	const double newVal = ObjectiveFunction().getValueFunction(position);
+	if (newVal < bestFitness) {
+		bestFitness = newVal;
 
 		for (int i = 0; i < dimensions; ++i) {
 			bestLocalPosition[i] = position[i];

@@ -23,6 +23,6 @@ double Swarm::findbestFitness() {
 
 void Swarm::updateParticles() {
 	for (size_t i = 0; i < particles.size(); ++i) {
-		particles[i].update(bestGlobalPosition);
+		particles[i].update(bestGlobalPosition, lower, upper);
 	}
 }

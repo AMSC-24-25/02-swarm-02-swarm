@@ -19,7 +19,9 @@ class Particle {
 
 	Particle(int dimensions, std::vector<double>& lower,
 			 std::vector<double>& upper);
-	void update(std::vector<double>& globalBestPosition);
+	void update(std::vector<double>& globalBestPosition,
+				const std::vector<double>& lower,
+				const std::vector<double>& upper);
 };
 
 #endif
