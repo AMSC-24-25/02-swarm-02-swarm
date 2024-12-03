@@ -5,6 +5,17 @@
 
 #include "Swarm.hpp"
 
+void print_minimum(const Swarm& swarm, const size_t dimensions) {
+	std::cout << "  f(";
+	for (size_t i = 0; i < dimensions; i++) {
+		std::cout << std::scientific << swarm.bestGlobalPosition[i];
+		if (i < dimensions - 1) {
+			std::cout << ", ";
+		}
+	}
+	std::cout << ") = " << std::scientific << swarm.minimum << std::endl;
+}
+
 int main() {
 	const int dimensions = 2;
 	const int num_particles = 100;
@@ -34,8 +45,8 @@ int main() {
 		const auto end_iteration = std::chrono::high_resolution_clock::now();
 		std::cout << "Iteration n. " << i << " / " << max_iterations
 				  << std::endl;
-		std::cout << "  Current minimum: " << std::scientific << swarm.minimum
-				  << std::endl;
+		std::cout << "  Current minimum: " << std::endl;
+		print_minimum(swarm, dimensions);
 		std::cout << "  Execution time: " << std::fixed << std::setprecision(6)
 				  << (static_cast<double>(
 						  std::chrono::duration_cast<std::chrono::nanoseconds>(
@@ -50,14 +61,7 @@ int main() {
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
-	std::cout << "  f(";
-	for (int i = 0; i < dimensions; i++) {
-		std::cout << std::scientific << swarm.bestGlobalPosition[i];
-		if (i < dimensions - 1) {
-			std::cout << ", ";
-		}
-	}
-	std::cout << ") = " << std::scientific << swarm.minimum << std::endl;
+	print_minimum(swarm, dimensions);
 	std::cout << "  Total execution time: " << std::fixed
 			  << std::setprecision(6)
 			  << (static_cast<double>(
