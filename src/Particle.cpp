@@ -1,5 +1,6 @@
 #include <vector>
 #include <limits>
+#include <random>
 
 #include "Particle.hpp"
 
@@ -11,13 +12,19 @@ Particle::Particle(int dimensions_, std::vector<double>& lower,
 	std::vector<double> velocity_(dimensions);
 	std::vector<double> bestLocalPosition_(dimensions);
 
+	std::random_device dev;
+	std::mt19937 rnd{dev()};
+
 	for (int i = 0; i < dimensions; ++i) {
-		position_[i] = (lower[i] + static_cast<double>(rand()) / RAND_MAX *
-									   (upper[i] - lower[i]));
-		velocity_[i] = ((static_cast<double>(rand()) / RAND_MAX * 2 - 1) *
-						(upper[i] - lower[i]) * 0.1);
-		bestLocalPosition_[i] = (position_[i]);
+		std::uniform_real_distribution<double> position_dist{lower[i],
+															 upper[i]};
+		position_[i] = position_dist(rnd);
+		std::uniform_real_distribution<double> velocity_dist{
+			-(upper[i] - lower[i]) * 0.1, (upper[i] - lower[i]) * 0.1};
+		velocity_[i] = velocity_dist(rnd);
+		bestLocalPosition_[i] = position_[i];
 	}
+
 	position = position_;
 	velocity = velocity_;
 	bestLocalPosition = bestLocalPosition_;
