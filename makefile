@@ -15,5 +15,8 @@ main: $(OBJS)
 build/%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $(INCLUDE) -o $@ $^
 
+format:
+	clang-format --style=file -i src/*.cpp include/*.hpp
+
 clean:
 	rm -rf build
