@@ -2,8 +2,7 @@
 
 #include "Swarm.hpp"
 
-Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_,
-			 std::vector<double> upper_) {
+Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_, std::vector<double> upper_) {
 	particles = particles_;
 	minimum = particles[0].bestFitness;
 	bestGlobalPosition = particles[0].bestLocalPosition;
