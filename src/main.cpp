@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <chrono>
 
 #include "Swarm.hpp"
 
@@ -24,16 +25,28 @@ int main() {
 	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound);
 
 	const int max_iterations = 100;
+	const auto beginning = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < max_iterations; ++i) {
+		const auto start_iteration = std::chrono::high_resolution_clock::now();
 		swarm.updateParticles();
 		swarm.findbestFitness();
+		const auto end_iteration = std::chrono::high_resolution_clock::now();
 		std::cout << "Iteration n. " << i << " / " << max_iterations
 				  << std::endl;
 		std::cout << "  Current minimum: " << std::scientific << swarm.minimum
 				  << std::endl;
+		std::cout << "  Execution time: " << std::fixed << std::setprecision(6)
+				  << (static_cast<double>(
+						  std::chrono::duration_cast<std::chrono::nanoseconds>(
+							  end_iteration - start_iteration)
+							  .count()) *
+					  1e-9)
+				  << " seconds" << std::endl;
 		std::cout << std::endl;
 	}
+
+	const auto end = std::chrono::high_resolution_clock::now();
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
@@ -45,6 +58,14 @@ int main() {
 		}
 	}
 	std::cout << ") = " << std::scientific << swarm.minimum << std::endl;
+	std::cout << "  Total execution time: " << std::fixed
+			  << std::setprecision(6)
+			  << (static_cast<double>(
+					  std::chrono::duration_cast<std::chrono::nanoseconds>(
+						  end - beginning)
+						  .count()) *
+				  1e-9)
+			  << " seconds" << std::endl;
 	std::cout << std::endl;
 
 	return 0;
