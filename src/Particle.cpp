@@ -2,20 +2,19 @@
 
 
 
-Particle::Particle(int dimensions, double lowerBound, double upperBound) {
+Particle::Particle(int dimensions, vector<double> lowerBound, vector<double> upperBound) {
     this->dimensions = dimensions;
-    this->lower= lowerBound;
-    this->upper = upperBound;
-    position.resize(dimensions);
-    velocity.resize(dimensions);
-    bestLocalPosition.resize(dimensions);
+    lower= lowerBound;
+    upper = upperBound;
+    std::cout<<lower.size()<<" "<<upper.size()<<" "<<dimensions<<std::endl;
     bestFitness = numeric_limits<double>::infinity();
 
     for (int i = 0; i < dimensions; ++i) {
-        position[i] = lowerBound + static_cast<double>(rand()) / RAND_MAX * (upperBound - lowerBound);
-
-        velocity[i] = (static_cast<double>(rand()) / RAND_MAX * 2 - 1) * (upperBound - lowerBound) * 0.1;
-        bestLocalPosition[i] = position[i];
+        position.push_back(lower[i] + static_cast<double>(rand()) / RAND_MAX * (upper[i] - lower[i]));
+        velocity.push_back((static_cast<double>(rand()) / RAND_MAX * 2 - 1) * (upper[i] - lower[i]) * 0.1);
+        bestLocalPosition.push_back(position[i]);
+        std::cout<<position[i]<<" "<<velocity[i]<<std::endl;
+        std::cout<<upper[i]<<" "<<lower[i]<<std::endl;
     }
 }
     
