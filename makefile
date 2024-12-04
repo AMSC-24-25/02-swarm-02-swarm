@@ -1,17 +1,30 @@
 CXX=g++
-INCLUDE = -I ./include
+INCLUDE=-I./include
+CXXFLAGS=-Wall -Wextra -Wpedantic -Wshadow -Werror
+DEBUGFLAGS=-O0 -g
+OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native
 
-SRCS  = $(wildcard src/*.cpp)
-OBJS = $(patsubst src/%.cpp, build/objects/%.o, $(SRCS))
+SRCS = $(wildcard src/*.cpp)
+DEBUG_OBJS = $(patsubst src/%.cpp, build/debug-%.o, $(SRCS))
+RELEASE_OBJS = $(patsubst src/%.cpp, build/release-%.o, $(SRCS))
 
-all: main
+all: debug
 
-main: $(OBJS)
-	$(CXX) $(INCLUDE) -o build/executors/$@ $^
+debug: $(DEBUG_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(DEBUGFLAGS) -o build/main $^
 
-build/objects%.o: src/%.cpp
-	$(CXX) -c $(INCLUDE) -o $@ $^
+release: $(RELEASE_OBJS)
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) -o build/main $^
+
+build/debug-%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $(INCLUDE) -o $@ $^
+
+build/release-%.o: src/%.cpp
+	$(CXX) $(CXXFLAGS) $(OPTFLAGS) -c $(INCLUDE) -o $@ $^
+
+format:
+	clang-format --style=file -i src/*.cpp include/*.hpp
 
 
 clean:
-	rm -f *.o main
+	rm -rf build/*
