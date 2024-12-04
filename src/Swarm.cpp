@@ -22,8 +22,8 @@ double Swarm::findbestFitness() {
 	return minimum;
 }
 
-void Swarm::updateParticles(double c1, double c2) {
+void Swarm::updateParticles(double c1, double c2, double w) {
 	for (size_t i = 0; i < particles.size(); ++i) {
-		particles[i].update(bestGlobalPosition, lower, upper, c1, c2);
+		particles[i].update(bestGlobalPosition, lower, upper, c1, c2, w);
 	}
 }

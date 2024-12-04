@@ -19,7 +19,7 @@ class Swarm {
 
 	double findbestFitness();
 
-	void updateParticles(double c1, double c2);
+	void updateParticles(double c1, double c2, double w);
 };
 
 #endif
