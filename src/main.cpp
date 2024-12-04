@@ -36,18 +36,19 @@ int main() {
     
 	double c1=2;
 	double c2=2;
-	double w;
 	double w_max=0.9;
 	double w_min=0.4;
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1 , c2 );
+	double w = w_max;
+
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1 , c2, w);
 
 	const int max_iterations = 100;
 	const auto beginning = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < max_iterations; ++i) {
 		const auto start_iteration = std::chrono::high_resolution_clock::now();
-		w=w_max - ((w_max - w_min)/max_iterations )* (i+1);
-		swarm.updateParticles(c1,c2, w);
+		swarm.updateInertia(max_iterations, w_min, w_max);
+		swarm.updateParticles();
 		swarm.findbestFitness();
 		const auto end_iteration = std::chrono::high_resolution_clock::now();
 		std::cout << "Iteration n. " << i << " / " << max_iterations << std::endl;
