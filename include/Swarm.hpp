@@ -12,11 +12,14 @@ class Swarm {
 	std::vector<double> lower;
 	std::vector<double> upper;
 	double minimum;
-	Swarm(std::vector<Particle>& particles, std::vector<double> lower_, std::vector<double> upper_);
+	double c1;
+	double c2;
+
+	Swarm(std::vector<Particle>& particles, std::vector<double> lower_, std::vector<double> upper_ , double c1_, double c2_);
 
 	double findbestFitness();
 
-	void updateParticles();
+	void updateParticles(double c1, double c2);
 };
 
 #endif

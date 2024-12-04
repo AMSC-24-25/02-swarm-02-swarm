@@ -31,16 +31,19 @@ int main() {
 
 	for (int i = 0; i < num_particles; ++i) {
 		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound));
-	}
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound);
+	}
+    
+	double c1=2;
+	double c2=2;
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1 , c2 );
 
 	const int max_iterations = 100;
 	const auto beginning = std::chrono::high_resolution_clock::now();
 
 	for (int i = 0; i < max_iterations; ++i) {
 		const auto start_iteration = std::chrono::high_resolution_clock::now();
-		swarm.updateParticles();
+		swarm.updateParticles(c1,c2);
 		swarm.findbestFitness();
 		const auto end_iteration = std::chrono::high_resolution_clock::now();
 		std::cout << "Iteration n. " << i << " / " << max_iterations << std::endl;

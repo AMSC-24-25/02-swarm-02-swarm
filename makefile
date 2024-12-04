@@ -1,6 +1,6 @@
 CXX=g++
 INCLUDE=-I./include
-CXXFLAGS=-Wall -Wextra -Wpedantic -Wshadow -Werror
+CXXFLAGS=-Wall -Wextra -Wpedantic -Werror
 DEBUGFLAGS=-O0 -g
 OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native
 
