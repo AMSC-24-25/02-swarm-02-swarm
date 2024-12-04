@@ -39,13 +39,10 @@ void Particle::update(std::vector<double>& globalBestPosition, const std::vector
 	std::uniform_real_distribution<double> r{0, 1};
 
 	for (int i = 0; i < dimensions; ++i) {
-
-		
 		r1 = r(rnd);
-		r2= r(rnd);
+		r2 = r(rnd);
 
-		velocity[i] = velocity[i] * w + c1 * r1 * (bestLocalPosition[i] - position[i]) +
-					  c2 * r2 * (globalBestPosition[i] - position[i]);
+		velocity[i] = velocity[i] * w + c1 * r1 * (bestLocalPosition[i] - position[i]) + c2 * r2 * (globalBestPosition[i] - position[i]);
 
 		// solid "sticky" bounds, when a particle reaches a boundary, it sticks
 		// to it
@@ -54,7 +51,6 @@ void Particle::update(std::vector<double>& globalBestPosition, const std::vector
 	const double newVal = ObjectiveFunction().getValueFunction(position);
 	if (newVal < bestFitness) {
 		bestFitness = newVal;
-
 		for (int i = 0; i < dimensions; ++i) {
 			bestLocalPosition[i] = position[i];
 		}
