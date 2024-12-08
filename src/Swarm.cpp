@@ -2,7 +2,8 @@
 
 #include "Swarm.hpp"
 
-Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_, std::vector<double> upper_ , double c1_, double c2_, double w_) { 
+Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double> lower_,
+			 const std::vector<double> upper_, const double c1_, const double c2_, const double w_) {
 	particles = particles_;
 	minimum = particles[0].bestFitness;
 	bestGlobalPosition = particles[0].bestLocalPosition;
@@ -13,7 +14,7 @@ Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_, std:
 	w = w_;
 }
 
-double Swarm::findbestFitness() {
+double Swarm::findBestFitness() {
 	for (size_t i = 0; i < particles.size(); ++i) {
 		if (particles[i].bestFitness < minimum) {
 			minimum = particles[i].bestFitness;
@@ -29,6 +30,6 @@ void Swarm::updateParticles() {
 	}
 }
 
-void Swarm::updateInertia(int max_iterations, double w_min, double w_max){
-	w = w - ((w_max - w_min)/ max_iterations );
+void Swarm::updateInertia(const int max_iterations, const double w_min, const double w_max) {
+	w = w - ((w_max - w_min) / max_iterations);
 }

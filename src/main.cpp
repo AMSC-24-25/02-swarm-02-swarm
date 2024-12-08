@@ -32,14 +32,14 @@ int main() {
 	for (int i = 0; i < num_particles; ++i) {
 		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound));
 	}
-    
-	double c1 = 2;
-	double c2 = 2;
-	double w_max = 0.9;
-	double w_min = 0.4;
-	double w = w_max;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1 , c2, w);
+	const double c1 = 2;
+	const double c2 = 2;
+	const double w_max = 0.9;
+	const double w_min = 0.4;
+	const double w = w_max;
+
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w);
 
 	const int max_iterations = 100;
 	const auto beginning = std::chrono::high_resolution_clock::now();
@@ -47,7 +47,7 @@ int main() {
 	for (int i = 0; i < max_iterations; ++i) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
 		swarm.updateParticles();
-		swarm.findbestFitness();
+		swarm.findBestFitness();
 		std::cout << "Iteration n. " << i << " / " << max_iterations << std::endl;
 		std::cout << "  Current minimum: " << std::endl;
 		print_minimum(swarm, dimensions);

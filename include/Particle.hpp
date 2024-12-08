@@ -14,12 +14,13 @@ class Particle {
 	std::vector<double> position;			// Posizione attuale
 	std::vector<double> velocity;			// Velocità attuale
 	std::vector<double> bestLocalPosition;	// Miglior posizione personale
-	double bestFitness;						// Miglior fitness personale (f(bestLocalpostion)
+	double bestFitness;						// Miglior fitness personale (f(bestLocalPosition)
 	int dimensions;
 
-	Particle(int dimensions, std::vector<double>& lower, std::vector<double>& upper);
-	void update(std::vector<double>& globalBestPosition, const std::vector<double>& lower,
-				const std::vector<double>& upper, double c1, double c2, double w);
+	Particle(const int dimensions, const std::vector<double>& lower, const std::vector<double>& upper);
+
+	void update(const std::vector<double>& globalBestPosition, const std::vector<double>& lower,
+				const std::vector<double>& upper, const double c1, const double c2, const double w);
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 class ObjectiveFunction {
    public:
-	double operator()(const std::vector<double>& position);
+	double operator()(const std::vector<double>& position) const;
 };
 
 #endif

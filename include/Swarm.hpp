@@ -16,13 +16,14 @@ class Swarm {
 	double c2;
 	double w;
 
-	Swarm(std::vector<Particle>& particles, std::vector<double> lower_, std::vector<double> upper_ , double c1_, double c2_, double w_);
+	Swarm(const std::vector<Particle>& particles, const std::vector<double> lower_, const std::vector<double> upper_,
+		  const double c1_, const double c2_, const double w_);
 
-	double findbestFitness();
+	double findBestFitness();
 
 	void updateParticles();
 
-	void updateInertia(int max_iterations, double w_min, double w_max);
+	void updateInertia(const int max_iterations, const double w_min, const double w_max);
 };
 
 #endif

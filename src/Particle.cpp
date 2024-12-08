@@ -5,7 +5,7 @@
 
 #include "Particle.hpp"
 
-Particle::Particle(int dimensions_, std::vector<double>& lower, std::vector<double>& upper) {
+Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper) {
 	dimensions = dimensions_;
 	bestFitness = std::numeric_limits<double>::infinity();
 	std::vector<double> position_(dimensions);
@@ -28,18 +28,16 @@ Particle::Particle(int dimensions_, std::vector<double>& lower, std::vector<doub
 	bestLocalPosition = bestLocalPosition_;
 }
 
-void Particle::update(std::vector<double>& globalBestPosition, const std::vector<double>& lower,
-					  const std::vector<double>& upper, double c1, double c2, double w) {
-	double r1;
-	double r2;
+void Particle::update(const std::vector<double>& globalBestPosition, const std::vector<double>& lower,
+					  const std::vector<double>& upper, const double c1, const double c2, const double w) {
 	std::random_device dev;
 	std::mt19937 rnd{dev()};
 
 	std::uniform_real_distribution<double> r{0, 1};
 
 	for (int i = 0; i < dimensions; ++i) {
-		r1 = r(rnd);
-		r2 = r(rnd);
+		const double r1 = r(rnd);
+		const double r2 = r(rnd);
 
 		velocity[i] = velocity[i] * w + c1 * r1 * (bestLocalPosition[i] - position[i]) +
 					  c2 * r2 * (globalBestPosition[i] - position[i]);
