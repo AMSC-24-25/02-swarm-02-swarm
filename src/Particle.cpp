@@ -2,6 +2,7 @@
 #include <limits>
 #include <random>
 #include <algorithm>
+#include <omp.h>
 
 #include "Particle.hpp"
 
