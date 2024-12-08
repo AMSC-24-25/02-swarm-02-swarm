@@ -5,10 +5,7 @@
 
 class ObjectiveFunction {
    public:
-	double sum;
-	ObjectiveFunction();
-
-	double getValueFunction(const std::vector<double>& position);
+	double operator()(const std::vector<double>& position);
 };
 
 #endif
