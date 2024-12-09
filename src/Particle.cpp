@@ -2,11 +2,13 @@
 #include <limits>
 #include <random>
 #include <algorithm>
+#include <cassert>
 
 #include "Particle.hpp"
 
 Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper,
 				   const size_t seed) {
+	assert(dimensions > 0);
 	dimensions = dimensions_;
 	bestFitness = std::numeric_limits<double>::infinity();
 	std::vector<double> position_(dimensions);
@@ -31,6 +33,8 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 void Particle::update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
 					  const std::vector<double>& lower, const std::vector<double>& upper, const double c1,
 					  const double c2, const double w, const size_t seed) {
+	assert(w > 0.0 && w <= 1.0);
+
 	std::mt19937 rnd{seed};
 
 	std::uniform_real_distribution<double> r{0, 1};
