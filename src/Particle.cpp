@@ -28,8 +28,9 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 	bestLocalPosition = bestLocalPosition_;
 }
 
-void Particle::update(const std::vector<double>& globalBestPosition, const std::vector<double>& lower,
-					  const std::vector<double>& upper, const double c1, const double c2, const double w) {
+void Particle::update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
+					  const std::vector<double>& lower, const std::vector<double>& upper, const double c1,
+					  const double c2, const double w) {
 	std::random_device dev;
 	std::mt19937 rnd{dev()};
 
@@ -47,7 +48,6 @@ void Particle::update(const std::vector<double>& globalBestPosition, const std::
 		position[i] = std::clamp(position[i] + velocity[i], lower[i], upper[i]);
 	}
 
-	ObjectiveFunction func;
 	const double newVal = func(position);
 	if (newVal < bestFitness) {
 		bestFitness = newVal;

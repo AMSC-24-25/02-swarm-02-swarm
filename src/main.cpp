@@ -4,6 +4,7 @@
 #include <chrono>
 
 #include "Swarm.hpp"
+#include "Sphere.hpp"
 
 void print_minimum(const Swarm& swarm, const size_t dimensions) {
 	std::cout << "  f(";
@@ -113,8 +114,9 @@ int main(const int argc, const char** argv) {
 	const double w_max = 0.9;
 	const double w_min = 0.4;
 	const double w = w_max;
+	Sphere func;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, func);
 
 	const auto beginning = std::chrono::high_resolution_clock::now();
 

@@ -19,8 +19,9 @@ class Particle {
 
 	Particle(const int dimensions, const std::vector<double>& lower, const std::vector<double>& upper);
 
-	void update(const std::vector<double>& globalBestPosition, const std::vector<double>& lower,
-				const std::vector<double>& upper, const double c1, const double c2, const double w);
+	void update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
+				const std::vector<double>& lower, const std::vector<double>& upper, const double c1, const double c2,
+				const double w);
 };
 
 #endif

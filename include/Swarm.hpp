@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Particle.hpp"
+#include "ObjectiveFunction.hpp"
 
 class Swarm {
    public:
@@ -15,9 +16,10 @@ class Swarm {
 	double c1;
 	double c2;
 	double w;
+	ObjectiveFunction& func;
 
 	Swarm(const std::vector<Particle>& particles, const std::vector<double> lower_, const std::vector<double> upper_,
-		  const double c1_, const double c2_, const double w_);
+		  const double c1_, const double c2_, const double w_, ObjectiveFunction& func_);
 
 	double findBestFitness();
 

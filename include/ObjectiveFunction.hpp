@@ -5,7 +5,9 @@
 
 class ObjectiveFunction {
    public:
-	double operator()(const std::vector<double>& position) const;
+	virtual double operator()(const std::vector<double>& position) const = 0;
+
+	virtual ~ObjectiveFunction() = default;
 };
 
 #endif
