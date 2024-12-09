@@ -4,6 +4,7 @@
 #include <chrono>
 #include <algorithm>
 #include <memory>
+#include <random>
 
 #include "Swarm.hpp"
 #include "Sphere.hpp"
@@ -27,10 +28,13 @@ void die(const std::string& msg) {
 }
 
 int main(const int argc, const char** argv) {
+	std::random_device dev;
+
 	int dimensions = 2;
 	int num_particles = 100;
 	int max_iterations = 100;
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
+	size_t seed = dev();
 
 	for (int i = 1; i < argc; i++) {
 		std::string arg = std::string(argv[i]);
@@ -51,6 +55,8 @@ int main(const int argc, const char** argv) {
 					  << "." << std::endl;
 			std::cout << " -f, --function    Sets the function to be minimized. Must be one of: sphere, "
 						 "euclideandistance, rosenbrock. Default: sphere."
+					  << std::endl;
+			std::cout << " -s, --seed        Sets the seed for the random number generator. Default: " << seed
 					  << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
@@ -114,6 +120,16 @@ int main(const int argc, const char** argv) {
 			} else {
 				die("Error: '" + function_name + "' is not a known function.");
 			}
+		} else if (arg == "-s" || arg == "--seed") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -s, --seed");
+			}
+			try {
+				seed = std::stoi(std::string(argv[i]));
+			} catch (const std::exception&) {
+				die("Error: -s, --seed requires a number.");
+			}
 		} else {
 			std::cerr << "Unknown argument '" << arg << "'" << std::endl;
 			return -1;
@@ -126,7 +142,7 @@ int main(const int argc, const char** argv) {
 	std::vector<double> upperBound(dimensions, 100.0);
 
 	for (int i = 0; i < num_particles; ++i) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound));
+		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, seed));
 	}
 
 	const double c1 = 2.0;
@@ -135,7 +151,7 @@ int main(const int argc, const char** argv) {
 	const double w_min = 0.4;
 	const double w = w_max;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, *func);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, seed, *func);
 
 	const auto beginning = std::chrono::high_resolution_clock::now();
 

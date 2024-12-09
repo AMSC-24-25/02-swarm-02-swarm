@@ -17,11 +17,12 @@ class Particle {
 	double bestFitness;						// Miglior fitness personale (f(bestLocalPosition)
 	int dimensions;
 
-	Particle(const int dimensions, const std::vector<double>& lower, const std::vector<double>& upper);
+	Particle(const int dimensions, const std::vector<double>& lower, const std::vector<double>& upper,
+			 const size_t seed);
 
 	void update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
 				const std::vector<double>& lower, const std::vector<double>& upper, const double c1, const double c2,
-				const double w);
+				const double w, const size_t seed);
 };
 
 #endif

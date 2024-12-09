@@ -3,7 +3,7 @@
 #include "Swarm.hpp"
 
 Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double> lower_,
-			 const std::vector<double> upper_, const double c1_, const double c2_, const double w_,
+			 const std::vector<double> upper_, const double c1_, const double c2_, const double w_, const size_t seed_,
 			 ObjectiveFunction& func_)
 	: particles(particles_),
 	  bestGlobalPosition(particles[0].bestLocalPosition),
@@ -13,6 +13,7 @@ Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double> 
 	  c1(c1_),
 	  c2(c2_),
 	  w(w_),
+	  seed(seed_),
 	  func(func_) {}
 
 double Swarm::findBestFitness() {
@@ -27,7 +28,7 @@ double Swarm::findBestFitness() {
 
 void Swarm::updateParticles() {
 	for (size_t i = 0; i < particles.size(); ++i) {
-		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w);
+		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w, seed);
 	}
 }
 

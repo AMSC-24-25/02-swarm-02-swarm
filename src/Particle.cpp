@@ -5,15 +5,15 @@
 
 #include "Particle.hpp"
 
-Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper) {
+Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper,
+				   const size_t seed) {
 	dimensions = dimensions_;
 	bestFitness = std::numeric_limits<double>::infinity();
 	std::vector<double> position_(dimensions);
 	std::vector<double> velocity_(dimensions);
 	std::vector<double> bestLocalPosition_(dimensions);
 
-	std::random_device dev;
-	std::mt19937 rnd{dev()};
+	std::mt19937 rnd{seed};
 
 	for (int i = 0; i < dimensions; ++i) {
 		std::uniform_real_distribution<double> position_dist{lower[i], upper[i]};
@@ -30,9 +30,8 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 
 void Particle::update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
 					  const std::vector<double>& lower, const std::vector<double>& upper, const double c1,
-					  const double c2, const double w) {
-	std::random_device dev;
-	std::mt19937 rnd{dev()};
+					  const double c2, const double w, const size_t seed) {
+	std::mt19937 rnd{seed};
 
 	std::uniform_real_distribution<double> r{0, 1};
 
