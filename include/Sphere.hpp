@@ -7,7 +7,7 @@
 
 class Sphere : public ObjectiveFunction {
    public:
-	virtual double operator()(const std::vector<double>& position) const;
+	virtual double operator()(const std::vector<double>& position) const override;
 };
 
 #endif	// SPHERE_HPP
