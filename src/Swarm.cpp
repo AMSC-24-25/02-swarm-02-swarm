@@ -29,7 +29,9 @@ double Swarm::findBestFitness() {
 
 void Swarm::updateParticles() {
 	for (size_t i = 0; i < particles.size(); ++i) {
-		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w, seed);
+		// Each particle receives a unique seed (different from the global one) so that each has a different sequence of
+		// random numbers
+		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w, seed + i + 1);
 	}
 }
 
