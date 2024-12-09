@@ -122,13 +122,8 @@ int main(const int argc, const char** argv) {
 
 	std::vector<Particle> swarmParticles;
 
-	std::vector<double> lowerBound(dimensions);
-	std::vector<double> upperBound(dimensions);
-
-	lowerBound[0] = -100.0;
-	lowerBound[1] = -100.0;
-	upperBound[0] = 100.0;
-	upperBound[1] = 100.0;
+	std::vector<double> lowerBound(dimensions, -100.0);
+	std::vector<double> upperBound(dimensions, 100.0);
 
 	for (int i = 0; i < num_particles; ++i) {
 		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound));
