@@ -6,11 +6,7 @@
 #include "Sphere.hpp"
 #include "EuclideanDistance.hpp"
 
-// Slightly modified formula to handle values really close to zero
-double relative_error(const double expected, const double actual, const double epsilon = 1e-6) {
-	const double denominator = std::max(epsilon, std::max(std::abs(expected), std::abs(actual)));
-	return std::abs(expected - actual) / denominator;
-}
+double absolute_error(const double expected, const double actual) { return std::abs(expected - actual); }
 
 bool test_sphere() {
 	const int dimensions = 2;
@@ -38,13 +34,13 @@ bool test_sphere() {
 		swarm.findBestFitness();
 	}
 
-	if (relative_error(0.0, swarm.minimum) >= 1e-9) {
+	if (absolute_error(0.0, swarm.minimum) >= 1e-9) {
 		std::cout << "  Wrong minimum: expected 0.0 but was " << swarm.minimum << "." << std::endl;
 		return false;
 	}
 	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (int i = 0; i < dimensions; i++) {
-		if (relative_error(expected_minimum.at(i), swarm.bestGlobalPosition.at(i)) >= 1e-9) {
+		if (absolute_error(expected_minimum.at(i), swarm.bestGlobalPosition.at(i)) >= 1e-9) {
 			std::cout << "  Wrong coordinate at index " << i << ": expected " << expected_minimum.at(i) << " but was "
 					  << swarm.bestGlobalPosition.at(i) << "." << std::endl;
 			return false;
@@ -80,13 +76,13 @@ bool test_euclidean_distance() {
 		swarm.findBestFitness();
 	}
 
-	if (relative_error(0.0, swarm.minimum) >= 1e-9) {
+	if (absolute_error(0.0, swarm.minimum) >= 1e-9) {
 		std::cout << "  Wrong minimum: expected 0.0 but was " << swarm.minimum << "." << std::endl;
 		return false;
 	}
 	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (int i = 0; i < dimensions; i++) {
-		if (relative_error(expected_minimum.at(i), swarm.bestGlobalPosition.at(i)) >= 1e-9) {
+		if (absolute_error(expected_minimum.at(i), swarm.bestGlobalPosition.at(i)) >= 1e-9) {
 			std::cout << "  Wrong coordinate at index " << i << ": expected " << expected_minimum.at(i) << " but was "
 					  << swarm.bestGlobalPosition.at(i) << "." << std::endl;
 			return false;
