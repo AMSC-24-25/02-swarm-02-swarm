@@ -25,7 +25,7 @@ build/release-%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(OPTFLAGS) -c $(INCLUDE) -o $@ $^
 
 format:
-	clang-format --style=file -i src/*.cpp include/*.hpp
+	clang-format --style=file -i src/*.cpp include/*.hpp exec/*.cpp
 
 
 clean:
