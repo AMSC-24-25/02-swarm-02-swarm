@@ -30,7 +30,7 @@ int main(const int argc, const char** argv) {
 	int dimensions = 2;
 	int num_particles = 100;
 	int max_iterations = 100;
-	std::unique_ptr<ObjectiveFunction> func;
+	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 
 	for (int i = 1; i < argc; i++) {
 		std::string arg = std::string(argv[i]);
