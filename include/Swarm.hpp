@@ -19,7 +19,7 @@ class Swarm {
 	const size_t seed;
 	ObjectiveFunction& func;
 
-	Swarm(const std::vector<Particle>& particles, const std::vector<double> lower_, const std::vector<double> upper_,
+	Swarm(const std::vector<Particle>& particles, const std::vector<double>& lower_, const std::vector<double>& upper_,
 		  const double c1_, const double c2_, const double w_, const size_t seed, ObjectiveFunction& func_);
 
 	double findBestFitness();

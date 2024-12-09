@@ -8,7 +8,8 @@
 
 Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper,
 				   const size_t seed) {
-	assert(dimensions > 0);
+	assert(dimensions_ > 0);
+
 	dimensions = dimensions_;
 	bestFitness = std::numeric_limits<double>::infinity();
 	std::vector<double> position_(dimensions);
