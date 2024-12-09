@@ -2,9 +2,12 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#include <algorithm>
+#include <memory>
 
 #include "Swarm.hpp"
 #include "Sphere.hpp"
+#include "EuclideanDistance.hpp"
 
 void print_minimum(const Swarm& swarm, const size_t dimensions) {
 	std::cout << "  f(";
@@ -26,6 +29,7 @@ int main(const int argc, const char** argv) {
 	int dimensions = 2;
 	int num_particles = 100;
 	int max_iterations = 100;
+	std::unique_ptr<ObjectiveFunction> func;
 
 	for (int i = 1; i < argc; i++) {
 		std::string arg = std::string(argv[i]);
@@ -44,10 +48,13 @@ int main(const int argc, const char** argv) {
 					  << "." << std::endl;
 			std::cout << " -i, --iterations  Sets the number of iterations. Must be >0. Default: " << max_iterations
 					  << "." << std::endl;
+			std::cout << " -f, --function    Sets the function to be minimized. Must be one of: sphere, "
+						 "euclideandistance. Default: sphere."
+					  << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
 			std::cout << "  " << argv[0] << " -d " << dimensions << " -p " << num_particles << " -i " << max_iterations
-					  << std::endl;
+					  << " -f sphere" << std::endl;
 			std::cout << std::endl;
 			return 0;
 		} else if (arg == "-d" || arg == "--dimensions") {
@@ -89,6 +96,21 @@ int main(const int argc, const char** argv) {
 			if (max_iterations <= 0) {
 				die("Error: -i, --iterations must be >0");
 			}
+		} else if (arg == "-f" || arg == "--function") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -f, --function");
+			}
+			std::string function_name = std::string(argv[i]);
+			std::transform(function_name.begin(), function_name.end(), function_name.begin(),
+						   [](const char ch) { return std::tolower(ch); });
+			if (function_name == "sphere") {
+				func = std::make_unique<Sphere>();
+			} else if (function_name == "euclideandistance") {
+				func = std::make_unique<EuclideanDistance>();
+			} else {
+				die("Error: '" + function_name + "' is not a known function.");
+			}
 		} else {
 			std::cerr << "Unknown argument '" << arg << "'" << std::endl;
 			return -1;
@@ -114,9 +136,8 @@ int main(const int argc, const char** argv) {
 	const double w_max = 0.9;
 	const double w_min = 0.4;
 	const double w = w_max;
-	Sphere func;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, func);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, *func);
 
 	const auto beginning = std::chrono::high_resolution_clock::now();
 
