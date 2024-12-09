@@ -8,6 +8,7 @@
 #include "Swarm.hpp"
 #include "Sphere.hpp"
 #include "EuclideanDistance.hpp"
+#include "Rosenbrock.hpp"
 
 void print_minimum(const Swarm& swarm, const size_t dimensions) {
 	std::cout << "  f(";
@@ -49,7 +50,7 @@ int main(const int argc, const char** argv) {
 			std::cout << " -i, --iterations  Sets the number of iterations. Must be >0. Default: " << max_iterations
 					  << "." << std::endl;
 			std::cout << " -f, --function    Sets the function to be minimized. Must be one of: sphere, "
-						 "euclideandistance. Default: sphere."
+						 "euclideandistance, rosenbrock. Default: sphere."
 					  << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
@@ -108,6 +109,8 @@ int main(const int argc, const char** argv) {
 				func = std::make_unique<Sphere>();
 			} else if (function_name == "euclideandistance") {
 				func = std::make_unique<EuclideanDistance>();
+			} else if (function_name == "rosenbrock") {
+				func = std::make_unique<Rosenbrock>();
 			} else {
 				die("Error: '" + function_name + "' is not a known function.");
 			}
