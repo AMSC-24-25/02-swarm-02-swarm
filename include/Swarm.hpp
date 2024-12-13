@@ -16,7 +16,8 @@ class Swarm {
 	double c2;
 	double w;
 
-	Swarm(std::vector<Particle>& particles, std::vector<double> lower_, std::vector<double> upper_ , double c1_, double c2_, double w_);
+	Swarm(std::vector<Particle>& particles, std::vector<double> lower_, std::vector<double> upper_, double c1_,
+		  double c2_, double w_);
 
 	double findbestFitness();
 

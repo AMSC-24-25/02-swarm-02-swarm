@@ -3,7 +3,8 @@
 
 #include "Swarm.hpp"
 
-Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_, std::vector<double> upper_ , double c1_, double c2_, double w_) { 
+Swarm::Swarm(std::vector<Particle>& particles_, std::vector<double> lower_, std::vector<double> upper_, double c1_,
+			 double c2_, double w_) {
 	particles = particles_;
 	minimum = particles[0].bestFitness;
 	bestGlobalPosition = particles[0].bestLocalPosition;
@@ -19,11 +20,11 @@ double Swarm::findbestFitness() {
 	std::vector<double> local_bestPosition = bestGlobalPosition;
 
 #pragma omp parallel
-	{	//for avoid race-condition
+	{  // for avoid race-condition
 		double thread_minimum = local_minimum;
 		std::vector<double> thread_bestPosition = local_bestPosition;
 
-		//no need to wait all threads
+		// no need to wait all threads
 #pragma omp for nowait
 		for (size_t i = 0; i < particles.size(); ++i) {
 			if (particles[i].bestFitness < thread_minimum) {
@@ -46,14 +47,13 @@ double Swarm::findbestFitness() {
 	return minimum;
 }
 
-
 void Swarm::updateParticles() {
-#pragma omp parallel for
+#pragma omp parallel for schedule(static)
 	for (size_t i = 0; i < particles.size(); ++i) {
 		particles[i].update(bestGlobalPosition, lower, upper, c1, c2, w);
 	}
 }
 
-void Swarm::updateInertia(int max_iterations, double w_min, double w_max){
-	w = w - ((w_max - w_min)/ max_iterations );
+void Swarm::updateInertia(int max_iterations, double w_min, double w_max) {
+	w = w - ((w_max - w_min) / max_iterations);
 }

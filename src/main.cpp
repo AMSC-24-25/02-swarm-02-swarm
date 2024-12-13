@@ -32,14 +32,14 @@ int main() {
 	for (int i = 0; i < num_particles; ++i) {
 		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound));
 	}
-    
+
 	double c1 = 2;
 	double c2 = 2;
 	double w_max = 0.9;
 	double w_min = 0.4;
 	double w = w_max;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1 , c2, w);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w);
 
 	const int max_iterations = 100;
 	const auto beginning = std::chrono::high_resolution_clock::now();

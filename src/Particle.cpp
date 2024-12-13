@@ -31,7 +31,6 @@ Particle::Particle(int dimensions_, std::vector<double>& lower, std::vector<doub
 
 void Particle::update(std::vector<double>& globalBestPosition, const std::vector<double>& lower,
 					  const std::vector<double>& upper, double c1, double c2, double w) {
-
 	double r1;
 	double r2;
 	std::random_device dev;
@@ -43,7 +42,8 @@ void Particle::update(std::vector<double>& globalBestPosition, const std::vector
 		r1 = r(rnd);
 		r2 = r(rnd);
 
-		velocity[i] = velocity[i] * w + c1 * r1 * (bestLocalPosition[i] - position[i]) + c2 * r2 * (globalBestPosition[i] - position[i]);
+		velocity[i] = velocity[i] * w + c1 * r1 * (bestLocalPosition[i] - position[i]) +
+					  c2 * r2 * (globalBestPosition[i] - position[i]);
 
 		// solid "sticky" bounds, when a particle reaches a boundary, it sticks
 		// to it
