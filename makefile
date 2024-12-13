@@ -1,8 +1,8 @@
 CXX=g++
 INCLUDE=-I./include
 CXXFLAGS=-Wall -Wextra -Wpedantic -Werror
-DEBUGFLAGS=-O0 -g
-OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native
+DEBUGFLAGS=-O0 -g -fopenmp
+OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native -fopenmp
 
 SRCS = $(wildcard src/*.cpp)
 DEBUG_OBJS = $(patsubst src/%.cpp, build/debug-%.o, $(SRCS))
@@ -26,7 +26,6 @@ build/release-%.o: src/%.cpp
 
 format:
 	clang-format --style=file -i src/*.cpp include/*.hpp exec/*.cpp
-
 
 clean:
 	rm -rf build/*
