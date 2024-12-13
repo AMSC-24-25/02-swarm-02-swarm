@@ -29,7 +29,7 @@ bool test_sphere() {
 	const double w = w_max;
 
 	Sphere s;
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, s);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, s, 1);
 
 	for (int i = 0; i < max_iterations; ++i) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
@@ -71,7 +71,7 @@ bool test_euclidean_distance() {
 	const double w = w_max;
 
 	EuclideanDistance ed;
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, ed);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, ed, 1);
 
 	for (int i = 0; i < max_iterations; ++i) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
@@ -113,7 +113,7 @@ bool test_rosenbrock() {
 	const double w = w_max;
 
 	Rosenbrock r;
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, r);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, r, 1);
 
 	for (int i = 0; i < max_iterations; ++i) {
 		swarm.updateInertia(max_iterations, w_min, w_max);

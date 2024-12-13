@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <memory>
 #include <random>
+#include <omp.h>
 
 #include "Swarm.hpp"
 #include "Sphere.hpp"
@@ -35,6 +36,7 @@ int main(const int argc, const char** argv) {
 	int max_iterations = 100;
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
+	size_t n_threads = 1;
 
 	for (int i = 1; i < argc; i++) {
 		std::string arg = std::string(argv[i]);
@@ -56,8 +58,10 @@ int main(const int argc, const char** argv) {
 			std::cout << " -f, --function    Sets the function to be minimized. Must be one of: sphere, "
 						 "euclideandistance, rosenbrock. Default: sphere."
 					  << std::endl;
-			std::cout << " -s, --seed        Sets the seed for the random number generator. Default: " << seed
+			std::cout << " -s, --seed        Sets the seed for the random number generator. Default: " << seed << "."
 					  << std::endl;
+			std::cout << " -j, --jobs        Sets the number of threads to be used. Must be >0 and <= "
+					  << omp_get_max_threads() << ". Default: " << n_threads << "." << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
 			std::cout << "  " << argv[0] << " -d " << dimensions << " -p " << num_particles << " -i " << max_iterations
@@ -67,7 +71,7 @@ int main(const int argc, const char** argv) {
 		} else if (arg == "-d" || arg == "--dimensions") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -d, --dimensions");
+				die("Error: missing argument for -d, --dimensions.");
 			}
 			try {
 				dimensions = std::stoi(std::string(argv[i]));
@@ -75,12 +79,12 @@ int main(const int argc, const char** argv) {
 				die("Error: -d, --dimensions requires a number.");
 			}
 			if (dimensions <= 0) {
-				die("Error: -d, --dimensions must be >0");
+				die("Error: -d, --dimensions must be >0.");
 			}
 		} else if (arg == "-p" || arg == "--particles") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -p, --particles");
+				die("Error: missing argument for -p, --particles.");
 			}
 			try {
 				num_particles = std::stoi(std::string(argv[i]));
@@ -88,12 +92,12 @@ int main(const int argc, const char** argv) {
 				die("Error: -p, --particles requires a number.");
 			}
 			if (num_particles <= 0) {
-				die("Error: -p, --particles must be >0");
+				die("Error: -p, --particles must be >0.");
 			}
 		} else if (arg == "-i" || arg == "--iterations") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -i, --iterations");
+				die("Error: missing argument for -i, --iterations.");
 			}
 			try {
 				max_iterations = std::stoi(std::string(argv[i]));
@@ -101,12 +105,12 @@ int main(const int argc, const char** argv) {
 				die("Error: -i, --iterations requires a number.");
 			}
 			if (max_iterations <= 0) {
-				die("Error: -i, --iterations must be >0");
+				die("Error: -i, --iterations must be >0.");
 			}
 		} else if (arg == "-f" || arg == "--function") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -f, --function");
+				die("Error: missing argument for -f, --function.");
 			}
 			std::string function_name = std::string(argv[i]);
 			std::transform(function_name.begin(), function_name.end(), function_name.begin(),
@@ -123,12 +127,25 @@ int main(const int argc, const char** argv) {
 		} else if (arg == "-s" || arg == "--seed") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -s, --seed");
+				die("Error: missing argument for -s, --seed.");
 			}
 			try {
 				seed = std::stoi(std::string(argv[i]));
 			} catch (const std::exception&) {
 				die("Error: -s, --seed requires a number.");
+			}
+		} else if (arg == "-j" || arg == "--jobs") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -j, --jobs.");
+			}
+			try {
+				n_threads = std::stoi(std::string(argv[i]));
+			} catch (const std::exception&) {
+				die("Error: -j, --jobs requires a number.");
+			}
+			if (n_threads <= 0 || n_threads > static_cast<size_t>(omp_get_max_threads())) {
+				die("Error: -j, --jobs must be >0 and <=" + std::to_string(omp_get_max_threads()) + ".");
 			}
 		} else {
 			std::cerr << "Unknown argument '" << arg << "'" << std::endl;
@@ -151,9 +168,9 @@ int main(const int argc, const char** argv) {
 	const double w_min = 0.4;
 	const double w = w_max;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, seed, *func);
+	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, seed, *func, n_threads);
 
-	const auto beginning = std::chrono::high_resolution_clock::now();
+	const auto beginning = omp_get_wtime();
 
 	for (int i = 0; i < max_iterations; ++i) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
@@ -165,15 +182,13 @@ int main(const int argc, const char** argv) {
 		std::cout << std::endl;
 	}
 
-	const auto end = std::chrono::high_resolution_clock::now();
+	const auto end = omp_get_wtime();
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
 	print_minimum(swarm, dimensions);
-	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6)
-			  << (static_cast<double>(std::chrono::duration_cast<std::chrono::nanoseconds>(end - beginning).count()) *
-				  1e-9)
-			  << " seconds" << std::endl;
+	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+			  << std::endl;
 	std::cout << std::endl;
 
 	return 0;

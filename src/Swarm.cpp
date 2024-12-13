@@ -6,7 +6,7 @@
 
 Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double>& lower_,
 			 const std::vector<double>& upper_, const double c1_, const double c2_, const double w_, const size_t seed_,
-			 ObjectiveFunction& func_)
+			 ObjectiveFunction& func_, const size_t n_threads_)
 	: particles(particles_),
 	  bestGlobalPosition(particles[0].bestLocalPosition),
 	  lower(lower_),
@@ -16,6 +16,7 @@ Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double>&
 	  c2(c2_),
 	  w(w_),
 	  seed(seed_),
+	  n_threads(n_threads_),
 	  func(func_) {}
 
 double Swarm::findBestFitness() {
@@ -51,7 +52,7 @@ double Swarm::findBestFitness() {
 }
 
 void Swarm::updateParticles() {
-#pragma omp parallel for schedule(static)
+#pragma omp parallel for schedule(static) num_threads(n_threads)
 	for (size_t i = 0; i < particles.size(); ++i) {
 		// Each particle receives a unique seed (different from the global one) so that each has a different sequence of
 		// random numbers
