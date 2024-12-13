@@ -18,7 +18,7 @@ Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double>&
 	  seed(seed_),
 	  func(func_) {}
 
-double Swarm::findbestFitness() {
+double Swarm::findBestFitness() {
 	double local_minimum = minimum;
 	std::vector<double> local_bestPosition = bestGlobalPosition;
 
