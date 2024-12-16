@@ -2,19 +2,26 @@
 Particle swarm optimization (PSO) is a stochastic population-based derivative-free optimization method which offers a high parallelization.
 
 The minimization problem can be defined as:
-$$ min f(x)
-$$ such that
-$$ x \in S \subset \R^n, \ \ \ \
-g_i(x) ≤ 0, \ \ \ \ i = {1...M}$$
+
+$$
+min f(x), f : \R^n \rightarrow \R
+$$
+
+such that
+
+$$
+x \in \R^n, g_i(x) ≤ 0, i = {1...M}
+$$
 
 ## The algorithm
 The algorithm involves creating a swarm of particles which, in turn, represent various solutions moving in the n-dimensional input space of the objective function. At each iteration, all the particles' velocities and positions are updated with the following formulas:
+
 $$
-\mathbf{v}_i^{t+1} = \omega \mathbf{v}_i^t + c_1 \mathbf{r}_1 \left( \mathbf{p}_{\text{best},i}^t - \mathbf{x}_i^t \right) + c_2 \mathbf{r}_2 \left( \mathbf{g}_{\text{best}}^t - \mathbf{x}_i^t \right)
+v_i^{t+1} = \omega v_i^t + c_1 r_1 \left( p_{\text{best},i}^t - x_i^t \right) + c_2 r_2 \left( g_{\text{best}}^t - x_i^t \right)
 $$
 
 $$
-\mathbf{x}_i^{t+1} = \mathbf{x}_i^t + \mathbf{v}_i^{t+1}
+x_i^{t+1} = x_i^t + v_i^{t+1}
 $$
 
 The global minimum coincides with the particle with the "best" value across the swarm.
