@@ -3,15 +3,17 @@ INCLUDE=-I./include
 CXXFLAGS=-Wall -Wextra -Wpedantic -Werror
 DEBUGFLAGS=-O0 -g -fopenmp
 OPTFLAGS=-O3 -DNDEBUG -march=native -mtune=native -fopenmp
+BENCHFLAGS = -lbenchmark -lpthread
 
 SRCS = $(wildcard src/*.cpp)
 DEBUG_OBJS = $(patsubst src/%.cpp, build/debug-%.o, $(SRCS))
 RELEASE_OBJS = $(patsubst src/%.cpp, build/release-%.o, $(SRCS))
+BENCH_OBJS = $(patsubst src/%.cpp, build/debug-%.o, $(SRCS))
 
 bench         = $(wildcard benchmark/*.cpp)
 bench_targets = $(patsubst benchmark/%.cpp,build/benchmark/%,$(bench))
 
-all: debug
+all: debug 
 
 debug: $(DEBUG_OBJS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(DEBUGFLAGS) exec/main.cpp -o build/main $^
@@ -25,8 +27,11 @@ release: $(RELEASE_OBJS)
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) exec/TestRosenbrock.cpp -o build/TestRosenbrock $^
 	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) exec/TestRastrigin.cpp -o build/TestRastrigin $^  # Aggiunta per TestRastrigin
 
-benchmark: $(bench_targets)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) -isystem benchmark/include   -Lbenchmark/build/src bench/benchmark_test.cpp -o build/bench/mm $^
+
+benchmark: build/bench/test.o $(RELEASE_OBJS)
+	g++ bench/bench_test.cpp -std=c++11 -isystem benchmark/include   -Lbenchmark/build/src -lbenchmark -lpthread -o build/mybenchmark
+	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) -isystem benchmark/include   -Lbenchmark/build/src $(BENCHFLAGS) build/bench/test.o -o build/bench/mm $^
+
 
 build/debug-%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(DEBUGFLAGS) -c $(INCLUDE) -o $@ $^
@@ -34,15 +39,11 @@ build/debug-%.o: src/%.cpp
 build/release-%.o: src/%.cpp
 	$(CXX) $(CXXFLAGS) $(OPTFLAGS) -c $(INCLUDE) -o $@ $^
 
-build/bench/%: build/bench/%.o $(objects)
-	$(CXX) $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) -o $@ $^ $(BENCHFLAGS)
-
-
-build/bench/%.o: bench/%.cpp
-	$(CXX) -c $(CXXFLAGS) $(INCLUDE) $(OPTFLAGS) $(BENCHFLAGS) -o $@ $^
+build/bench/test.o: bench/benchmark_test.cpp
+	$(CXX) -c $(WARNINGS) $(INCLUDE) -isystem benchmark/include  -o $@ $^
 
 format:
-	clang-format --style=file -i src/*.cpp include/*.hpp exec/*.cpp
+	clang-format --style=file -i src/*.cpp include/*.hpp exec/*.cpp bench/*.cpp
 
 clean:
 	rm -rf build/*

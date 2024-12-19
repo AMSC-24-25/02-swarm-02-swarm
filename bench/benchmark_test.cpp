@@ -8,6 +8,9 @@
 #include <chrono>
 #include <omp.h>
 
+#include "Swarm.hpp"
+#include "Sphere.hpp"
+#include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
 
 
@@ -17,7 +20,6 @@ static void BM_PSOIteration(benchmark::State& state) {
     const int dimensions = 6;
 	const int num_particles = 10000;
 	const int max_iterations = 100;
-	double distance_from_globalminimum = 0.0;
 
 	std::vector<Particle> swarmParticles;
 
