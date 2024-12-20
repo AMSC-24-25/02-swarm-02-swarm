@@ -4,13 +4,13 @@ Particle swarm optimization (PSO) is a stochastic population-based derivative-fr
 The minimization problem can be defined as:
 
 $$
-min f(x), f : \R^n \rightarrow \R
+min f(x), f : \mathbb{R}^n \rightarrow \mathbb{R}
 $$
 
 such that
 
 $$
-x \in \R^n, g_i(x) ≤ 0, i = {1...M}
+x \in \mathbb{R}^n, g_i(x) ≤ 0, i = {1...M}
 $$
 
 ## The algorithm
