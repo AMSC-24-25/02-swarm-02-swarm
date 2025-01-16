@@ -9,7 +9,9 @@
 #include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
 
-double absolute_error(const double expected, const double actual) { return std::abs(expected - actual); }
+double absolute_error(const double expected, const double actual) {
+	return std::abs(expected - actual);
+}
 
 bool test_sphere() {
 	const int dimensions = 2;

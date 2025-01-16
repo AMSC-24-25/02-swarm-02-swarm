@@ -6,22 +6,22 @@
 #include <chrono>
 #include <omp.h>
 
-
 #include "Swarm.hpp"
 #include "Sphere.hpp"
 #include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
 
-
-double absolute_error(const double expected, const double actual) { return std::abs(expected - actual); }
+double absolute_error(const double expected, const double actual) {
+	return std::abs(expected - actual);
+}
 
 double calculate_max_distance(const std::vector<double>& lowerBound, const std::vector<double>& upperBound) {
-    // Calcola la distanza massima possibile dal minimo globale
-    double max_distance = 0.0;
-    for (size_t i = 0; i < lowerBound.size(); ++i) {
-        max_distance += std::pow(std::max(std::abs(lowerBound[i]), std::abs(upperBound[i])), 2);
-    }
-    return std::sqrt(max_distance);
+	// Calcola la distanza massima possibile dal minimo globale
+	double max_distance = 0.0;
+	for (size_t i = 0; i < lowerBound.size(); ++i) {
+		max_distance += std::pow(std::max(std::abs(lowerBound[i]), std::abs(upperBound[i])), 2);
+	}
+	return std::sqrt(max_distance);
 }
 
 int main() {
@@ -39,7 +39,6 @@ int main() {
 		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
 	}
 
-
 	const double w_max = 0.9;
 	const double w_min = 0.4;
 	const double w = w_max;
@@ -55,12 +54,13 @@ int main() {
 		swarm.findBestFitness();
 	}
 	const auto end = omp_get_wtime();
-	std::cout<<"Sequential attempt" <<std::endl;
-	std::cout << "Residual is: "<< swarm.minimum - 0.0 << std::endl;
+	std::cout << "Sequential attempt" << std::endl;
+	std::cout << "Residual is: " << swarm.minimum - 0.0 << std::endl;
 	std::cout << "Total execution time: " << (end - beginning) << " seconds" << std::endl;
 
 	for (int i = 0; i < dimensions; i++) {
-		distance_from_globalminimum = distance_from_globalminimum + (swarm.bestGlobalPosition[i])*(swarm.bestGlobalPosition[i]);
+		distance_from_globalminimum =
+			distance_from_globalminimum + (swarm.bestGlobalPosition[i]) * (swarm.bestGlobalPosition[i]);
 	}
 	double distance = sqrt(distance_from_globalminimum);
 
@@ -68,8 +68,7 @@ int main() {
 
 	std::cout << "Distance from the global minimum is: " << distance << std::endl;
 	std::cout << "Normalized distance (percentage): " << normalized_distance * 100 << "%" << std::endl;
-	std::cout<< "******************************************************" << std::endl;
-
+	std::cout << "******************************************************" << std::endl;
 
 	std::vector<Particle> swarmParticles2;
 
@@ -87,22 +86,23 @@ int main() {
 	}
 	const auto end2 = omp_get_wtime();
 
-	std::cout<<"Parallel attempt" <<std::endl;
-	std::cout << "The residual is: "<< swarm2.minimum - 0.0 << std::endl;
+	std::cout << "Parallel attempt" << std::endl;
+	std::cout << "The residual is: " << swarm2.minimum - 0.0 << std::endl;
 	std::cout << "Total execution time: " << (end2 - beginning2) << " seconds" << std::endl;
 	distance_from_globalminimum = 0.0;
 	for (int i = 0; i < dimensions; i++) {
-		distance_from_globalminimum = distance_from_globalminimum + (swarm2.bestGlobalPosition[i])*(swarm2.bestGlobalPosition[i]);
+		distance_from_globalminimum =
+			distance_from_globalminimum + (swarm2.bestGlobalPosition[i]) * (swarm2.bestGlobalPosition[i]);
 	}
 	distance = sqrt(distance_from_globalminimum);
 
 	// Calcola la distanza normalizzata
 	normalized_distance = distance / max_distance;
 
-	std::cout << "In the parallel attempt the distance from the global minimum is: " << distance<< std::endl;
+	std::cout << "In the parallel attempt the distance from the global minimum is: " << distance << std::endl;
 	std::cout << "Normalized distance (percentage): " << normalized_distance * 100 << "%" << std::endl;
 
-	std::cout<< "*****************************************************" << std::endl;
+	std::cout << "*****************************************************" << std::endl;
 
 	distance_from_globalminimum = 0.0;
 
@@ -126,18 +126,21 @@ int main() {
 		swarm3.findBestFitness();
 	}
 	const auto end3 = omp_get_wtime();
-	std::cout<<"Best attempt(parallel):"<<std::endl;
-	std::cout << "In the best attempt (parallel)  the residual is: "<< swarm3.minimum - 0.0 << std::endl;
-	std::cout << "In the best attempt (parallel) the total execution time : " << (end3 - beginning3) << " seconds" << std::endl;
+	std::cout << "Best attempt(parallel):" << std::endl;
+	std::cout << "In the best attempt (parallel)  the residual is: " << swarm3.minimum - 0.0 << std::endl;
+	std::cout << "In the best attempt (parallel) the total execution time : " << (end3 - beginning3) << " seconds"
+			  << std::endl;
 
 	for (int i = 0; i < dimensions; i++) {
-		distance_from_globalminimum = distance_from_globalminimum + (swarm3.bestGlobalPosition[i])*(swarm3.bestGlobalPosition[i]);
+		distance_from_globalminimum =
+			distance_from_globalminimum + (swarm3.bestGlobalPosition[i]) * (swarm3.bestGlobalPosition[i]);
 	}
 	distance = sqrt(distance_from_globalminimum);
 	normalized_distance = distance / max_distance;
 	std::cout << "In the best attempt (parallel) the distance from the global minimum is: " << distance << std::endl;
 	std::cout << "Normalized distance (percentage): " << normalized_distance * 100 << "%" << std::endl;
-	std::cout << "In the best attempt we used : w_max = " << w_max2 << ", w_min = " << w_min2 << ", c1 = "<< 1 << ", c2 = "<< 1<<std::endl;
+	std::cout << "In the best attempt we used : w_max = " << w_max2 << ", w_min = " << w_min2 << ", c1 = " << 1
+			  << ", c2 = " << 1 << std::endl;
 
 	return 0;
 }

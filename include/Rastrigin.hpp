@@ -7,7 +7,6 @@
 
 class Rastrigin : public ObjectiveFunction {
    public:
-
 	const double A = 10.0;
 
 	virtual double operator()(const std::vector<double>& position) const override;
