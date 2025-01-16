@@ -34,7 +34,7 @@ The main classes involved in this project are:
 
 The main area in which we parallelized was the `Swarm::updateParticles()` method which is embarrassingly parallel, meaning that a single OpenMP `#pragma` directive was sufficient to achieve near-linear speedup. Another area involved in the optimization was the `Swarm::findBestFitness()` method which performs a reduction across all particles in the swarm to find the best position to be used in the successive iterations. This kind of reduction was not so straightforward since it needed to find only the index of the best particle (instead of its value), so we implemented it "manually" through a parallel for followed by an update of the global result inside a `critical` section.
 
-To check the algorithm's correctness and performance, we tested it against different functions with increasingly harder to minimize:
+To check the algorithm's correctness and performance, we tested it against different functions with increasingly harder minima:
  - Sphere: the easiest one, a single global minimum.
  - EuclideanDistance: a single global minimum.
  - [Rosenbrock](https://en.wikipedia.org/wiki/Rosenbrock_function): the "banana" function, notoriously hard to find the minimum inside the main valley.
@@ -43,6 +43,7 @@ To check the algorithm's correctness and performance, we tested it against diffe
 ## How to compile and run
 Compile with:
 ```bash
+mkdir build
 make
 ```
 
@@ -53,5 +54,5 @@ Run with:
 
 Check that everything works correctly
 ```bash
-make test
+./build/test
 ```
