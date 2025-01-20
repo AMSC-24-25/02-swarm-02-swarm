@@ -1,5 +1,6 @@
 #include <vector>
 #include <cassert>
+#include <algorithm>
 #include <omp.h>
 
 #include "Swarm.hpp"
@@ -30,7 +31,7 @@ double Swarm::findBestFitness() {
 
 		// no need to wait all threads
 #pragma omp for nowait
-		for (size_t i = 0; i < particles.size(); ++i) {
+		for (size_t i = 0; i < particles.size(); i++) {
 			if (particles[i].bestFitness < thread_minimum) {
 				thread_minimum = particles[i].bestFitness;
 				thread_bestPosition = particles[i].position;
@@ -53,7 +54,7 @@ double Swarm::findBestFitness() {
 
 void Swarm::updateParticles() {
 #pragma omp parallel for schedule(static) num_threads(n_threads)
-	for (size_t i = 0; i < particles.size(); ++i) {
+	for (size_t i = 0; i < particles.size(); i++) {
 		// Each particle receives a unique seed (different from the global one) so that each has a different sequence of
 		// random numbers
 		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w, seed + i + 1);
@@ -65,5 +66,6 @@ void Swarm::updateInertia(const int max_iterations, const double w_min, const do
 	assert(w_min > 0.0);
 	assert(w_min < w_max);
 	assert(w_max <= 1.0);
-	w = w - ((w_max - w_min) / max_iterations);
+	const double new_w = w - ((w_max - w_min) / max_iterations);
+	w = std::clamp(w_min, w_max, new_w);
 }

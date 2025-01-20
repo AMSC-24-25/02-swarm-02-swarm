@@ -18,7 +18,7 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 
 	std::mt19937 rnd{seed};
 
-	for (int i = 0; i < dimensions; ++i) {
+	for (int i = 0; i < dimensions; i++) {
 		std::uniform_real_distribution<double> position_dist{lower[i], upper[i]};
 		position_[i] = position_dist(rnd);
 		std::uniform_real_distribution<double> velocity_dist{-(upper[i] - lower[i]) * 0.1, (upper[i] - lower[i]) * 0.1};
@@ -34,13 +34,14 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 void Particle::update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
 					  const std::vector<double>& lower, const std::vector<double>& upper, const double c1,
 					  const double c2, const double w, const size_t seed) {
-	assert(w > 0.0 && w <= 1.0);
+	assert(w > 0.0);
+	assert(w <= 1.0);
 
 	std::mt19937 rnd{seed};
 
 	std::uniform_real_distribution<double> r{0, 1};
 
-	for (int i = 0; i < dimensions; ++i) {
+	for (int i = 0; i < dimensions; i++) {
 		const double r1 = r(rnd);
 		const double r2 = r(rnd);
 
@@ -55,7 +56,7 @@ void Particle::update(const ObjectiveFunction& func, const std::vector<double>& 
 	const double newVal = func(position);
 	if (newVal < bestFitness) {
 		bestFitness = newVal;
-		for (int i = 0; i < dimensions; ++i) {
+		for (int i = 0; i < dimensions; i++) {
 			bestLocalPosition[i] = position[i];
 		}
 	}
