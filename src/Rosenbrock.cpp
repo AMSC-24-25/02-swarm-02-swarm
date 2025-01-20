@@ -14,7 +14,7 @@
  * https://www.sfu.ca/~ssurjano/rosen.html
  */
 double Rosenbrock::operator()(const std::vector<double>& position) const {
-	assert(position.size() > 0);
+	assert(position.size() > 1);
 
 	double s = 0.0;
 	for (size_t i = 0; i < position.size() - 1; i++) {
