@@ -1,6 +1,8 @@
 #include <cmath>
 #include <cassert>
 #include <vector>
+#include <functional>
+#include <numeric>
 
 #include "Rastrigin.hpp"
 
@@ -13,9 +15,6 @@
 double Rastrigin::operator()(const std::vector<double>& position) const {
 	assert(position.size() > 0);
 
-	double s = A * position.size();	 // Usa A definita nella classe
-	for (const double x : position) {
-		s += x * x - A * std::cos(2 * M_PI * x);
-	}
-	return s;
+	return std::transform_reduce(position.begin(), position.end(), A * position.size(), std::plus<double>{},
+								 [&A = this->A](const double x) { return x * x - A * std::cos(2.0 * M_PI * x); });
 }
