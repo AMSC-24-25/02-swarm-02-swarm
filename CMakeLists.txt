@@ -32,11 +32,19 @@ if(ENABLE_TESTS)
     )
     enable_testing()
 
-    add_executable(prova exec/test.cpp ${SOURCES})
-    target_compile_options(prova PUBLIC ${WARNINGS})
-    target_link_libraries(prova PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+    add_executable(test_function_convergence test/test_function_convergence.cpp ${SOURCES})
+    target_compile_options(test_function_convergence PUBLIC ${WARNINGS})
+    target_link_libraries(test_function_convergence PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
     include(GoogleTest)
-    gtest_discover_tests(prova)
+    gtest_discover_tests(test_function_convergence)
+
+    add_executable(TestRastrigin test/TestRastrigin.cpp ${SOURCES})
+    target_compile_options(TestRastrigin PUBLIC ${WARNINGS})
+    target_link_libraries(TestRastrigin PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+
+    add_executable(TestRosenbrock test/TestRosenbrock.cpp ${SOURCES})
+    target_compile_options(TestRosenbrock PUBLIC ${WARNINGS})
+    target_link_libraries(TestRosenbrock PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
 endif()
 
 if(ENABLE_BENCHMARKS)
@@ -54,7 +62,7 @@ if(ENABLE_BENCHMARKS)
     endif()
 
     set(BENCHMARK_SOURCES
-        bench/benchmark_test.cpp
+        bench/bench_swarm_search.cpp
     )
     add_executable(bench ${BENCHMARK_SOURCES} ${SOURCES})
     target_link_libraries(bench PRIVATE benchmark)
