@@ -41,10 +41,11 @@ To check the algorithm's correctness and performance, we tested it against diffe
  - [Rastrigin](https://en.wikipedia.org/wiki/Rastrigin_function): a lot of local minima clustered around the central global minimum.
 
 ## How to compile and run
-Compile with:
+This project uses CMake as build system.
+You can compile it with:
 ```bash
-mkdir build
-make
+cmake -S . -B build
+cmake --build build -- all
 ```
 
 Run with:
@@ -52,7 +53,7 @@ Run with:
 ./build/main
 ```
 
-Check that everything works correctly
+Check that everything works correctly:
 ```bash
-./build/test
+ctest --test-dir build
 ```
