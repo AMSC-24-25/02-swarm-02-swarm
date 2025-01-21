@@ -8,6 +8,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 option(ENABLE_TESTS "Configures the test suite." ON)
 option(ENABLE_BENCHMARKS "Configures the benchmark suite." ON)
 
+# Default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Default build type." FORCE)
+endif()
+
+# Default flags
+set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g" CACHE STRING "Default flags for Debug builds." FORCE)
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -mtune=native" CACHE STRING "Default flags for Release builds." FORCE)
+
 include(cmake/modules/CPM.cmake)
 
 find_package(OpenMP REQUIRED)
@@ -89,11 +98,9 @@ else()
     message(WARNING "Clang Format not found in PATH.")
 endif()
 
-if(clang_format_exists)
-endif()
-
 message(STATUS "")
 message(STATUS "Project ${PROJECT_NAME} v${PROJECT_VERSION} successfully configured.")
+message(STATUS "CMAKE_BUILD_TYPE         : ${CMAKE_BUILD_TYPE}")
 message(STATUS "ENABLE_TESTS             : ${ENABLE_TESTS}")
 
 if(ENABLE_TESTS)
