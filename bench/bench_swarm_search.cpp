@@ -19,19 +19,21 @@ static void SwarmSearch_Rosenbrock(benchmark::State& state) {
 	const int max_iterations = 100;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
+	const size_t seed = 42;
 
 	for (auto _ : state) {
 		std::vector<Particle> swarmParticles;
 
-		std::generate_n(std::back_inserter(swarmParticles), num_particles,
-						[&]() { return Particle(dimensions, lower_bound, upper_bound, 42); });
+		for (size_t i = 0; i < num_particles; i++) {
+			swarmParticles.push_back(Particle(dimensions, lower_bound, upper_bound, seed + i));
+		}
 
 		const double w_max = 0.9;
 		const double w_min = 0.4;
 		const double w = w_max;
 
 		Rosenbrock r;
-		Swarm swarm = Swarm(swarmParticles, lower_bound, upper_bound, 2.0, 2.0, w, 42, r, 1);
+		Swarm swarm = Swarm(swarmParticles, lower_bound, upper_bound, 2.0, 2.0, w, seed, r, 1);
 
 		const auto start = std::chrono::high_resolution_clock::now();
 
