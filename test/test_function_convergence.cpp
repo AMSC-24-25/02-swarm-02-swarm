@@ -27,9 +27,8 @@ TEST(FunctionConvergence, Sphere) {
 	std::vector<double> lowerBound(dimensions, -100.0);
 	std::vector<double> upperBound(dimensions, 100.0);
 
-	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
-	}
+	std::generate_n(std::back_inserter(swarmParticles), num_particles,
+					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
 
 	const double w_max = 0.9;
 	const double w_min = 0.4;
@@ -61,9 +60,8 @@ TEST(FunctionConvergence, EuclideanDistance) {
 	std::vector<double> lowerBound(dimensions, -100.0);
 	std::vector<double> upperBound(dimensions, 100.0);
 
-	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
-	}
+	std::generate_n(std::back_inserter(swarmParticles), num_particles,
+					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
 
 	const double w_max = 0.9;
 	const double w_min = 0.4;
@@ -95,9 +93,8 @@ TEST(FunctionConvergence, Rosenbrock) {
 	std::vector<double> lowerBound(dimensions, -100.0);
 	std::vector<double> upperBound(dimensions, 100.0);
 
-	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
-	}
+	std::generate_n(std::back_inserter(swarmParticles), num_particles,
+					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
 
 	const double w_max = 0.9;
 	const double w_min = 0.4;
@@ -132,9 +129,8 @@ TEST(FunctionConvergence, Rastrigin) {
 	std::vector<double> lowerBound(dimensions, -100.0);
 	std::vector<double> upperBound(dimensions, 100.0);
 
-	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
-	}
+	std::generate_n(std::back_inserter(swarmParticles), num_particles,
+					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
 
 	const double w_max = 0.9;
 	const double w_min = 0.4;

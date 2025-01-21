@@ -51,9 +51,8 @@ void run_swarm(const int dimensions, const int num_particles, const int max_iter
 	std::vector<double> lowerBound(dimensions, -100.0);
 	std::vector<double> upperBound(dimensions, 100.0);
 
-	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, seed));
-	}
+	std::generate_n(std::back_inserter(swarmParticles), num_particles,
+					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
 
 	const double c1 = 2.0;
 	const double c2 = 2.0;
