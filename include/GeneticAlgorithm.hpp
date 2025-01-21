@@ -3,10 +3,11 @@
 
 #include <vector>
 
+#include "Creature.hpp"
+#include "ObjectiveFunction.hpp"
+
 class GeneticAlgorithm {
    public:
-	using Creature = std::vector<double>;
-
 	std::vector<Creature> creatures;
 	const double lower_bound;
 	const double upper_bound;
@@ -14,10 +15,19 @@ class GeneticAlgorithm {
 	const double mutation_rate;
 	const double crossover_rate;
 	Creature bestCreature;
-	double bestFitness;
+	const ObjectiveFunction& func;
 
 	GeneticAlgorithm(const std::vector<Creature>& creatures, const double lower_bound, const double upper_bound,
-					 const double mutation_rate, const double crossover_rate, const double survival_rate);
+					 const double mutation_rate, const double crossover_rate, const double survival_rate,
+					 ObjectiveFunction& func);
+
+	void evaluateCreatures();
+
+	void sortCreatures();
+
+	void applyCrossover() const;
+
+	void applyMutation() const;
 };
 
 #endif	// GENETIC_ALGORITHM_HPP

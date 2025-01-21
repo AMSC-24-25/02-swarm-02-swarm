@@ -91,28 +91,39 @@ void run_genetic() {
 	const size_t seed = 42;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
-	std::vector<GeneticAlgorithm::Creature> creatures;
+	std::vector<Creature> creatures;
 
 	std::mt19937 rnd{seed};
 	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
 	for (size_t i{0}; i < num_particles; i++) {
-		GeneticAlgorithm::Creature c(dimensions);
-		std::generate(c.begin(), c.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(c);
+		std::vector<double> tmp(dimensions);
+		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
+		creatures.push_back(Creature(tmp));
 	}
 
 	const double mutation_rate = 0.1;
 	const double crossover_rate = 0.5;
 	const double survival_rate = 0.1;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, crossover_rate, survival_rate);
+	Sphere s;
+
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, crossover_rate, survival_rate, s);
 
 	const double beginning = omp_get_wtime();
 
+	// Initial evaluation
+	ga.evaluateCreatures();
+	ga.sortCreatures();
+
 	for (size_t i{0}; i < max_iterations; i++) {
+		ga.applyCrossover();
+		ga.applyMutation();
+		ga.evaluateCreatures();
+		ga.sortCreatures();
+
 		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
 		std::cout << "  Current minimum: " << std::endl;
-		print_point(dimensions, ga.bestCreature, ga.bestFitness);
+		print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
 		std::cout << std::endl;
 	}
 
@@ -120,7 +131,7 @@ void run_genetic() {
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
-	print_point(dimensions, ga.bestCreature, ga.bestFitness);
+	print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
 	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
 			  << std::endl;
 	std::cout << std::endl;
