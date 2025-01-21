@@ -45,14 +45,12 @@ void print_minimum(const Swarm& swarm, const size_t dimensions) {
 }
 
 void run_swarm(const int dimensions, const int num_particles, const int max_iterations, const size_t seed,
-			   const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads) {
+			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
+			   const size_t n_threads) {
 	std::vector<Particle> swarmParticles;
 
-	std::vector<double> lowerBound(dimensions, -100.0);
-	std::vector<double> upperBound(dimensions, 100.0);
-
 	std::generate_n(std::back_inserter(swarmParticles), num_particles,
-					[&]() { return Particle(dimensions, lowerBound, upperBound, 42); });
+					[&]() { return Particle(dimensions, lower_bound, upper_bound, 42); });
 
 	const double c1 = 2.0;
 	const double c2 = 2.0;
@@ -60,7 +58,7 @@ void run_swarm(const int dimensions, const int num_particles, const int max_iter
 	const double w_min = 0.4;
 	const double w = w_max;
 
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, c1, c2, w, seed, *func, n_threads);
+	Swarm swarm = Swarm(swarmParticles, lower_bound, upper_bound, c1, c2, w, seed, *func, n_threads);
 
 	const auto beginning = omp_get_wtime();
 
@@ -279,8 +277,13 @@ int main(const int argc, const char** argv) {
 		}
 	}
 
+	// Ensure that the lower bound is lower than the upper bound
+	if (upper_bound > lower_bound) {
+		std::swap(lower_bound, upper_bound);
+	}
+
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
-		run_swarm(dimensions, num_particles, max_iterations, seed, func, n_threads);
+		run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
 		run_genetic();
 	} else {

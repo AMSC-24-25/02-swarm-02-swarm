@@ -6,8 +6,7 @@
 
 #include "Particle.hpp"
 
-Particle::Particle(const int dimensions_, const std::vector<double>& lower, const std::vector<double>& upper,
-				   const size_t seed) {
+Particle::Particle(const int dimensions_, const double lower_bound, const double upper_bound, const size_t seed) {
 	assert(dimensions_ > 0);
 
 	dimensions = dimensions_;
@@ -17,11 +16,12 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 	std::vector<double> bestLocalPosition_(dimensions);
 
 	std::mt19937 rnd{seed};
+	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
+	std::uniform_real_distribution<double> velocity_dist{-(upper_bound - lower_bound) * 0.1,
+														 (upper_bound - lower_bound) * 0.1};
 
 	for (int i = 0; i < dimensions; i++) {
-		std::uniform_real_distribution<double> position_dist{lower[i], upper[i]};
 		position_[i] = position_dist(rnd);
-		std::uniform_real_distribution<double> velocity_dist{-(upper[i] - lower[i]) * 0.1, (upper[i] - lower[i]) * 0.1};
 		velocity_[i] = velocity_dist(rnd);
 		bestLocalPosition_[i] = position_[i];
 	}
@@ -32,14 +32,14 @@ Particle::Particle(const int dimensions_, const std::vector<double>& lower, cons
 }
 
 void Particle::update(const ObjectiveFunction& func, const std::vector<double>& globalBestPosition,
-					  const std::vector<double>& lower, const std::vector<double>& upper, const double c1,
-					  const double c2, const double w, const size_t seed) {
+					  const double lower_bound, const double upper_bound, const double c1, const double c2,
+					  const double w, const size_t seed) {
 	assert(w > 0.0);
 	assert(w <= 1.0);
 
 	std::mt19937 rnd{seed};
 
-	std::uniform_real_distribution<double> r{0, 1};
+	std::uniform_real_distribution<double> r{0.0, 1.0};
 
 	for (int i = 0; i < dimensions; i++) {
 		const double r1 = r(rnd);
@@ -50,7 +50,7 @@ void Particle::update(const ObjectiveFunction& func, const std::vector<double>& 
 
 		// solid "sticky" bounds, when a particle reaches a boundary, it sticks
 		// to it
-		position[i] = std::clamp(position[i] + velocity[i], lower[i], upper[i]);
+		position[i] = std::clamp(position[i] + velocity[i], lower_bound, upper_bound);
 	}
 
 	const double newVal = func(position);

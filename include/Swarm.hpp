@@ -10,8 +10,8 @@ class Swarm {
    public:
 	std::vector<Particle> particles;
 	std::vector<double> bestGlobalPosition;
-	std::vector<double> lower;
-	std::vector<double> upper;
+	double lower_bound;
+	double upper_bound;
 	double minimum;
 	double c1;
 	double c2;
@@ -20,7 +20,7 @@ class Swarm {
 	const size_t n_threads;
 	ObjectiveFunction& func;
 
-	Swarm(const std::vector<Particle>& particles, const std::vector<double>& lower_, const std::vector<double>& upper_,
+	Swarm(const std::vector<Particle>& particles, const double lower_bound_, const double upper_bound_,
 		  const double c1_, const double c2_, const double w_, const size_t seed, ObjectiveFunction& func_,
 		  const size_t n_threads);
 

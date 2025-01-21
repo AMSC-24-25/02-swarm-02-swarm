@@ -4,13 +4,13 @@
 
 #include "Swarm.hpp"
 
-Swarm::Swarm(const std::vector<Particle>& particles_, const std::vector<double>& lower_,
-			 const std::vector<double>& upper_, const double c1_, const double c2_, const double w_, const size_t seed_,
-			 ObjectiveFunction& func_, const size_t n_threads_)
+Swarm::Swarm(const std::vector<Particle>& particles_, const double lower_bound_, const double upper_bound_,
+			 const double c1_, const double c2_, const double w_, const size_t seed_, ObjectiveFunction& func_,
+			 const size_t n_threads_)
 	: particles(particles_),
 	  bestGlobalPosition(particles[0].bestLocalPosition),
-	  lower(lower_),
-	  upper(upper_),
+	  lower_bound(lower_bound_),
+	  upper_bound(upper_bound_),
 	  minimum(particles[0].bestFitness),
 	  c1(c1_),
 	  c2(c2_),
@@ -56,7 +56,7 @@ void Swarm::updateParticles() {
 	for (size_t i = 0; i < particles.size(); i++) {
 		// Each particle receives a unique seed (different from the global one) so that each has a different sequence of
 		// random numbers
-		particles[i].update(func, bestGlobalPosition, lower, upper, c1, c2, w, seed + i + 1);
+		particles[i].update(func, bestGlobalPosition, lower_bound, upper_bound, c1, c2, w, seed + i + 1);
 	}
 }
 

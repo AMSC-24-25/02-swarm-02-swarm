@@ -13,11 +13,11 @@ double absolute_error(const double expected, const double actual) {
 	return std::abs(expected - actual);
 }
 
-double calculate_max_distance(const std::vector<double>& lowerBound, const std::vector<double>& upperBound) {
+double calculate_max_distance(const int dimensions, const double lower_bound, const double upper_bound) {
 	// Calcola la distanza massima possibile dal minimo globale
 	double max_distance = 0.0;
-	for (size_t i = 0; i < lowerBound.size(); i++) {
-		max_distance += std::pow(std::max(std::abs(lowerBound[i]), std::abs(upperBound[i])), 2);
+	for (int i = 0; i < dimensions; i++) {
+		max_distance += std::pow(std::max(std::abs(lower_bound), std::abs(upper_bound)), 2);
 	}
 	return std::sqrt(max_distance);
 }
@@ -26,18 +26,18 @@ int main() {
 	const int dimensions = 6;
 	const int num_particles = 10000;
 	const int max_iterations = 100;
+	const double lower_bound = -5.12;
+	const double upper_bound = 5.12;
 	double distance_from_globalminimum = 0.0;
 
 	std::vector<Particle> swarmParticles;
-	std::vector<double> lowerBound(dimensions, -5.12);
-	std::vector<double> upperBound(dimensions, 5.12);
 
 	// Calcola la distanza massima possibile dal minimo globale
-	const double max_distance = calculate_max_distance(lowerBound, upperBound);
+	const double max_distance = calculate_max_distance(dimensions, lower_bound, upper_bound);
 
 	// Inizializza il primo sciame di particelle
 	for (int i = 0; i < num_particles; i++) {
-		swarmParticles.push_back(Particle(dimensions, lowerBound, upperBound, 42));
+		swarmParticles.push_back(Particle(dimensions, lower_bound, upper_bound, 42));
 	}
 
 	const double w_max = 0.9;
@@ -45,7 +45,7 @@ int main() {
 	const double w = w_max;
 
 	Rastrigin r;
-	Swarm swarm = Swarm(swarmParticles, lowerBound, upperBound, 2.0, 2.0, w, 42, r, 1);
+	Swarm swarm = Swarm(swarmParticles, lower_bound, upper_bound, 2.0, 2.0, w, 42, r, 1);
 
 	const auto beginning = omp_get_wtime();
 
@@ -76,10 +76,10 @@ int main() {
 	std::vector<Particle> swarmParticles2;
 
 	for (int i = 0; i < num_particles; i++) {
-		swarmParticles2.push_back(Particle(dimensions, lowerBound, upperBound, 42));
+		swarmParticles2.push_back(Particle(dimensions, lower_bound, upper_bound, 42));
 	}
 
-	Swarm swarm2 = Swarm(swarmParticles2, lowerBound, upperBound, 2.0, 2.0, w, 42, r, 100);
+	Swarm swarm2 = Swarm(swarmParticles2, lower_bound, upper_bound, 2.0, 2.0, w, 42, r, 100);
 
 	const auto beginning2 = omp_get_wtime();
 	for (int i = 0; i < max_iterations; i++) {
@@ -111,14 +111,14 @@ int main() {
 	std::vector<Particle> swarmParticles3;
 
 	for (int i = 0; i < num_particles; i++) {
-		swarmParticles3.push_back(Particle(dimensions, lowerBound, upperBound, 42));
+		swarmParticles3.push_back(Particle(dimensions, lower_bound, upper_bound, 42));
 	}
 
 	const double w_max2 = 0.8;
 	const double w_min2 = 0.4;
 	const double w2 = w_max2;
 
-	Swarm swarm3 = Swarm(swarmParticles3, lowerBound, upperBound, 2, 2, w2, 42, r, 100);
+	Swarm swarm3 = Swarm(swarmParticles3, lower_bound, upper_bound, 2, 2, w2, 42, r, 100);
 
 	const auto beginning3 = omp_get_wtime();
 
