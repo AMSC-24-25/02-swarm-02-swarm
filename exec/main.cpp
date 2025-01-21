@@ -8,6 +8,7 @@
 #include <omp.h>
 
 #include "Swarm.hpp"
+#include "GeneticAlgorithm.hpp"
 #include "Sphere.hpp"
 #include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
@@ -30,17 +31,17 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
 	return os;
 }
 
-void print_minimum(const Swarm& swarm, const size_t dimensions) {
+void print_point(const size_t dimensions, const std::vector<double>& x, const double f) {
 	std::ios oldState(nullptr);
 	oldState.copyfmt(std::cout);
 	std::cout << "  f(";
 	for (size_t i = 0; i < dimensions; i++) {
-		std::cout << std::scientific << swarm.bestGlobalPosition[i];
+		std::cout << std::scientific << x.at(i);
 		if (i < dimensions - 1) {
 			std::cout << ", ";
 		}
 	}
-	std::cout << ") = " << std::scientific << swarm.minimum << std::endl;
+	std::cout << ") = " << std::scientific << f << std::endl;
 	std::cout.copyfmt(oldState);
 }
 
@@ -61,7 +62,7 @@ void run_swarm(const int dimensions, const size_t num_particles, const int max_i
 
 	Swarm swarm = Swarm(swarmParticles, lower_bound, upper_bound, c1, c2, w, seed, *func, n_threads);
 
-	const auto beginning = omp_get_wtime();
+	const double beginning = omp_get_wtime();
 
 	for (int i = 0; i < max_iterations; i++) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
@@ -69,22 +70,60 @@ void run_swarm(const int dimensions, const size_t num_particles, const int max_i
 		swarm.findBestFitness();
 		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
 		std::cout << "  Current minimum: " << std::endl;
-		print_minimum(swarm, dimensions);
+		print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
 		std::cout << std::endl;
 	}
 
-	const auto end = omp_get_wtime();
+	const double end = omp_get_wtime();
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
-	print_minimum(swarm, dimensions);
+	print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
 	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
 			  << std::endl;
 	std::cout << std::endl;
 }
 
 void run_genetic() {
-	std::cout << "TODO: implement genetic algorithm." << std::endl;
+	const size_t dimensions = 2;
+	const size_t num_particles = 100;
+	const size_t max_iterations = 100;
+	const size_t seed = 42;
+	const double lower_bound = -100.0;
+	const double upper_bound = 100.0;
+	std::vector<GeneticAlgorithm::Creature> creatures;
+
+	std::mt19937 rnd{seed};
+	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
+	for (size_t i{0}; i < num_particles; i++) {
+		GeneticAlgorithm::Creature c(dimensions);
+		std::generate(c.begin(), c.end(), [&dist, &rnd]() { return dist(rnd); });
+		creatures.push_back(c);
+	}
+
+	const double mutation_rate = 0.1;
+	const double crossover_rate = 0.5;
+	const double survival_rate = 0.1;
+
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, crossover_rate, survival_rate);
+
+	const double beginning = omp_get_wtime();
+
+	for (size_t i{0}; i < max_iterations; i++) {
+		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+		std::cout << "  Current minimum: " << std::endl;
+		print_point(dimensions, ga.bestCreature, ga.bestFitness);
+		std::cout << std::endl;
+	}
+
+	const double end = omp_get_wtime();
+
+	std::cout << std::endl;
+	std::cout << "Minimum found:" << std::endl;
+	print_point(dimensions, ga.bestCreature, ga.bestFitness);
+	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+			  << std::endl;
+	std::cout << std::endl;
 }
 
 void die(const std::string& msg) {
