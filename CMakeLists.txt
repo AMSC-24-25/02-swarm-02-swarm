@@ -68,14 +68,42 @@ if(ENABLE_BENCHMARKS)
     target_link_libraries(bench PRIVATE benchmark)
 endif()
 
+# Clang Format configuration
+find_program(CLANG_FORMAT_EXECUTABLE
+    NAMES clang-format
+    clang-format-14
+    clang-format-15
+    clang-format-16
+    clang-format-17
+    clang-format-18
+    clang-format-19
+    DOC "Path to the clang-format executable."
+)
+
+if(CLANG_FORMAT_EXECUTABLE)
+    message(STATUS "Found Clang Format at ${CLANG_FORMAT_EXECUTABLE}. Adding new target 'format'.")
+    file(GLOB_RECURSE ALL_SOURCE_FILES
+        bench/*.cpp exec/*.cpp include/*.hpp src/*.cpp test/*.cpp)
+    add_custom_target(format COMMAND ${CLANG_FORMAT_EXECUTABLE} --style=file -i ${ALL_SOURCE_FILES})
+else()
+    message(WARNING "Clang Format not found in PATH.")
+endif()
+
+if(clang_format_exists)
+endif()
+
 message(STATUS "")
 message(STATUS "Project ${PROJECT_NAME} v${PROJECT_VERSION} successfully configured.")
 message(STATUS "ENABLE_TESTS             : ${ENABLE_TESTS}")
+
 if(ENABLE_TESTS)
     message(STATUS "Google Test version      : ${GOOGLE_TEST_VERSION}")
 endif()
+
 message(STATUS "ENABLE_BENCHMARKS        : ${ENABLE_BENCHMARKS}")
+
 if(ENABLE_BENCHMARKS)
     message(STATUS "Google Benchmark version : ${GOOGLE_BENCHMARK_VERSION}")
 endif()
+
 message(STATUS "")
