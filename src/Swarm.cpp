@@ -1,6 +1,5 @@
 #include <vector>
 #include <cassert>
-#include <algorithm>
 #include <omp.h>
 
 #include "Swarm.hpp"
@@ -66,6 +65,5 @@ void Swarm::updateInertia(const int max_iterations, const double w_min, const do
 	assert(w_min > 0.0);
 	assert(w_min < w_max);
 	assert(w_max <= 1.0);
-	const double new_w = w - ((w_max - w_min) / max_iterations);
-	w = std::clamp(w_min, w_max, new_w);
+	w = w - ((w_max - w_min) / static_cast<double>(max_iterations));
 }
