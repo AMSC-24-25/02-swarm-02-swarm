@@ -44,13 +44,14 @@ void print_minimum(const Swarm& swarm, const size_t dimensions) {
 	std::cout.copyfmt(oldState);
 }
 
-void run_swarm(const int dimensions, const int num_particles, const int max_iterations, const size_t seed,
+void run_swarm(const int dimensions, const size_t num_particles, const int max_iterations, const size_t seed,
 			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
 			   const size_t n_threads) {
 	std::vector<Particle> swarmParticles;
 
-	std::generate_n(std::back_inserter(swarmParticles), num_particles,
-					[&]() { return Particle(dimensions, lower_bound, upper_bound, 42); });
+	for (size_t i = 0; i < num_particles; i++) {
+		swarmParticles.push_back(Particle(dimensions, lower_bound, upper_bound, seed + i));
+	}
 
 	const double c1 = 2.0;
 	const double c2 = 2.0;
@@ -66,7 +67,7 @@ void run_swarm(const int dimensions, const int num_particles, const int max_iter
 		swarm.updateInertia(max_iterations, w_min, w_max);
 		swarm.updateParticles();
 		swarm.findBestFitness();
-		std::cout << "Iteration n. " << i << " / " << max_iterations << std::endl;
+		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
 		std::cout << "  Current minimum: " << std::endl;
 		print_minimum(swarm, dimensions);
 		std::cout << std::endl;
@@ -95,9 +96,9 @@ int main(const int argc, const char** argv) {
 	std::random_device dev;
 
 	minimization_algorithm algo = minimization_algorithm::GENETIC;
-	int dimensions = 2;
-	int num_particles = 100;
-	int max_iterations = 100;
+	size_t dimensions = 2;
+	size_t num_particles = 100;
+	size_t max_iterations = 100;
 	double lower_bound = -100.0;
 	double upper_bound = 100.0;
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
@@ -278,7 +279,7 @@ int main(const int argc, const char** argv) {
 	}
 
 	// Ensure that the lower bound is lower than the upper bound
-	if (upper_bound > lower_bound) {
+	if (lower_bound > upper_bound) {
 		std::swap(lower_bound, upper_bound);
 	}
 

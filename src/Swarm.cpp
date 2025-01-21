@@ -9,9 +9,9 @@ Swarm::Swarm(const std::vector<Particle>& particles_, const double lower_bound_,
 			 const size_t n_threads_)
 	: particles(particles_),
 	  bestGlobalPosition(particles[0].bestLocalPosition),
+	  minimum(particles[0].bestFitness),
 	  lower_bound(lower_bound_),
 	  upper_bound(upper_bound_),
-	  minimum(particles[0].bestFitness),
 	  c1(c1_),
 	  c2(c2_),
 	  w(w_),
@@ -19,11 +19,11 @@ Swarm::Swarm(const std::vector<Particle>& particles_, const double lower_bound_,
 	  n_threads(n_threads_),
 	  func(func_) {}
 
-double Swarm::findBestFitness() {
+void Swarm::findBestFitness() {
 	double local_minimum = minimum;
 	std::vector<double> local_bestPosition = bestGlobalPosition;
 
-#pragma omp parallel
+#pragma omp parallel num_threads(n_threads) default(none) shared(local_minimum, local_bestPosition)
 	{  // for avoid race-condition
 		double thread_minimum = local_minimum;
 		std::vector<double> thread_bestPosition = local_bestPosition;
@@ -47,8 +47,8 @@ double Swarm::findBestFitness() {
 	}
 
 	minimum = local_minimum;
-	bestGlobalPosition = local_bestPosition;
-	return minimum;
+	std::copy(local_bestPosition.begin(), local_bestPosition.end(), bestGlobalPosition.begin());
+	// bestGlobalPosition = local_bestPosition;
 }
 
 void Swarm::updateParticles() {
@@ -56,11 +56,14 @@ void Swarm::updateParticles() {
 	for (size_t i = 0; i < particles.size(); i++) {
 		// Each particle receives a unique seed (different from the global one) so that each has a different sequence of
 		// random numbers
-		particles[i].update(func, bestGlobalPosition, lower_bound, upper_bound, c1, c2, w, seed + i + 1);
+		particles[i].update(func, bestGlobalPosition, lower_bound, upper_bound, c1, c2, w, seed + i);
 	}
+
+	// Update seed
+	seed += particles.size();
 }
 
-void Swarm::updateInertia(const int max_iterations, const double w_min, const double w_max) {
+void Swarm::updateInertia(const size_t max_iterations, const double w_min, const double w_max) {
 	assert(max_iterations > 0);
 	assert(w_min > 0.0);
 	assert(w_min < w_max);

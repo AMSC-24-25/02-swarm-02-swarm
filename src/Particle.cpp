@@ -6,11 +6,13 @@
 
 #include "Particle.hpp"
 
-Particle::Particle(const int dimensions_, const double lower_bound, const double upper_bound, const size_t seed) {
+Particle::Particle(const size_t dimensions_, const double lower_bound, const double upper_bound, const size_t seed)
+	: bestFitness(std::numeric_limits<double>::infinity()), dimensions(dimensions_) {
 	assert(dimensions_ > 0);
+	assert(std::isfinite(lower_bound));
+	assert(std::isfinite(upper_bound));
+	assert(lower_bound < upper_bound);
 
-	dimensions = dimensions_;
-	bestFitness = std::numeric_limits<double>::infinity();
 	std::vector<double> position_(dimensions);
 	std::vector<double> velocity_(dimensions);
 	std::vector<double> bestLocalPosition_(dimensions);
@@ -20,11 +22,12 @@ Particle::Particle(const int dimensions_, const double lower_bound, const double
 	std::uniform_real_distribution<double> velocity_dist{-(upper_bound - lower_bound) * 0.1,
 														 (upper_bound - lower_bound) * 0.1};
 
-	for (int i = 0; i < dimensions; i++) {
+	for (size_t i = 0; i < dimensions; i++) {
 		position_[i] = position_dist(rnd);
 		velocity_[i] = velocity_dist(rnd);
-		bestLocalPosition_[i] = position_[i];
 	}
+
+	std::copy(position_.begin(), position_.end(), bestLocalPosition_.begin());
 
 	position = position_;
 	velocity = velocity_;
@@ -41,7 +44,7 @@ void Particle::update(const ObjectiveFunction& func, const std::vector<double>& 
 
 	std::uniform_real_distribution<double> r{0.0, 1.0};
 
-	for (int i = 0; i < dimensions; i++) {
+	for (size_t i = 0; i < dimensions; i++) {
 		const double r1 = r(rnd);
 		const double r2 = r(rnd);
 
@@ -56,8 +59,6 @@ void Particle::update(const ObjectiveFunction& func, const std::vector<double>& 
 	const double newVal = func(position);
 	if (newVal < bestFitness) {
 		bestFitness = newVal;
-		for (int i = 0; i < dimensions; i++) {
-			bestLocalPosition[i] = position[i];
-		}
+		std::copy(position.begin(), position.end(), bestLocalPosition.begin());
 	}
 }
