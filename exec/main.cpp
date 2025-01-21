@@ -100,6 +100,8 @@ int main(const int argc, const char** argv) {
 	int dimensions = 2;
 	int num_particles = 100;
 	int max_iterations = 100;
+	double lower_bound = -100.0;
+	double upper_bound = 100.0;
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
 	size_t n_threads = 1;
@@ -114,23 +116,35 @@ int main(const int argc, const char** argv) {
 			std::cout << "       SWARM SEARCH" << std::endl;
 			std::cout << std::endl;
 			std::cout << "Command-line arguments:" << std::endl;
-			std::cout << " -h, --help        Prints this message and exits." << std::endl;
-			std::cout << " -a, --algorithm   Sets the minimization algorithm to be used. Must be one of: "
-					  << minimization_algorithm::SWARM_SEARCH << ", " << minimization_algorithm::GENETIC
-					  << ". Default: " << algo << "." << std::endl;
-			std::cout << " -d, --dimensions  Sets the number of dimensions. Must be >0. Default: " << dimensions << "."
+			std::cout << " -h,  --help         Prints this message and exits." << std::endl;
+			std::cout << " -a,  --algorithm    Sets the minimization algorithm to be used." << std::endl;
+			std::cout << "                     Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
+					  << minimization_algorithm::GENETIC << "." << std::endl;
+			std::cout << "                     Default: " << algo << "." << std::endl;
+			std::cout << " -d,  --dimensions   Sets the number of dimensions." << std::endl;
+			std::cout << "                     Must be >0." << std::endl;
+			std::cout << "                     Default: " << dimensions << "." << std::endl;
+			std::cout << " -p,  --particles    Sets the number of particles." << std::endl;
+			std::cout << "                     Must be >0." << std::endl;
+			std::cout << "                     Default: " << num_particles << "." << std::endl;
+			std::cout << " -i,  --iterations   Sets the number of iterations." << std::endl;
+			std::cout << "                     Must be >0." << std::endl;
+			std::cout << "                     Default: " << max_iterations << "." << std::endl;
+			std::cout << " -lb, --lower-bound  Sets the lower boundary of the simulation space." << std::endl;
+			std::cout << "                     Must be finite." << std::endl;
+			std::cout << "                     Default: " << lower_bound << "." << std::endl;
+			std::cout << " -ub, --upper-bound  Sets the upper boundary of the simulation space." << std::endl;
+			std::cout << "                     Must be finite." << std::endl;
+			std::cout << "                     Default: " << upper_bound << "." << std::endl;
+			std::cout << " -f,  --function     Sets the function to be minimized." << std::endl;
+			std::cout << "                     Must be one of: sphere, euclideandistance, rosenbrock, rastrigin."
 					  << std::endl;
-			std::cout << " -p, --particles   Sets the number of particles. Must be >0. Default: " << num_particles
-					  << "." << std::endl;
-			std::cout << " -i, --iterations  Sets the number of iterations. Must be >0. Default: " << max_iterations
-					  << "." << std::endl;
-			std::cout << " -f, --function    Sets the function to be minimized. Must be one of: sphere, "
-						 "euclideandistance, rosenbrock, rastrigin. Default: sphere."
-					  << std::endl;
-			std::cout << " -s, --seed        Sets the seed for the random number generator. Default: " << seed << "."
-					  << std::endl;
-			std::cout << " -j, --jobs        Sets the number of threads to be used. Must be >0 and <= "
-					  << omp_get_max_threads() << ". Default: " << n_threads << "." << std::endl;
+			std::cout << "                     Default: sphere." << std::endl;
+			std::cout << " -s,  --seed         Sets the seed for the random number generator." << std::endl;
+			std::cout << "                     Default: " << seed << "." << std::endl;
+			std::cout << " -j,  --jobs         Sets the number of threads to be used." << std::endl;
+			std::cout << "                     Must be >0 and <= " << omp_get_max_threads() << "." << std::endl;
+			std::cout << "                     Default: " << n_threads << "." << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
 			std::cout << "  " << argv[0] << " -d " << dimensions << " -p " << num_particles << " -i " << max_iterations
@@ -190,6 +204,32 @@ int main(const int argc, const char** argv) {
 			}
 			if (max_iterations <= 0) {
 				die("Error: -i, --iterations must be >0.");
+			}
+		} else if (arg == "-lb" || arg == "--lower-bound") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -lb, --lower-bound.");
+			}
+			try {
+				lower_bound = std::stod(std::string(argv[i]));
+			} catch (const std::exception&) {
+				die("Error: -ld, --lower-bound requires a number.");
+			}
+			if (!std::isfinite(lower_bound)) {
+				die("Error: -lb, --lower-bound must be finite.");
+			}
+		} else if (arg == "-ub" || arg == "--upper-bound") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -ub, --upper-bound.");
+			}
+			try {
+				upper_bound = std::stod(std::string(argv[i]));
+			} catch (const std::exception&) {
+				die("Error: -ud, --upper-bound requires a number.");
+			}
+			if (!std::isfinite(upper_bound)) {
+				die("Error: -ub, --upper-bound must be finite.");
 			}
 		} else if (arg == "-f" || arg == "--function") {
 			i++;
