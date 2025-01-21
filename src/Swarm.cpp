@@ -48,7 +48,6 @@ void Swarm::findBestFitness() {
 
 	minimum = local_minimum;
 	std::copy(local_bestPosition.begin(), local_bestPosition.end(), bestGlobalPosition.begin());
-	// bestGlobalPosition = local_bestPosition;
 }
 
 void Swarm::updateParticles() {
