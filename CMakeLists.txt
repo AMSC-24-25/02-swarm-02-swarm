@@ -52,6 +52,7 @@ if(ENABLE_TESTS)
     endmacro()
 
     add_test(swarm_convergence)
+    add_test(genetic_convergence)
 
     add_executable(TestRastrigin test/TestRastrigin.cpp ${SOURCES})
     target_compile_options(TestRastrigin PUBLIC ${WARNINGS})
