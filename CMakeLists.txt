@@ -34,6 +34,10 @@ set(WARNINGS -Wall -Wextra -Wpedantic -Werror -Wshadow)
 
 add_executable(main exec/main.cpp ${SOURCES})
 target_compile_options(main PUBLIC ${WARNINGS})
+if(USE_MPI)
+    target_compile_definitions(main PUBLIC USE_MPI=1)
+    target_link_libraries(main PUBLIC MPI::MPI_CXX)
+endif()
 target_link_libraries(main PUBLIC OpenMP::OpenMP_CXX)
 
 if(ENABLE_TESTS)
