@@ -41,11 +41,17 @@ if(ENABLE_TESTS)
     )
     enable_testing()
 
-    add_executable(test_swarm_convergence test/test_swarm_convergence.cpp ${SOURCES})
-    target_compile_options(test_swarm_convergence PUBLIC ${WARNINGS})
-    target_link_libraries(test_swarm_convergence PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
     include(GoogleTest)
-    gtest_discover_tests(test_swarm_convergence)
+
+    macro(add_test target)
+        set(test_filename test_${target})
+        add_executable(${test_filename} test/${test_filename}.cpp ${SOURCES})
+        target_compile_options(${test_filename} PUBLIC ${WARNINGS})
+        target_link_libraries(${test_filename} PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+        gtest_discover_tests(${test_filename})
+    endmacro()
+
+    add_test(swarm_convergence)
 
     add_executable(TestRastrigin test/TestRastrigin.cpp ${SOURCES})
     target_compile_options(TestRastrigin PUBLIC ${WARNINGS})
