@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 option(ENABLE_TESTS "Configures the test suite." ON)
 option(ENABLE_BENCHMARKS "Configures the benchmark suite." ON)
+option(USE_MPI "Enables usage of MPI algorithms." OFF)
 
 # Default build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -20,6 +21,10 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -mtune=native" CACHE STR
 include(cmake/modules/CPM.cmake)
 
 find_package(OpenMP REQUIRED)
+
+if(USE_MPI)
+    find_package(MPI REQUIRED)
+endif()
 
 file(GLOB_RECURSE SOURCES "src/*.cpp")
 
@@ -119,6 +124,13 @@ message(STATUS "ENABLE_BENCHMARKS        : ${ENABLE_BENCHMARKS}")
 
 if(ENABLE_BENCHMARKS)
     message(STATUS "Google Benchmark version : ${GOOGLE_BENCHMARK_VERSION}")
+endif()
+
+message(STATUS "USE_MPI                  : ${USE_MPI}")
+
+if(USE_MPI)
+    message(STATUS "MPI version              : v${MPI_CXX_VERSION}")
+    message(STATUS "MPIEXEC_EXECUTABLE       : ${MPIEXEC_EXECUTABLE}")
 endif()
 
 message(STATUS "")
