@@ -85,7 +85,8 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const size_t
 }
 
 void run_genetic(const size_t dimensions, const size_t num_creatures, const size_t max_iterations, const size_t seed,
-				 const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func) {
+				 const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
+				 const size_t n_threads) {
 	std::vector<Creature> creatures;
 
 	std::mt19937 rnd{seed};
@@ -99,7 +100,7 @@ void run_genetic(const size_t dimensions, const size_t num_creatures, const size
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func, n_threads);
 
 	const double beginning = omp_get_wtime();
 
@@ -316,7 +317,7 @@ int main(const int argc, const char** argv) {
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func);
+		run_genetic(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else {
 		die("Error: unknown algorithm.");
 	}

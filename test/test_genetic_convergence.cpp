@@ -37,7 +37,7 @@ TEST(GeneticConvergence, Sphere) {
 
 	Sphere s;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, s);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, s, 1);
 
 	ga.evaluateCreatures();
 	ga.sortCreatures();
@@ -79,7 +79,7 @@ TEST(GeneticConvergence, EuclideanDistance) {
 
 	EuclideanDistance ed;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, ed);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, ed, 1);
 
 	ga.evaluateCreatures();
 	ga.sortCreatures();
@@ -121,7 +121,7 @@ TEST(GeneticConvergence, Rosenbrock) {
 
 	Rosenbrock r;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
 
 	ga.evaluateCreatures();
 	ga.sortCreatures();
@@ -166,7 +166,7 @@ TEST(GeneticConvergence, Rastrigin) {
 
 	Rastrigin r;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
 
 	ga.evaluateCreatures();
 	ga.sortCreatures();

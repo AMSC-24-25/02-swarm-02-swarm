@@ -30,7 +30,7 @@ static void Genetic_Rosenbrock(benchmark::State& state) {
 
 		Rosenbrock r;
 
-		GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r);
+		GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
 
 		const auto start = std::chrono::high_resolution_clock::now();
 

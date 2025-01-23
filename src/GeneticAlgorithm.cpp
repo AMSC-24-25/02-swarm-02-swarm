@@ -12,13 +12,14 @@
 
 GeneticAlgorithm::GeneticAlgorithm(const std::vector<Creature>& creatures_, const double lower_bound_,
 								   const double upper_bound_, const double survival_rate_, const double mutation_rate_,
-								   ObjectiveFunction& func_)
+								   ObjectiveFunction& func_, const size_t n_threads_)
 	: creatures(creatures_),
 	  lower_bound(lower_bound_),
 	  upper_bound(upper_bound_),
 	  survival_rate(survival_rate_),
 	  mutation_rate(mutation_rate_),
 	  bestCreature(creatures[0]),
+	  n_threads(n_threads_),
 	  func(func_) {
 	assert(creatures.size() > 0);
 	assert(std::isfinite(lower_bound));
@@ -26,10 +27,12 @@ GeneticAlgorithm::GeneticAlgorithm(const std::vector<Creature>& creatures_, cons
 	assert(lower_bound < upper_bound);
 	assert(survival_rate > 0.0 && survival_rate < 1.0);
 	assert(mutation_rate >= 0.0 && mutation_rate < 1.0);
+	assert(n_threads > 0);
 }
 
 void GeneticAlgorithm::evaluateCreatures() {
-	for (size_t i{0}; i < creatures.size(); i++) {
+#pragma omp parallel for schedule(static) num_threads(n_threads) default(none)
+	for (size_t i = 0; i < creatures.size(); i++) {
 		// Avoid evaluating the same creatures multiple times
 		if (std::isfinite(creatures.at(i).fitness)) {
 			continue;
@@ -59,7 +62,10 @@ void GeneticAlgorithm::applyCrossover(const size_t seed) {
 	std::mt19937 rnd{seed};
 	std::uniform_int_distribution<size_t> index_dist{0, survived - 1};
 	std::bernoulli_distribution bool_dist{0.5};
-	for (size_t i{survived}; i < n_creatures; i++) {
+
+#pragma omp parallel for schedule(static) num_threads(n_threads) default(none) \
+	shared(survived, n_creatures, rnd, index_dist, bool_dist)
+	for (size_t i = survived; i < n_creatures; i++) {
 		// Choosing father randomly
 		const size_t father_index = index_dist(rnd);
 		assert(father_index < survived);
@@ -92,13 +98,15 @@ void GeneticAlgorithm::applyMutation(const size_t seed) {
 	const size_t dimensions = creatures.at(0).position.size();
 	std::uniform_int_distribution<size_t> index_dist{0, dimensions - 1};
 
-	for (Creature& c : creatures) {
+#pragma omp parallel for schedule(static) num_threads(n_threads) default(none) \
+	shared(rnd, bool_dist, position_dist, index_dist)
+	for (size_t i = 0; i < creatures.size(); i++) {
 		if (!bool_dist(rnd)) {
 			continue;
 		}
 
-		c.position[index_dist(rnd)] = position_dist(rnd);
+		creatures.at(i).position[index_dist(rnd)] = position_dist(rnd);
 		// Reset its fitness
-		c.fitness = std::numeric_limits<double>::infinity();
+		creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 	}
 }
