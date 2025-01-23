@@ -149,6 +149,19 @@ size_t parse_integer(const std::string& arg, const std::string& short_arg_name, 
 	return n;
 }
 
+double parse_double(const std::string& arg, const std::string& short_arg_name, const std::string& long_arg_name) {
+	double x;
+	try {
+		x = std::stod(arg);
+	} catch (const std::exception&) {
+		die("Error: " + short_arg_name + ", " + long_arg_name + " requires a number.");
+	}
+	if (!std::isfinite(x)) {
+		die("Error: " + short_arg_name + ", " + long_arg_name + " must be finite.");
+	}
+	return x;
+}
+
 int main(const int argc, const char** argv) {
 	std::random_device dev;
 
@@ -245,27 +258,13 @@ int main(const int argc, const char** argv) {
 			if (i >= argc) {
 				die("Error: missing argument for -lb, --lower-bound.");
 			}
-			try {
-				lower_bound = std::stod(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -ld, --lower-bound requires a number.");
-			}
-			if (!std::isfinite(lower_bound)) {
-				die("Error: -lb, --lower-bound must be finite.");
-			}
+			lower_bound = parse_double(std::string(argv[i]), std::string("-lb"), std::string("--lower-bound"));
 		} else if (arg == "-ub" || arg == "--upper-bound") {
 			i++;
 			if (i >= argc) {
 				die("Error: missing argument for -ub, --upper-bound.");
 			}
-			try {
-				upper_bound = std::stod(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -ud, --upper-bound requires a number.");
-			}
-			if (!std::isfinite(upper_bound)) {
-				die("Error: -ub, --upper-bound must be finite.");
-			}
+			upper_bound = parse_double(std::string(argv[i]), std::string("-ub"), std::string("--upper-bound"));
 		} else if (arg == "-f" || arg == "--function") {
 			i++;
 			if (i >= argc) {
