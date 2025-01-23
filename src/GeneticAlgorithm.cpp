@@ -41,19 +41,19 @@ void GeneticAlgorithm::evaluateCreatures() {
 
 void GeneticAlgorithm::sortCreatures() {
 	std::sort(creatures.begin(), creatures.end(),
-			  [](const Creature& a, const Creature& b) { return a.fitness > b.fitness; });
+			  [](const Creature& a, const Creature& b) { return a.fitness < b.fitness; });
 
 	bestCreature = creatures.at(0);
 }
 
-void GeneticAlgorithm::applyCrossover() {
+void GeneticAlgorithm::applyCrossover(const size_t seed) {
 	const size_t n_creatures = creatures.size();
 	const size_t survived = creatures.size() * survival_rate;
 
 	// The population which did not survive is not actually removed, it gets overwritten during crossover
 
 	// Fill the rest of the population with new offspring
-	std::mt19937 rnd{42};
+	std::mt19937 rnd{seed};
 	std::uniform_int_distribution<size_t> index_dist{0, survived - 1};
 	std::bernoulli_distribution bool_dist{0.5};
 	for (size_t i{survived}; i < n_creatures; i++) {
@@ -81,8 +81,8 @@ void GeneticAlgorithm::applyCrossover() {
 	assert(creatures.size() == n_creatures);
 }
 
-void GeneticAlgorithm::applyMutation() {
-	std::mt19937 rnd{42};
+void GeneticAlgorithm::applyMutation(const size_t seed) {
+	std::mt19937 rnd{seed};
 	std::bernoulli_distribution bool_dist{mutation_rate};
 	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
 
@@ -95,5 +95,7 @@ void GeneticAlgorithm::applyMutation() {
 		}
 
 		c.position[index_dist(rnd)] = position_dist(rnd);
+		// Reset its fitness
+		c.fitness = std::numeric_limits<double>::infinity();
 	}
 }

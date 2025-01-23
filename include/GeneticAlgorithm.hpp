@@ -23,9 +23,9 @@ class GeneticAlgorithm {
 
 	void sortCreatures();
 
-	void applyCrossover();
+	void applyCrossover(const size_t seed);
 
-	void applyMutation();
+	void applyMutation(const size_t seed);
 };
 
 #endif	// GENETIC_ALGORITHM_HPP

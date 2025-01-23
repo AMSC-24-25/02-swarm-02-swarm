@@ -101,8 +101,8 @@ void run_genetic() {
 		creatures.push_back(Creature(tmp));
 	}
 
-	const double mutation_rate = 0.1;
-	const double survival_rate = 0.1;
+	const double mutation_rate = 0.2;
+	const double survival_rate = 0.5;
 
 	Sphere s;
 
@@ -115,8 +115,8 @@ void run_genetic() {
 	ga.sortCreatures();
 
 	for (size_t i{0}; i < max_iterations; i++) {
-		ga.applyCrossover();
-		ga.applyMutation();
+		ga.applyCrossover(seed + i);
+		ga.applyMutation(seed + i + 1);
 		ga.evaluateCreatures();
 		ga.sortCreatures();
 
