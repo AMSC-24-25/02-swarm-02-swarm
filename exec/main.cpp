@@ -167,7 +167,7 @@ int main(const int argc, const char** argv) {
 
 	minimization_algorithm algo = minimization_algorithm::GENETIC;
 	size_t dimensions = 2;
-	size_t num_particles = 100;
+	size_t num_points = 100;
 	size_t max_iterations = 100;
 	double lower_bound = -100.0;
 	double upper_bound = 100.0;
@@ -193,10 +193,11 @@ int main(const int argc, const char** argv) {
 			std::cout << " -d,  --dimensions   Sets the number of dimensions." << std::endl;
 			std::cout << "                     Must be >0." << std::endl;
 			std::cout << "                     Default: " << dimensions << "." << std::endl;
-			std::cout << " -p,  --particles    Sets the number of particles." << std::endl;
+			std::cout << " -n,  --num-points   Sets the number of particles or creatures, depending on the algorithm."
+					  << std::endl;
 			std::cout << "                     Must be >0." << std::endl;
-			std::cout << "                     Default: " << num_particles << "." << std::endl;
-			std::cout << " -i,  --iterations   Sets the number of iterations." << std::endl;
+			std::cout << "                     Default: " << num_points << "." << std::endl;
+			std::cout << " -i,  --iterations   Sets the maximum number of iterations." << std::endl;
 			std::cout << "                     Must be >0." << std::endl;
 			std::cout << "                     Default: " << max_iterations << "." << std::endl;
 			std::cout << " -lb, --lower-bound  Sets the lower boundary of the simulation space." << std::endl;
@@ -216,7 +217,7 @@ int main(const int argc, const char** argv) {
 			std::cout << "                     Default: " << n_threads << "." << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
-			std::cout << "  " << argv[0] << " -d " << dimensions << " -p " << num_particles << " -i " << max_iterations
+			std::cout << "  " << argv[0] << " -d " << dimensions << " -n " << num_points << " -i " << max_iterations
 					  << " -f sphere" << std::endl;
 			std::cout << std::endl;
 			return 0;
@@ -241,12 +242,12 @@ int main(const int argc, const char** argv) {
 				die("Error: missing argument for -d, --dimensions.");
 			}
 			dimensions = parse_integer(std::string(argv[i]), std::string("-d"), std::string("--dimensions"));
-		} else if (arg == "-p" || arg == "--particles") {
+		} else if (arg == "-n" || arg == "--num-points") {
 			i++;
 			if (i >= argc) {
-				die("Error: missing argument for -p, --particles.");
+				die("Error: missing argument for -n, --num-points.");
 			}
-			num_particles = parse_integer(std::string(argv[i]), std::string("-p"), std::string("--particles"));
+			num_points = parse_integer(std::string(argv[i]), std::string("-n"), std::string("--num-points"));
 		} else if (arg == "-i" || arg == "--iterations") {
 			i++;
 			if (i >= argc) {
@@ -315,9 +316,9 @@ int main(const int argc, const char** argv) {
 	}
 
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
-		run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
+		run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound);
+		run_genetic(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound);
 	} else {
 		die("Error: unknown algorithm.");
 	}
