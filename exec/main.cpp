@@ -45,7 +45,7 @@ void print_point(const size_t dimensions, const std::vector<double>& x, const do
 	std::cout.copyfmt(oldState);
 }
 
-void run_swarm(const int dimensions, const size_t num_particles, const int max_iterations, const size_t seed,
+void run_swarm(const size_t dimensions, const size_t num_particles, const int max_iterations, const size_t seed,
 			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
 			   const size_t n_threads) {
 	std::vector<Particle> swarmParticles;
@@ -84,8 +84,7 @@ void run_swarm(const int dimensions, const size_t num_particles, const int max_i
 	std::cout << std::endl;
 }
 
-void run_genetic() {
-	const size_t dimensions = 2;
+void run_genetic(const size_t dimensions) {
 	const size_t num_particles = 100;
 	const size_t max_iterations = 100;
 	const size_t seed = 42;
@@ -335,7 +334,7 @@ int main(const int argc, const char** argv) {
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic();
+		run_genetic(dimensions);
 	} else {
 		die("Error: unknown algorithm.");
 	}
