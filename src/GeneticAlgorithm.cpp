@@ -81,6 +81,19 @@ void GeneticAlgorithm::applyCrossover() {
 	assert(creatures.size() == n_creatures);
 }
 
-void GeneticAlgorithm::applyMutation() const {
-	std::cout << "TODO: implement mutation" << std::endl;
+void GeneticAlgorithm::applyMutation() {
+	std::mt19937 rnd{42};
+	std::bernoulli_distribution bool_dist{mutation_rate};
+	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
+
+	const size_t dimensions = creatures.at(0).position.size();
+	std::uniform_int_distribution<size_t> index_dist{0, dimensions - 1};
+
+	for (Creature& c : creatures) {
+		if (!bool_dist(rnd)) {
+			continue;
+		}
+
+		c.position[index_dist(rnd)] = position_dist(rnd);
+	}
 }

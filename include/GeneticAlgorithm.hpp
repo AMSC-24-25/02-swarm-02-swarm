@@ -25,7 +25,7 @@ class GeneticAlgorithm {
 
 	void applyCrossover();
 
-	void applyMutation() const;
+	void applyMutation();
 };
 
 #endif	// GENETIC_ALGORITHM_HPP
