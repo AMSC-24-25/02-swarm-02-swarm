@@ -45,7 +45,7 @@ void print_point(const size_t dimensions, const std::vector<double>& x, const do
 	std::cout.copyfmt(oldState);
 }
 
-void run_swarm(const size_t dimensions, const size_t num_particles, const int max_iterations, const size_t seed,
+void run_swarm(const size_t dimensions, const size_t num_particles, const size_t max_iterations, const size_t seed,
 			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
 			   const size_t n_threads) {
 	std::vector<Particle> swarmParticles;
@@ -64,7 +64,7 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const int ma
 
 	const double beginning = omp_get_wtime();
 
-	for (int i = 0; i < max_iterations; i++) {
+	for (size_t i = 0; i < max_iterations; i++) {
 		swarm.updateInertia(max_iterations, w_min, w_max);
 		swarm.updateParticles();
 		swarm.findBestFitness();
@@ -84,8 +84,7 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const int ma
 	std::cout << std::endl;
 }
 
-void run_genetic(const size_t dimensions, const size_t num_creatures) {
-	const size_t max_iterations = 100;
+void run_genetic(const size_t dimensions, const size_t num_creatures, const size_t max_iterations) {
 	const size_t seed = 42;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
@@ -333,7 +332,7 @@ int main(const int argc, const char** argv) {
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic(dimensions, num_particles);
+		run_genetic(dimensions, num_particles, max_iterations);
 	} else {
 		die("Error: unknown algorithm.");
 	}
