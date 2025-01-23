@@ -13,19 +13,17 @@ class GeneticAlgorithm {
 	const double upper_bound;
 	const double survival_rate;
 	const double mutation_rate;
-	const double crossover_rate;
 	Creature bestCreature;
 	const ObjectiveFunction& func;
 
 	GeneticAlgorithm(const std::vector<Creature>& creatures, const double lower_bound, const double upper_bound,
-					 const double mutation_rate, const double crossover_rate, const double survival_rate,
-					 ObjectiveFunction& func);
+					 const double mutation_rate, const double survival_rate, ObjectiveFunction& func);
 
 	void evaluateCreatures();
 
 	void sortCreatures();
 
-	void applyCrossover() const;
+	void applyCrossover();
 
 	void applyMutation() const;
 };

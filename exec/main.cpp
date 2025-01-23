@@ -102,12 +102,11 @@ void run_genetic() {
 	}
 
 	const double mutation_rate = 0.1;
-	const double crossover_rate = 0.5;
 	const double survival_rate = 0.1;
 
 	Sphere s;
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, crossover_rate, survival_rate, s);
+	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, s);
 
 	const double beginning = omp_get_wtime();
 
