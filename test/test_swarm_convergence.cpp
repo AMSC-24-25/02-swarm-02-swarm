@@ -18,7 +18,7 @@ double absolute_error(const double expected, const double actual) {
 	return std::abs(expected - actual);
 }
 
-TEST(FunctionConvergence, Sphere) {
+TEST(SwarmConvergence, Sphere) {
 	const size_t dimensions = 2;
 	const size_t num_particles = 100;
 	const size_t max_iterations = 200;
@@ -52,7 +52,7 @@ TEST(FunctionConvergence, Sphere) {
 	}
 }
 
-TEST(FunctionConvergence, EuclideanDistance) {
+TEST(SwarmConvergence, EuclideanDistance) {
 	const size_t dimensions = 2;
 	const size_t num_particles = 100;
 	const size_t max_iterations = 200;
@@ -86,7 +86,7 @@ TEST(FunctionConvergence, EuclideanDistance) {
 	}
 }
 
-TEST(FunctionConvergence, Rosenbrock) {
+TEST(SwarmConvergence, Rosenbrock) {
 	const size_t dimensions = 2;
 	const size_t num_particles = 100;
 	const size_t max_iterations = 200;
@@ -123,7 +123,7 @@ TEST(FunctionConvergence, Rosenbrock) {
 	}
 }
 
-TEST(FunctionConvergence, Rastrigin) {
+TEST(SwarmConvergence, Rastrigin) {
 	const size_t dimensions = 2;
 	const size_t num_particles = 100;
 	const size_t max_iterations = 200;
