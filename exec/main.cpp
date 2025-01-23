@@ -7,6 +7,10 @@
 #include <random>
 #include <omp.h>
 
+#if defined(USE_MPI) && USE_MPI == 1
+#include <mpi.h>
+#endif	// USE_MPI
+
 #include "Swarm.hpp"
 #include "GeneticAlgorithm.hpp"
 #include "Sphere.hpp"
@@ -14,16 +18,30 @@
 #include "Rosenbrock.hpp"
 #include "Rastrigin.hpp"
 
-enum class minimization_algorithm { SWARM_SEARCH, GENETIC };
+enum class minimization_algorithm {
+	SWARM_SEARCH,
+	GENETIC_OPENMP
+#if defined(USE_MPI) && USE_MPI == 1
+	,
+	GENETIC_MPI
+#endif	// USE_MPI
+};
 
 std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
 	switch (algo) {
 		case minimization_algorithm::SWARM_SEARCH:
 			os << "swarm_search";
 			break;
-		case minimization_algorithm::GENETIC:
-			os << "genetic";
+		case minimization_algorithm::GENETIC_OPENMP:
+			os << "genetic_omp";
 			break;
+
+#if defined(USE_MPI) && USE_MPI == 1
+		case minimization_algorithm::GENETIC_MPI:
+			os << "genetic_mpi";
+			break;
+#endif	// USE_MPI
+
 		default:
 			os << "Unknown";
 			break;
@@ -84,9 +102,9 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const size_t
 	std::cout << std::endl;
 }
 
-void run_genetic(const size_t dimensions, const size_t num_creatures, const size_t max_iterations, const size_t seed,
-				 const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
-				 const size_t n_threads) {
+void run_genetic_openmp(const size_t dimensions, const size_t num_creatures, const size_t max_iterations,
+						const size_t seed, const double lower_bound, const double upper_bound,
+						const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads) {
 	std::vector<Creature> creatures;
 
 	std::mt19937 rnd{seed};
@@ -130,6 +148,22 @@ void run_genetic(const size_t dimensions, const size_t num_creatures, const size
 	std::cout << std::endl;
 }
 
+#if defined(USE_MPI) && USE_MPI == 1
+void run_genetic_mpi() {
+	std::cout << "TODO: implement genetic_mpi" << std::endl;
+	MPI_Init(NULL, NULL);
+
+	int world_size;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+	int world_rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+	std::cout << "Processor " << world_rank << " out of " << world_size << " is alive." << std::endl;
+
+	MPI_Finalize();
+}
+#endif	// USE_MPI
+
 void die(const std::string& msg) {
 	std::cerr << msg << std::endl;
 	std::exit(-1);
@@ -164,7 +198,7 @@ double parse_double(const std::string& arg, const std::string& short_arg_name, c
 int main(const int argc, const char** argv) {
 	std::random_device dev;
 
-	minimization_algorithm algo = minimization_algorithm::GENETIC;
+	minimization_algorithm algo = minimization_algorithm::GENETIC_OPENMP;
 	size_t dimensions = 2;
 	size_t num_points = 100;
 	size_t max_iterations = 100;
@@ -187,7 +221,11 @@ int main(const int argc, const char** argv) {
 			std::cout << " -h,  --help         Prints this message and exits." << std::endl;
 			std::cout << " -a,  --algorithm    Sets the minimization algorithm to be used." << std::endl;
 			std::cout << "                     Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
-					  << minimization_algorithm::GENETIC << "." << std::endl;
+					  << minimization_algorithm::GENETIC_OPENMP
+#if defined(USE_MPI) && USE_MPI == 1
+					  << ", " << minimization_algorithm::GENETIC_MPI
+#endif	// USE_MPI
+					  << "." << std::endl;
 			std::cout << "                     Default: " << algo << "." << std::endl;
 			std::cout << " -d,  --dimensions   Sets the number of dimensions." << std::endl;
 			std::cout << "                     Must be >0." << std::endl;
@@ -231,8 +269,14 @@ int main(const int argc, const char** argv) {
 			if (algo_name == "swarm_search") {
 				algo = minimization_algorithm::SWARM_SEARCH;
 			} else if (algo_name == "genetic") {
-				algo = minimization_algorithm::GENETIC;
-			} else {
+				algo = minimization_algorithm::GENETIC_OPENMP;
+			}
+#if defined(USE_MPI) && USE_MPI == 1
+			else if (algo_name == "genetic_mpi") {
+				algo = minimization_algorithm::GENETIC_MPI;
+			}
+#endif	// USE_MPI
+			else {
 				die("Error: '" + algo_name + "' is not a known algorithm.");
 			}
 		} else if (arg == "-d" || arg == "--dimensions") {
@@ -316,9 +360,15 @@ int main(const int argc, const char** argv) {
 
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
-	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
-	} else {
+	} else if (algo == minimization_algorithm::GENETIC_OPENMP) {
+		run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
+	}
+#if defined(USE_MPI) && USE_MPI == 1
+	else if (algo == minimization_algorithm::GENETIC_MPI) {
+		run_genetic_mpi();
+	}
+#endif	// USE_MPI
+	else {
 		die("Error: unknown algorithm.");
 	}
 
