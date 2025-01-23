@@ -136,6 +136,19 @@ void die(const std::string& msg) {
 	std::exit(-1);
 }
 
+size_t parse_integer(const std::string& arg, const std::string& short_arg_name, const std::string& long_arg_name) {
+	size_t n;
+	try {
+		n = std::stoi(arg);
+	} catch (const std::exception&) {
+		die("Error: " + short_arg_name + ", " + long_arg_name + " requires a number.");
+	}
+	if (n <= 0) {
+		die("Error: " + short_arg_name + ", " + long_arg_name + " must be >0.");
+	}
+	return n;
+}
+
 int main(const int argc, const char** argv) {
 	std::random_device dev;
 
@@ -214,40 +227,19 @@ int main(const int argc, const char** argv) {
 			if (i >= argc) {
 				die("Error: missing argument for -d, --dimensions.");
 			}
-			try {
-				dimensions = std::stoi(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -d, --dimensions requires a number.");
-			}
-			if (dimensions <= 0) {
-				die("Error: -d, --dimensions must be >0.");
-			}
+			dimensions = parse_integer(std::string(argv[i]), std::string("-d"), std::string("--dimensions"));
 		} else if (arg == "-p" || arg == "--particles") {
 			i++;
 			if (i >= argc) {
 				die("Error: missing argument for -p, --particles.");
 			}
-			try {
-				num_particles = std::stoi(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -p, --particles requires a number.");
-			}
-			if (num_particles <= 0) {
-				die("Error: -p, --particles must be >0.");
-			}
+			num_particles = parse_integer(std::string(argv[i]), std::string("-p"), std::string("--particles"));
 		} else if (arg == "-i" || arg == "--iterations") {
 			i++;
 			if (i >= argc) {
 				die("Error: missing argument for -i, --iterations.");
 			}
-			try {
-				max_iterations = std::stoi(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -i, --iterations requires a number.");
-			}
-			if (max_iterations <= 0) {
-				die("Error: -i, --iterations must be >0.");
-			}
+			max_iterations = parse_integer(std::string(argv[i]), std::string("-i"), std::string("--iterations"));
 		} else if (arg == "-lb" || arg == "--lower-bound") {
 			i++;
 			if (i >= argc) {
@@ -308,13 +300,9 @@ int main(const int argc, const char** argv) {
 			if (i >= argc) {
 				die("Error: missing argument for -j, --jobs.");
 			}
-			try {
-				n_threads = std::stoi(std::string(argv[i]));
-			} catch (const std::exception&) {
-				die("Error: -j, --jobs requires a number.");
-			}
-			if (n_threads <= 0 || n_threads > static_cast<size_t>(omp_get_max_threads())) {
-				die("Error: -j, --jobs must be >0 and <=" + std::to_string(omp_get_max_threads()) + ".");
+			n_threads = parse_integer(std::string(argv[i]), std::string("-j"), std::string("--jobs"));
+			if (n_threads > static_cast<size_t>(omp_get_max_threads())) {
+				die("Error: -j, --jobs must be <=" + std::to_string(omp_get_max_threads()) + ".");
 			}
 		} else {
 			std::cerr << "Unknown argument '" << arg << "'" << std::endl;
