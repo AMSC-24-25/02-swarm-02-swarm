@@ -84,8 +84,7 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const int ma
 	std::cout << std::endl;
 }
 
-void run_genetic(const size_t dimensions) {
-	const size_t num_particles = 100;
+void run_genetic(const size_t dimensions, const size_t num_creatures) {
 	const size_t max_iterations = 100;
 	const size_t seed = 42;
 	const double lower_bound = -100.0;
@@ -94,7 +93,7 @@ void run_genetic(const size_t dimensions) {
 
 	std::mt19937 rnd{seed};
 	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_particles; i++) {
+	for (size_t i{0}; i < num_creatures; i++) {
 		std::vector<double> tmp(dimensions);
 		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
 		creatures.push_back(Creature(tmp));
@@ -334,7 +333,7 @@ int main(const int argc, const char** argv) {
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC) {
-		run_genetic(dimensions);
+		run_genetic(dimensions, num_particles);
 	} else {
 		die("Error: unknown algorithm.");
 	}
