@@ -48,7 +48,10 @@ void GeneticAlgorithm::sortCreatures() {
 
 void GeneticAlgorithm::applyCrossover(const size_t seed) {
 	const size_t n_creatures = creatures.size();
-	const size_t survived = creatures.size() * survival_rate;
+	const size_t survived = static_cast<size_t>(static_cast<double>(n_creatures) * survival_rate);
+	if (survived < 2) {
+		return;
+	}
 
 	// The population which did not survive is not actually removed, it gets overwritten during crossover
 

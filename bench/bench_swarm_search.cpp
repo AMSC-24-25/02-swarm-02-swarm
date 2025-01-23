@@ -9,8 +9,6 @@
 #include <omp.h>
 
 #include "Swarm.hpp"
-#include "Sphere.hpp"
-#include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
 
 static void SwarmSearch_Rosenbrock(benchmark::State& state) {
@@ -54,5 +52,3 @@ static void SwarmSearch_Rosenbrock(benchmark::State& state) {
 }
 
 BENCHMARK(SwarmSearch_Rosenbrock)->Range(1, 1'000)->RangeMultiplier(2)->UseManualTime();
-
-BENCHMARK_MAIN();

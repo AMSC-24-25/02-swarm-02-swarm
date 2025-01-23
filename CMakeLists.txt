@@ -79,9 +79,10 @@ if(ENABLE_BENCHMARKS)
 
     set(BENCHMARK_SOURCES
         bench/bench_swarm_search.cpp
+        bench/bench_genetic.cpp
     )
     add_executable(bench ${BENCHMARK_SOURCES} ${SOURCES})
-    target_link_libraries(bench PRIVATE benchmark)
+    target_link_libraries(bench PRIVATE benchmark benchmark_main)
 endif()
 
 # Clang Format configuration
