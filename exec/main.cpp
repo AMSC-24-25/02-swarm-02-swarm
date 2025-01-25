@@ -180,7 +180,6 @@ void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const 
 		// The root process sends to everyone
 		for (int i = 1; i < world_size; i++) {
 			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
-				std::vector<double> tmp = creature_positions[j];
 				MPI_Send(creature_positions[j].data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
 			}
 		}
@@ -198,8 +197,8 @@ void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const 
 		creature_positions.resize(local_size);
 	}
 
-	DistributedGeneticAlgorithm ga(world_rank, creature_positions, lower_bound, upper_bound, mutation_rate,
-								   survival_rate, *func);
+	DistributedGeneticAlgorithm ga(world_rank, world_size, num_creatures, creature_positions, lower_bound, upper_bound,
+								   mutation_rate, survival_rate, *func);
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	const double beginning = MPI_Wtime();
