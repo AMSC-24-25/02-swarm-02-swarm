@@ -3,22 +3,23 @@
 
 #include <vector>
 
-#include "Creature.hpp"
 #include "ObjectiveFunction.hpp"
 
 class DistributedGeneticAlgorithm {
    public:
-	std::vector<Creature> creatures;
+	const int world_rank;
+	std::vector<std::vector<double>> creature_positions;
+	std::vector<double> creature_fitnesses;
 	const double lower_bound;
 	const double upper_bound;
 	const double survival_rate;
 	const double mutation_rate;
-	Creature bestCreature;
+	size_t best_creature_index;
 	const ObjectiveFunction& func;
 
-	DistributedGeneticAlgorithm(const std::vector<Creature>& creatures, const double lower_bound,
-								const double upper_bound, const double mutation_rate, const double survival_rate,
-								ObjectiveFunction& func);
+	DistributedGeneticAlgorithm(const int world_rank, const std::vector<std::vector<double>>& creature_positions,
+								const double lower_bound, const double upper_bound, const double mutation_rate,
+								const double survival_rate, ObjectiveFunction& func);
 
 	void evaluateCreatures();
 

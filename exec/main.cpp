@@ -160,22 +160,49 @@ void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const 
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	int world_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+	const size_t local_size = num_creatures / static_cast<size_t>(world_size);
 
-	std::vector<Creature> creatures;
+	std::vector<std::vector<double>> creature_positions;
 
-	{
+	// Only the "root process" initializes the creatures
+	if (world_rank == 0) {
 		std::mt19937 rnd{seed};
 		std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
 		for (size_t i{0}; i < num_creatures; i++) {
 			std::vector<double> tmp(dimensions);
 			std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-			creatures.push_back(Creature(tmp));
+			creature_positions.push_back(tmp);
 		}
 	}
 
-	DistributedGeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func);
+	// Split the creatures data among processes
+	if (world_rank == 0) {
+		// The root process sends to everyone
+		for (int i = 1; i < world_size; i++) {
+			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
+				std::vector<double> tmp = creature_positions[j];
+				MPI_Send(creature_positions[j].data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+			}
+		}
+	} else {
+		// The other processes only receive
+		creature_positions.resize(local_size);
+		for (size_t i{0}; i < local_size; i++) {
+			creature_positions[i].resize(dimensions);
+			MPI_Recv(creature_positions[i].data(), dimensions, MPI_DOUBLE, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		}
+	}
 
-	const double beginning = omp_get_wtime();
+	// The root process resizes its local vector
+	if (world_rank == 0) {
+		creature_positions.resize(local_size);
+	}
+
+	DistributedGeneticAlgorithm ga(world_rank, creature_positions, lower_bound, upper_bound, mutation_rate,
+								   survival_rate, *func);
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	const double beginning = MPI_Wtime();
 
 	// Initial evaluation
 	ga.evaluateCreatures();
@@ -187,22 +214,27 @@ void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const 
 		ga.evaluateCreatures();
 		ga.sortCreatures();
 
-		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-		std::cout << "  Current minimum: " << std::endl;
-		print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
-		std::cout << std::endl;
+		if (world_rank == 0) {
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),
+						ga.creature_fitnesses.at(ga.best_creature_index));
+			std::cout << std::endl;
+		}
 	}
 
-	const double end = omp_get_wtime();
+	MPI_Barrier(MPI_COMM_WORLD);
+	const double end = MPI_Wtime();
+
+	MPI_Finalize();
 
 	std::cout << std::endl;
 	std::cout << "Minimum found:" << std::endl;
-	print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
+	print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),
+				ga.creature_fitnesses.at(ga.best_creature_index));
 	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
 			  << std::endl;
 	std::cout << std::endl;
-
-	MPI_Finalize();
 }
 #endif	// USE_MPI
 

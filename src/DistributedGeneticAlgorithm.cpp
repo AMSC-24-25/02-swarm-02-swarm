@@ -5,18 +5,22 @@
 
 #include "DistributedGeneticAlgorithm.hpp"
 
-DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const std::vector<Creature>& creatures_,
+DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const int world_rank_,
+														 const std::vector<std::vector<double>>& creature_positions_,
 														 const double lower_bound_, const double upper_bound_,
 														 const double survival_rate_, const double mutation_rate_,
 														 ObjectiveFunction& func_)
-	: creatures(creatures_),
+	: world_rank(world_rank_),
+	  creature_positions(creature_positions_),
+	  creature_fitnesses(std::vector<double>(creature_positions.size(), std::numeric_limits<double>::infinity())),
 	  lower_bound(lower_bound_),
 	  upper_bound(upper_bound_),
 	  survival_rate(survival_rate_),
 	  mutation_rate(mutation_rate_),
-	  bestCreature(creatures[0]),
+	  best_creature_index(0),
 	  func(func_) {
-	assert(creatures.size() > 0);
+	assert(world_rank >= 0);
+	assert(creature_positions_.size() > 0);
 	assert(std::isfinite(lower_bound));
 	assert(std::isfinite(upper_bound));
 	assert(lower_bound < upper_bound);
@@ -25,17 +29,17 @@ DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const std::vector<Creat
 }
 
 void DistributedGeneticAlgorithm::evaluateCreatures() {
-	std::cout << "TODO: implement evaluation" << std::endl;
+	std::cout << "[" << world_rank << "] TODO: implement evaluation" << std::endl;
 }
 
 void DistributedGeneticAlgorithm::sortCreatures() {
-	std::cout << "TODO: implement sorting" << std::endl;
+	std::cout << "[" << world_rank << "] TODO: implement sorting" << std::endl;
 }
 
 void DistributedGeneticAlgorithm::applyCrossover(const size_t) {
-	std::cout << "TODO: implement crossover" << std::endl;
+	std::cout << "[" << world_rank << "] TODO: implement crossover" << std::endl;
 }
 
 void DistributedGeneticAlgorithm::applyMutation(const size_t) {
-	std::cout << "TODO: implement mutation" << std::endl;
+	std::cout << "[" << world_rank << "] TODO: implement mutation" << std::endl;
 }
