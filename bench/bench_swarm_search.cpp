@@ -12,9 +12,9 @@
 #include "Rosenbrock.hpp"
 
 static void SwarmSearch_Rosenbrock(benchmark::State& state) {
-	const int dimensions = 6;
-	const int num_particles = state.range(0);
-	const int max_iterations = 100;
+	const size_t dimensions = 6;
+	const size_t num_particles = state.range(0);
+	const size_t max_iterations = 100;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
 	const size_t seed = 42;
@@ -35,7 +35,7 @@ static void SwarmSearch_Rosenbrock(benchmark::State& state) {
 
 		const auto start = std::chrono::high_resolution_clock::now();
 
-		for (int i = 0; i < max_iterations; i++) {
+		for (size_t i = 0; i < max_iterations; i++) {
 			swarm.updateInertia(max_iterations, w_min, w_max);
 			swarm.updateParticles();
 			swarm.findBestFitness();
