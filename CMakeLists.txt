@@ -26,19 +26,26 @@ if(USE_MPI)
     find_package(MPI REQUIRED)
 endif()
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-
-include_directories(include)
-
 set(WARNINGS -Wall -Wextra -Wpedantic -Werror -Wshadow)
 
-add_executable(main exec/main.cpp ${SOURCES})
-target_compile_options(main PUBLIC ${WARNINGS})
+file(GLOB_RECURSE SOURCES "src/*.cpp")
+
+# Define main library target
+add_library(02-swarm ${SOURCES})
+target_include_directories(02-swarm PUBLIC include)
+target_compile_options(02-swarm PUBLIC ${WARNINGS})
+target_link_libraries(02-swarm PUBLIC OpenMP::OpenMP_CXX)
+if(USE_MPI)
+    target_compile_definitions(02-swarm PUBLIC USE_MPI=1)
+    target_link_libraries(02-swarm PUBLIC MPI::MPI_CXX)
+endif()
+
+add_executable(main exec/main.cpp)
 if(USE_MPI)
     target_compile_definitions(main PUBLIC USE_MPI=1)
     target_link_libraries(main PUBLIC MPI::MPI_CXX)
 endif()
-target_link_libraries(main PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(main PUBLIC 02-swarm)
 
 if(ENABLE_TESTS)
     set(GOOGLE_TEST_VERSION "1.15.2" CACHE STRING "" FORCE)
@@ -54,22 +61,19 @@ if(ENABLE_TESTS)
 
     macro(add_test target)
         set(test_filename test_${target})
-        add_executable(${test_filename} test/${test_filename}.cpp ${SOURCES})
-        target_compile_options(${test_filename} PUBLIC ${WARNINGS})
-        target_link_libraries(${test_filename} PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+        add_executable(${test_filename} test/${test_filename}.cpp)
+        target_link_libraries(${test_filename} PUBLIC 02-swarm gtest gtest_main)
         gtest_discover_tests(${test_filename})
     endmacro()
 
     add_test(swarm_convergence)
     add_test(genetic_convergence)
 
-    add_executable(TestRastrigin test/TestRastrigin.cpp ${SOURCES})
-    target_compile_options(TestRastrigin PUBLIC ${WARNINGS})
-    target_link_libraries(TestRastrigin PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+    add_executable(TestRastrigin test/TestRastrigin.cpp)
+    target_link_libraries(TestRastrigin PUBLIC 02-swarm gtest gtest_main)
 
-    add_executable(TestRosenbrock test/TestRosenbrock.cpp ${SOURCES})
-    target_compile_options(TestRosenbrock PUBLIC ${WARNINGS})
-    target_link_libraries(TestRosenbrock PUBLIC OpenMP::OpenMP_CXX gtest gtest_main)
+    add_executable(TestRosenbrock test/TestRosenbrock.cpp)
+    target_link_libraries(TestRosenbrock PUBLIC 02-swarm gtest gtest_main)
 endif()
 
 if(ENABLE_BENCHMARKS)
@@ -90,8 +94,8 @@ if(ENABLE_BENCHMARKS)
         bench/bench_swarm_search.cpp
         bench/bench_genetic.cpp
     )
-    add_executable(bench ${BENCHMARK_SOURCES} ${SOURCES})
-    target_link_libraries(bench PRIVATE benchmark benchmark_main)
+    add_executable(bench ${BENCHMARK_SOURCES})
+    target_link_libraries(bench PUBLIC 02-swarm benchmark benchmark_main)
 endif()
 
 # Clang Format configuration
