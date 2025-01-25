@@ -97,22 +97,27 @@ void GeneticAlgorithm::applyCrossover(const size_t seed) {
 }
 
 void GeneticAlgorithm::applyMutation(const size_t seed) {
-	std::mt19937 rnd{seed};
-	std::bernoulli_distribution bool_dist{mutation_rate};
-	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
+#pragma omp parallel num_threads(n_threads) default(none) shared(seed)
+	{
+		// Each thread creates its own random number generator
+		const size_t thread_id = omp_get_thread_num();
 
-	const size_t dimensions = creatures.at(0).position.size();
-	std::uniform_int_distribution<size_t> index_dist{0, dimensions - 1};
+		std::mt19937 rnd{seed + thread_id};
+		std::bernoulli_distribution bool_dist{mutation_rate};
+		std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
 
-#pragma omp parallel for schedule(static) num_threads(n_threads) default(none) \
-	shared(rnd, bool_dist, position_dist, index_dist)
-	for (size_t i = 0; i < creatures.size(); i++) {
-		if (!bool_dist(rnd)) {
-			continue;
+		const size_t dimensions = creatures.at(0).position.size();
+		std::uniform_int_distribution<size_t> index_dist{0, dimensions - 1};
+
+#pragma omp for schedule(static)
+		for (size_t i = 0; i < creatures.size(); i++) {
+			if (!bool_dist(rnd)) {
+				continue;
+			}
+
+			creatures.at(i).position[index_dist(rnd)] = position_dist(rnd);
+			// Reset its fitness
+			creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 		}
-
-		creatures.at(i).position[index_dist(rnd)] = position_dist(rnd);
-		// Reset its fitness
-		creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 	}
 }
