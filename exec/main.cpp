@@ -9,6 +9,8 @@
 
 #if defined(USE_MPI) && USE_MPI == 1
 #include <mpi.h>
+
+#include "DistributedGeneticAlgorithm.hpp"
 #endif	// USE_MPI
 
 #include "Swarm.hpp"
@@ -108,12 +110,14 @@ void run_genetic_openmp(const size_t dimensions, const size_t num_creatures, con
 						const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads) {
 	std::vector<Creature> creatures;
 
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(Creature(tmp));
+	{
+		std::mt19937 rnd{seed};
+		std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
+		for (size_t i{0}; i < num_creatures; i++) {
+			std::vector<double> tmp(dimensions);
+			std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
+			creatures.push_back(Creature(tmp));
+		}
 	}
 
 	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func, n_threads);
@@ -147,8 +151,9 @@ void run_genetic_openmp(const size_t dimensions, const size_t num_creatures, con
 }
 
 #if defined(USE_MPI) && USE_MPI == 1
-void run_genetic_mpi() {
-	std::cout << "TODO: implement genetic_mpi" << std::endl;
+void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const size_t max_iterations,
+					 const size_t seed, const double lower_bound, const double upper_bound, const double mutation_rate,
+					 const double survival_rate, const std::unique_ptr<ObjectiveFunction>& func) {
 	MPI_Init(NULL, NULL);
 
 	int world_size;
@@ -156,7 +161,46 @@ void run_genetic_mpi() {
 	int world_rank;
 	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
 
-	std::cout << "Processor " << world_rank << " out of " << world_size << " is alive." << std::endl;
+	std::vector<Creature> creatures;
+
+	{
+		std::mt19937 rnd{seed};
+		std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
+		for (size_t i{0}; i < num_creatures; i++) {
+			std::vector<double> tmp(dimensions);
+			std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
+			creatures.push_back(Creature(tmp));
+		}
+	}
+
+	DistributedGeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func);
+
+	const double beginning = omp_get_wtime();
+
+	// Initial evaluation
+	ga.evaluateCreatures();
+	ga.sortCreatures();
+
+	for (size_t i{0}; i < max_iterations; i++) {
+		ga.applyCrossover(seed + i);
+		ga.applyMutation(seed + i + 1);
+		ga.evaluateCreatures();
+		ga.sortCreatures();
+
+		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+		std::cout << "  Current minimum: " << std::endl;
+		print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
+		std::cout << std::endl;
+	}
+
+	const double end = omp_get_wtime();
+
+	std::cout << std::endl;
+	std::cout << "Minimum found:" << std::endl;
+	print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
+	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+			  << std::endl;
+	std::cout << std::endl;
 
 	MPI_Finalize();
 }
@@ -390,7 +434,8 @@ int main(const int argc, const char** argv) {
 	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
-		run_genetic_mpi();
+		run_genetic_mpi(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, mutation_rate,
+						survival_rate, func);
 	}
 #endif	// USE_MPI
 	else {
