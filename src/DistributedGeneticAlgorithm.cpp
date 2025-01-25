@@ -29,7 +29,14 @@ DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const int world_rank_,
 }
 
 void DistributedGeneticAlgorithm::evaluateCreatures() {
-	std::cout << "[" << world_rank << "] TODO: implement evaluation" << std::endl;
+	// Each process evaluates its own vector of creatures
+	for (size_t i{0}; i < creature_positions.size(); i++) {
+		if (std::isfinite(creature_fitnesses.at(i))) {
+			continue;
+		}
+
+		creature_fitnesses[i] = func(creature_positions[i]);
+	}
 }
 
 void DistributedGeneticAlgorithm::sortCreatures() {
