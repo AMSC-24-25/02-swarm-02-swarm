@@ -7,6 +7,7 @@
 #include <limits>
 #include <utility>
 #include <numeric>
+#include <omp.h>
 
 #include "GeneticAlgorithm.hpp"
 
@@ -58,32 +59,37 @@ void GeneticAlgorithm::applyCrossover(const size_t seed) {
 
 	// The population which did not survive is not actually removed, it gets overwritten during crossover
 
-	// Fill the rest of the population with new offspring
-	std::mt19937 rnd{seed};
-	std::uniform_int_distribution<size_t> index_dist{0, survived - 1};
-	std::bernoulli_distribution bool_dist{0.5};
+#pragma omp parallel num_threads(n_threads) default(none) shared(seed, survived, n_creatures)
+	{
+		// Each thread creates its own random number generator
+		const size_t thread_id = omp_get_thread_num();
 
-#pragma omp parallel for schedule(static) num_threads(n_threads) default(none) \
-	shared(survived, n_creatures, rnd, index_dist, bool_dist)
-	for (size_t i = survived; i < n_creatures; i++) {
-		// Choosing father randomly
-		const size_t father_index = index_dist(rnd);
-		assert(father_index < survived);
-		const Creature& father = creatures.at(father_index);
+		std::mt19937 rnd{seed + thread_id};
+		std::uniform_int_distribution<size_t> index_dist{0, survived - 1};
+		std::bernoulli_distribution bool_dist{0.5};
 
-		// Choose mother randomly
-		size_t mother_index;
-		do {
-			mother_index = index_dist(rnd);
-		} while (father_index == mother_index);
-		assert(mother_index < survived);
-		assert(father_index != mother_index);
-		const Creature& mother = creatures.at(mother_index);
+		// Fill the rest of the population with new offspring
+#pragma omp for schedule(static)
+		for (size_t i = survived; i < n_creatures; i++) {
+			// Choosing father randomly
+			const size_t father_index = index_dist(rnd);
+			assert(father_index < survived);
+			const Creature& father = creatures.at(father_index);
 
-		for (size_t j{0}; j < creatures.at(i).position.size(); j++) {
-			creatures.at(i).position.at(j) = bool_dist(rnd) ? father.position.at(j) : mother.position.at(j);
+			// Choose mother randomly
+			size_t mother_index;
+			do {
+				mother_index = index_dist(rnd);
+			} while (father_index == mother_index);
+			assert(mother_index < survived);
+			assert(father_index != mother_index);
+			const Creature& mother = creatures.at(mother_index);
+
+			for (size_t j{0}; j < creatures.at(i).position.size(); j++) {
+				creatures.at(i).position.at(j) = bool_dist(rnd) ? father.position.at(j) : mother.position.at(j);
+			}
+			creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 		}
-		creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 	}
 
 	// Make sure that no creature is added nor removed from the vector during crossover
