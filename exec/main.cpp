@@ -104,6 +104,7 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const size_t
 
 void run_genetic_openmp(const size_t dimensions, const size_t num_creatures, const size_t max_iterations,
 						const size_t seed, const double lower_bound, const double upper_bound,
+						const double mutation_rate, const double survival_rate,
 						const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads) {
 	std::vector<Creature> creatures;
 
@@ -114,9 +115,6 @@ void run_genetic_openmp(const size_t dimensions, const size_t num_creatures, con
 		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
 		creatures.push_back(Creature(tmp));
 	}
-
-	const double mutation_rate = 0.2;
-	const double survival_rate = 0.5;
 
 	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, *func, n_threads);
 
@@ -204,6 +202,8 @@ int main(const int argc, const char** argv) {
 	size_t max_iterations = 100;
 	double lower_bound = -100.0;
 	double upper_bound = 100.0;
+	double mutation_rate = 0.2;
+	double survival_rate = 0.5;
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
 	size_t n_threads = 1;
@@ -218,40 +218,46 @@ int main(const int argc, const char** argv) {
 			std::cout << "       SWARM SEARCH" << std::endl;
 			std::cout << std::endl;
 			std::cout << "Command-line arguments:" << std::endl;
-			std::cout << " -h,  --help         Prints this message and exits." << std::endl;
-			std::cout << " -a,  --algorithm    Sets the minimization algorithm to be used." << std::endl;
-			std::cout << "                     Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
+			std::cout << " -h,  --help          Prints this message and exits." << std::endl;
+			std::cout << " -a,  --algorithm     Sets the minimization algorithm to be used." << std::endl;
+			std::cout << "                      Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
 					  << minimization_algorithm::GENETIC_OPENMP
 #if defined(USE_MPI) && USE_MPI == 1
 					  << ", " << minimization_algorithm::GENETIC_MPI
 #endif	// USE_MPI
 					  << "." << std::endl;
-			std::cout << "                     Default: " << algo << "." << std::endl;
-			std::cout << " -d,  --dimensions   Sets the number of dimensions." << std::endl;
-			std::cout << "                     Must be >0." << std::endl;
-			std::cout << "                     Default: " << dimensions << "." << std::endl;
-			std::cout << " -n,  --num-points   Sets the number of particles or creatures, depending on the algorithm."
+			std::cout << "                      Default: " << algo << "." << std::endl;
+			std::cout << " -d,  --dimensions    Sets the number of dimensions." << std::endl;
+			std::cout << "                      Must be >0." << std::endl;
+			std::cout << "                      Default: " << dimensions << "." << std::endl;
+			std::cout << " -n,  --num-points    Sets the number of particles or creatures, depending on the algorithm."
 					  << std::endl;
-			std::cout << "                     Must be >0." << std::endl;
-			std::cout << "                     Default: " << num_points << "." << std::endl;
-			std::cout << " -i,  --iterations   Sets the maximum number of iterations." << std::endl;
-			std::cout << "                     Must be >0." << std::endl;
-			std::cout << "                     Default: " << max_iterations << "." << std::endl;
-			std::cout << " -lb, --lower-bound  Sets the lower boundary of the simulation space." << std::endl;
-			std::cout << "                     Must be finite." << std::endl;
-			std::cout << "                     Default: " << lower_bound << "." << std::endl;
-			std::cout << " -ub, --upper-bound  Sets the upper boundary of the simulation space." << std::endl;
-			std::cout << "                     Must be finite." << std::endl;
-			std::cout << "                     Default: " << upper_bound << "." << std::endl;
-			std::cout << " -f,  --function     Sets the function to be minimized." << std::endl;
-			std::cout << "                     Must be one of: sphere, euclideandistance, rosenbrock, rastrigin."
+			std::cout << "                      Must be >0." << std::endl;
+			std::cout << "                      Default: " << num_points << "." << std::endl;
+			std::cout << " -i,  --iterations    Sets the maximum number of iterations." << std::endl;
+			std::cout << "                      Must be >0." << std::endl;
+			std::cout << "                      Default: " << max_iterations << "." << std::endl;
+			std::cout << " -lb, --lower-bound   Sets the lower boundary of the simulation space." << std::endl;
+			std::cout << "                      Must be finite." << std::endl;
+			std::cout << "                      Default: " << lower_bound << "." << std::endl;
+			std::cout << " -ub, --upper-bound   Sets the upper boundary of the simulation space." << std::endl;
+			std::cout << "                      Must be finite." << std::endl;
+			std::cout << "                      Default: " << upper_bound << "." << std::endl;
+			std::cout << " -sr, --survival-rate Sets the survival rate for the genetic algorithm." << std::endl;
+			std::cout << "                      Must be between 0.0 and 1.0." << std::endl;
+			std::cout << "                      Default: " << survival_rate << "." << std::endl;
+			std::cout << " -mr, --mutation-rate Sets the mutation rate for the genetic algorithm." << std::endl;
+			std::cout << "                      Must be between 0.0 and 1.0." << std::endl;
+			std::cout << "                      Default: " << mutation_rate << "." << std::endl;
+			std::cout << " -f,  --function      Sets the function to be minimized." << std::endl;
+			std::cout << "                      Must be one of: sphere, euclideandistance, rosenbrock, rastrigin."
 					  << std::endl;
-			std::cout << "                     Default: sphere." << std::endl;
-			std::cout << " -s,  --seed         Sets the seed for the random number generator." << std::endl;
-			std::cout << "                     Default: " << seed << "." << std::endl;
-			std::cout << " -j,  --jobs         Sets the number of threads to be used." << std::endl;
-			std::cout << "                     Must be >0 and <= " << omp_get_max_threads() << "." << std::endl;
-			std::cout << "                     Default: " << n_threads << "." << std::endl;
+			std::cout << "                      Default: sphere." << std::endl;
+			std::cout << " -s,  --seed          Sets the seed for the random number generator." << std::endl;
+			std::cout << "                      Default: " << seed << "." << std::endl;
+			std::cout << " -j,  --jobs          Sets the number of threads to be used." << std::endl;
+			std::cout << "                      Must be >0 and <= " << omp_get_max_threads() << "." << std::endl;
+			std::cout << "                      Default: " << n_threads << "." << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
 			std::cout << "  " << argv[0] << " -d " << dimensions << " -n " << num_points << " -i " << max_iterations
@@ -268,7 +274,7 @@ int main(const int argc, const char** argv) {
 						   [](const char ch) { return std::tolower(ch); });
 			if (algo_name == "swarm_search") {
 				algo = minimization_algorithm::SWARM_SEARCH;
-			} else if (algo_name == "genetic") {
+			} else if (algo_name == "genetic_omp") {
 				algo = minimization_algorithm::GENETIC_OPENMP;
 			}
 #if defined(USE_MPI) && USE_MPI == 1
@@ -309,6 +315,24 @@ int main(const int argc, const char** argv) {
 				die("Error: missing argument for -ub, --upper-bound.");
 			}
 			upper_bound = parse_double(std::string(argv[i]), std::string("-ub"), std::string("--upper-bound"));
+		} else if (arg == "-sr" || arg == "--survival-rate") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -sr, --survival-rate.");
+			}
+			survival_rate = parse_double(std::string(argv[i]), std::string("-sr"), std::string("--survival-rate"));
+			if (survival_rate <= 0.0 || survival_rate >= 1.0) {
+				die("Error: survival rate must be between 0.0 and 1.0.");
+			}
+		} else if (arg == "-mr" || arg == "--mutation-rate") {
+			i++;
+			if (i >= argc) {
+				die("Error: missing argument for -mr, --mutation-rate.");
+			}
+			mutation_rate = parse_double(std::string(argv[i]), std::string("-mr"), std::string("--mutation-rate"));
+			if (mutation_rate <= 0.0 || mutation_rate >= 1.0) {
+				die("Error: mutation rate must be between 0.0 and 1.0.");
+			}
 		} else if (arg == "-f" || arg == "--function") {
 			i++;
 			if (i >= argc) {
@@ -361,7 +385,8 @@ int main(const int argc, const char** argv) {
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
 	} else if (algo == minimization_algorithm::GENETIC_OPENMP) {
-		run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
+		run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, mutation_rate,
+						   survival_rate, func, n_threads);
 	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
