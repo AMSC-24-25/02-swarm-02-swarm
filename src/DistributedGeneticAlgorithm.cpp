@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cmath>
 #include <algorithm>
+#include <random>
 #include <mpi.h>
 
 #include "DistributedGeneticAlgorithm.hpp"
@@ -118,8 +119,43 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 	}
 }
 
-void DistributedGeneticAlgorithm::applyCrossover(const size_t) {
-	std::cout << "[" << world_rank << "] TODO: implement crossover" << std::endl;
+void DistributedGeneticAlgorithm::applyCrossover(const size_t seed) {
+	const size_t n_creatures = creature_positions.size();
+	const size_t survived = static_cast<size_t>(static_cast<double>(n_creatures) * survival_rate);
+	if (survived < 2) {
+		return;
+	}
+
+	// The population which did not survive is not actually removed, it gets overwritten during crossover
+
+	// Each process creates its own random number generator
+	std::mt19937 rnd{seed + world_rank};
+	std::uniform_int_distribution<size_t> index_dist{0, survived - 1};
+	std::bernoulli_distribution bool_dist{0.5};
+
+	// Fill the rest of the population with new offspring
+	for (size_t i{survived}; i < n_creatures; i++) {
+		// Choosing father randomly
+		const size_t father_index = index_dist(rnd);
+		assert(father_index < survived);
+
+		// Choose mother randomly
+		size_t mother_index;
+		do {
+			mother_index = index_dist(rnd);
+		} while (father_index == mother_index);
+		assert(mother_index < survived);
+		assert(father_index != mother_index);
+
+		for (size_t j{0}; j < creature_positions.at(i).size(); j++) {
+			creature_positions.at(i).at(j) =
+				bool_dist(rnd) ? creature_positions.at(father_index).at(j) : creature_positions.at(mother_index).at(j);
+		}
+		creature_fitnesses.at(i) = std::numeric_limits<double>::infinity();
+	}
+
+	// Make sure that no creature is added nor removed from the vector during crossover
+	assert(creature_positions.size() == n_creatures);
 }
 
 void DistributedGeneticAlgorithm::applyMutation(const size_t) {
