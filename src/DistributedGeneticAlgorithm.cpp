@@ -25,16 +25,18 @@ DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const int world_rank_, 
 	  mutation_rate(mutation_rate_),
 	  best_creature_index(0),
 	  func(func_) {
-	assert(world_rank >= 0);
-	assert(world_size >= world_rank);
+	assert(world_size > 0);
+	assert(world_rank >= 0 && world_rank <= world_size - 1);
 	assert(total_creatures > 0);
 	assert(creature_positions.size() > 0);
 	assert(creature_positions.size() < total_creatures);
+	assert(std::all_of(creature_positions.begin(), creature_positions.end(),
+					   [&](const std::vector<double>& pos) { return pos.size() == creature_positions.at(0).size(); }));
 	assert(std::isfinite(lower_bound));
 	assert(std::isfinite(upper_bound));
 	assert(lower_bound < upper_bound);
 	assert(survival_rate > 0.0 && survival_rate < 1.0);
-	assert(mutation_rate >= 0.0 && mutation_rate < 1.0);
+	assert(mutation_rate > 0.0 && mutation_rate < 1.0);
 }
 
 void DistributedGeneticAlgorithm::evaluateCreatures() {
