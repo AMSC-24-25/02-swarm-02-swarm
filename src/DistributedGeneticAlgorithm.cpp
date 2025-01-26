@@ -158,6 +158,22 @@ void DistributedGeneticAlgorithm::applyCrossover(const size_t seed) {
 	assert(creature_positions.size() == n_creatures);
 }
 
-void DistributedGeneticAlgorithm::applyMutation(const size_t) {
-	std::cout << "[" << world_rank << "] TODO: implement mutation" << std::endl;
+void DistributedGeneticAlgorithm::applyMutation(const size_t seed) {
+	// Each process creates its own random number generator
+	std::mt19937 rnd{seed + world_rank};
+	std::bernoulli_distribution bool_dist{mutation_rate};
+	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
+
+	const size_t dimensions = creature_positions.at(0).size();
+	std::uniform_int_distribution<size_t> index_dist{0, dimensions - 1};
+
+	for (size_t i = 0; i < creature_positions.size(); i++) {
+		if (!bool_dist(rnd)) {
+			continue;
+		}
+
+		creature_positions.at(i).at(index_dist(rnd)) = position_dist(rnd);
+		// Reset its fitness
+		creature_fitnesses.at(i) = std::numeric_limits<double>::infinity();
+	}
 }
