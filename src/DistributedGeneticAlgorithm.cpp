@@ -63,7 +63,6 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 		for (int i = 1; i < world_size; i++) {
 			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
 				creature_positions.at(j).resize(dimensions);
-				std::vector<double> tmp = creature_positions[j];
 				MPI_Recv(creature_positions.at(j).data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD,
 						 MPI_STATUS_IGNORE);
 			}
