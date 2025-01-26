@@ -227,13 +227,15 @@ void run_genetic_mpi(const size_t dimensions, const size_t num_creatures, const 
 
 	MPI_Finalize();
 
-	std::cout << std::endl;
-	std::cout << "Minimum found:" << std::endl;
-	print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),
-				ga.creature_fitnesses.at(ga.best_creature_index));
-	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
-			  << std::endl;
-	std::cout << std::endl;
+	if (world_rank == 0) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),
+					ga.creature_fitnesses.at(ga.best_creature_index));
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
 }
 #endif	// USE_MPI
 
