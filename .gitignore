@@ -38,3 +38,6 @@ bin/
 # IDE-specific directories
 .idea/
 .vscode/
+
+doc/*
+!doc/*.tex
