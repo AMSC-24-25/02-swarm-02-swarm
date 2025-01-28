@@ -94,6 +94,7 @@ int main(const int argc, const char** argv) {
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
 	size_t n_threads = 1;
+	bool verbose = true;
 
 	for (int i = 1; i < argc; i++) {
 		std::string arg = std::string(argv[i]);
@@ -145,6 +146,10 @@ int main(const int argc, const char** argv) {
 			std::cout << " -j,  --jobs          Sets the number of threads to be used." << std::endl;
 			std::cout << "                      Must be >0 and <= " << omp_get_max_threads() << "." << std::endl;
 			std::cout << "                      Default: " << n_threads << "." << std::endl;
+			std::cout << " -v, --verbose        Enables output on the console." << std::endl;
+			std::cout << "                      Does not need any arguments." << std::endl;
+			std::cout << " -q, --quiet          Disables output on the console." << std::endl;
+			std::cout << "                      Does not need any arguments." << std::endl;
 			std::cout << std::endl;
 			std::cout << "You can use it like so:" << std::endl;
 			std::cout << "  " << argv[0] << " -d " << dimensions << " -n " << num_points << " -i " << max_iterations
@@ -258,6 +263,10 @@ int main(const int argc, const char** argv) {
 			if (n_threads > static_cast<size_t>(omp_get_max_threads())) {
 				die("Error: -j, --jobs must be <=" + std::to_string(omp_get_max_threads()) + ".");
 			}
+		} else if (arg == "-v" || arg == "--verbose") {
+			verbose = true;
+		} else if (arg == "-q" || arg == "--quiet") {
+			verbose = false;
 		} else {
 			std::cerr << "Unknown argument '" << arg << "'" << std::endl;
 			return -1;
@@ -271,15 +280,15 @@ int main(const int argc, const char** argv) {
 
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
 		algorithm::run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads,
-							 true);
+							 verbose);
 	} else if (algo == minimization_algorithm::GENETIC_OPENMP) {
 		algorithm::run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
-									  mutation_rate, survival_rate, func, n_threads, true);
+									  mutation_rate, survival_rate, func, n_threads, verbose);
 	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		algorithm::run_genetic_mpi(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
-								   mutation_rate, survival_rate, func, true);
+								   mutation_rate, survival_rate, func, verbose);
 	}
 #endif	// USE_MPI
 	else {
