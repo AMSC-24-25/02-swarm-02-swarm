@@ -14,14 +14,14 @@
 GeneticAlgorithm::GeneticAlgorithm(const std::vector<Creature>& creatures_, const double lower_bound_,
 								   const double upper_bound_, const double survival_rate_, const double mutation_rate_,
 								   ObjectiveFunction& func_, const size_t n_threads_)
-	: creatures(creatures_),
-	  lower_bound(lower_bound_),
+	: lower_bound(lower_bound_),
 	  upper_bound(upper_bound_),
 	  survival_rate(survival_rate_),
 	  mutation_rate(mutation_rate_),
-	  bestCreature(creatures[0]),
 	  n_threads(n_threads_),
-	  func(func_) {
+	  func(func_),
+	  creatures(creatures_),
+	  bestCreature(creatures[0]) {
 	assert(creatures.size() > 0);
 	assert(std::isfinite(lower_bound));
 	assert(std::isfinite(upper_bound));

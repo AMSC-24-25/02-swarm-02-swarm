@@ -7,15 +7,17 @@
 #include "ObjectiveFunction.hpp"
 
 class GeneticAlgorithm {
-   public:
-	std::vector<Creature> creatures;
+   private:
 	const double lower_bound;
 	const double upper_bound;
 	const double survival_rate;
 	const double mutation_rate;
-	Creature bestCreature;
 	const size_t n_threads;
 	const ObjectiveFunction& func;
+
+   public:
+	std::vector<Creature> creatures;
+	Creature bestCreature;
 
 	GeneticAlgorithm(const std::vector<Creature>& creatures, const double lower_bound, const double upper_bound,
 					 const double mutation_rate, const double survival_rate, ObjectiveFunction& func,
