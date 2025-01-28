@@ -17,14 +17,14 @@ DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const int world_rank_, 
 	: world_rank(world_rank_),
 	  world_size(world_size_),
 	  total_creatures(total_creatures_),
-	  creature_positions(creature_positions_),
-	  creature_fitnesses(std::vector<double>(creature_positions.size(), std::numeric_limits<double>::infinity())),
 	  lower_bound(lower_bound_),
 	  upper_bound(upper_bound_),
 	  survival_rate(survival_rate_),
 	  mutation_rate(mutation_rate_),
-	  best_creature_index(0),
-	  func(func_) {
+	  func(func_),
+	  creature_positions(creature_positions_),
+	  creature_fitnesses(std::vector<double>(creature_positions.size(), std::numeric_limits<double>::infinity())),
+	  best_creature_index(0) {
 	assert(world_size > 0);
 	assert(world_rank >= 0 && world_rank <= world_size - 1);
 	assert(total_creatures > 0);

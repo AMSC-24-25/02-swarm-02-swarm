@@ -6,18 +6,20 @@
 #include "ObjectiveFunction.hpp"
 
 class DistributedGeneticAlgorithm {
-   public:
+   private:
 	const int world_rank;
 	const int world_size;
 	const size_t total_creatures;
-	std::vector<std::vector<double>> creature_positions;
-	std::vector<double> creature_fitnesses;
 	const double lower_bound;
 	const double upper_bound;
 	const double survival_rate;
 	const double mutation_rate;
-	size_t best_creature_index;
 	const ObjectiveFunction& func;
+
+   public:
+	std::vector<std::vector<double>> creature_positions;
+	std::vector<double> creature_fitnesses;
+	size_t best_creature_index;
 
 	DistributedGeneticAlgorithm(const int world_rank, const int world_size, const size_t total_creatures,
 								const std::vector<std::vector<double>>& creature_positions, const double lower_bound,
