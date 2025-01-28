@@ -28,7 +28,20 @@ endif()
 
 set(WARNINGS -Wall -Wextra -Wpedantic -Werror -Wshadow)
 
-file(GLOB_RECURSE SOURCES "src/*.cpp")
+set(SOURCES
+    src/Algorithm.cpp
+    src/Creature.cpp
+    src/EuclideanDistance.cpp
+    src/GeneticAlgorithm.cpp
+    src/Particle.cpp
+    src/Rastrigin.cpp
+    src/Rosenbrock.cpp
+    src/Sphere.cpp
+    src/Swarm.cpp
+)
+if(USE_MPI)
+    list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
+endif()
 
 # Define main library target
 add_library(02-swarm ${SOURCES})
@@ -71,6 +84,7 @@ if(ENABLE_TESTS)
 
     if(USE_MPI)
         add_executable(test_genetic_convergence_mpi test/test_genetic_convergence_mpi.cpp)
+        target_compile_definitions(test_genetic_convergence_mpi PUBLIC USE_MPI=1)
         target_link_libraries(test_genetic_convergence_mpi PUBLIC 02-swarm gtest gtest_main MPI::MPI_CXX)
         gtest_discover_tests(test_genetic_convergence_mpi)
     endif(USE_MPI)
