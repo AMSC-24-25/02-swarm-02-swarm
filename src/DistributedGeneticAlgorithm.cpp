@@ -61,12 +61,14 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 		creature_positions.resize(total_creatures);
 		creature_fitnesses.resize(total_creatures);
 		for (int i = 1; i < world_size; i++) {
-			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
+			const size_t start = i * local_size;
+			const size_t end = (i + 1) * local_size;
+			for (size_t j{start}; j < end; j++) {
 				creature_positions.at(j).resize(dimensions);
 				MPI_Recv(creature_positions.at(j).data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD,
 						 MPI_STATUS_IGNORE);
 			}
-			MPI_Recv(creature_fitnesses.data() + (i * local_size), local_size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD,
+			MPI_Recv(creature_fitnesses.data() + start, local_size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD,
 					 MPI_STATUS_IGNORE);
 		}
 	} else {
@@ -100,10 +102,12 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 	// The root process then sends back all the creatures to the processes
 	if (world_rank == 0) {
 		for (int i = 1; i < world_size; i++) {
-			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
+			const size_t start = i * local_size;
+			const size_t end = (i + 1) * local_size;
+			for (size_t j{start}; j < end; j++) {
 				MPI_Send(creature_positions.at(j).data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
 			}
-			MPI_Send(creature_fitnesses.data() + (i * local_size), local_size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
+			MPI_Send(creature_fitnesses.data() + start, local_size, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
 		}
 	} else {
 		for (size_t i{0}; i < local_size; i++) {
@@ -148,7 +152,8 @@ void DistributedGeneticAlgorithm::applyCrossover(const size_t seed) {
 		assert(mother_index < survived);
 		assert(father_index != mother_index);
 
-		for (size_t j{0}; j < creature_positions.at(i).size(); j++) {
+		const size_t d = creature_positions.at(i).size();
+		for (size_t j{0}; j < d; j++) {
 			creature_positions.at(i).at(j) =
 				bool_dist(rnd) ? creature_positions.at(father_index).at(j) : creature_positions.at(mother_index).at(j);
 		}

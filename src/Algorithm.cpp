@@ -169,7 +169,9 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 	if (world_rank == 0) {
 		// The root process sends to everyone
 		for (int i = 1; i < world_size; i++) {
-			for (size_t j{i * local_size}; j < (i + 1) * local_size; j++) {
+			const size_t start = i * local_size;
+			const size_t end = (i + 1) * local_size;
+			for (size_t j{start}; j < end; j++) {
 				MPI_Send(creature_positions[j].data(), dimensions, MPI_DOUBLE, i, 0, MPI_COMM_WORLD);
 			}
 		}
