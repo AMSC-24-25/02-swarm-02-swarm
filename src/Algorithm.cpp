@@ -37,9 +37,11 @@ void print_point(const size_t dimensions, const std::vector<double>& x, const do
 
 }  // namespace utils
 
-void run_swarm(const size_t dimensions, const size_t num_particles, const size_t max_iterations, const size_t seed,
-			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
-			   const size_t n_threads) {
+std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const size_t num_particles,
+												 const size_t max_iterations, const size_t seed,
+												 const double lower_bound, const double upper_bound,
+												 const std::unique_ptr<ObjectiveFunction>& func,
+												 const size_t n_threads) {
 	std::vector<Particle> swarmParticles;
 
 	for (size_t i = 0; i < num_particles; i++) {
@@ -74,6 +76,8 @@ void run_swarm(const size_t dimensions, const size_t num_particles, const size_t
 	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
 			  << std::endl;
 	std::cout << std::endl;
+
+	return {swarm.bestGlobalPosition, swarm.minimum};
 }
 
 std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,

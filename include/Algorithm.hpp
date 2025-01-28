@@ -9,9 +9,11 @@
 
 namespace algorithm {
 
-void run_swarm(const size_t dimensions, const size_t num_particles, const size_t max_iterations, const size_t seed,
-			   const double lower_bound, const double upper_bound, const std::unique_ptr<ObjectiveFunction>& func,
-			   const size_t n_threads);
+std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const size_t num_particles,
+												 const size_t max_iterations, const size_t seed,
+												 const double lower_bound, const double upper_bound,
+												 const std::unique_ptr<ObjectiveFunction>& func,
+												 const size_t n_threads);
 
 std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,
 														  const size_t max_iterations, const size_t seed,
