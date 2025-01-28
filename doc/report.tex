@@ -3,10 +3,12 @@
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[margin=1in]{geometry}
 
-\title{Project for Advanced Methods for Scientific Computing a.y. 2024/2025}
-\author{Filippo Barbari - Group 02}
+\title{%
+	Parallel Genetic Algorithm with OpenMP and MPI \\
+	\large Project for Advanced Methods for Scientific Computing \\
+	a.y. 2024/2025}
+\author{Filippo Barbari 259411 - Group 02}
 \date{4th February 2025}
 
 \begin{document}
@@ -23,9 +25,50 @@
 	\clearpage
 	
 	\section{Genetic Algorithm}
+	A Genetic Algorithm (GA, for short) is a type of derivative-free optimization algorithm which aims to mimic the evolutionary behavior of animal species in order to find the optimum of a given function.
+	In the GA jargon, a \textbf{creature} is a certain solution (i.e. a point in the \textit{n}-dimensional search space) while the \textbf{population} is the collection of all solutions currently handled by the algorithm. Also, to further explain the analogy, it is really common to see Genetic Algorithm descriptions using the term \textbf{generation} to indicate iterations and \textbf{offspring} to indicate the population for the next generation.
 	
+	A Genetic Algorithm, at a high level, is divided in 4 steps, to be repeated as many times as needed:
+	\begin{enumerate}
+		\item \textbf{Evaluation}: Each creature/solution is evaluated and assigned a \textbf{fitness score}.
+
+		\item \textbf{Selection}: Based on the results of the evaluation phase, a process is applied to either select the "best" creatures (the ones with better results) or to discard the "worst" creatures. This process emulates the natural selection applied from a certain environment to the animal species which live in it.
+		
+		\item \textbf{Crossover/Reproduction}: During this phase, the selected creatures are randomly combined to create new offspring (new solutions) to fill the next generation.
+
+		\item \textbf{Mutation}: The solutions in the new generation are randomly modified to introduce variety in the population.
+	\end{enumerate}
+
+	A Genetic Algorithm needs a pair of parameters to control its behavior:
+	\begin{itemize}
+		\item The \textbf{survival rate}: a coefficient between 0 and 1 representing the relative amount of creatures surviving from a generation to the next one.
+		\item The \textbf{mutation rate}: a coefficient between 0 and 1 representing the probability of a mutation appearing in a creature.
+	\end{itemize}
+
+	These two parameters help to control the algorithm's behavior and to balance it between exploration and convergence.
+	A low survival rate means that a lot of solutions are discarded at each generation and, therefore, the offspring is generated from a small pool of creatures resulting in a fast convergence towards an optimum.
+	A high mutation rate, on the other hand, makes the algorithm more similar to a random search since many of the creatures of each generation are 
+
+	\section{Analysis}
+	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we say that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and discards all the worst $n \cdot (1 - s)$ creatures.
+
+	\subsection{Evaluation}
+	The evaluation phase requires to compute the value of the objective/fitness function for each creature in the population. We can assume that the evaluation of the objective function on a given creature is independent from all the other creatures in the population so this phase is embarrassingly parallel.
+	We can also optimize this phase by avoiding to re-compute the fitness for creatures which did not change since the last generation.
+
+	\subsection{Selection}
+
+	\subsection{Crossover}
+
+	\subsection{Mutation}
+
 	\section{Implementation}
+	\subsection{OpenMP}
+	\subsection{MPI}
 	
 	\section{Results}
+	\subsection{Benchmark setup}
+	\subsection{OpenMP results}
+	\subsection{MPI results}
 
 \end{document}
