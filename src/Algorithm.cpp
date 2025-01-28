@@ -40,8 +40,8 @@ void print_point(const size_t dimensions, const std::vector<double>& x, const do
 std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const size_t num_particles,
 												 const size_t max_iterations, const size_t seed,
 												 const double lower_bound, const double upper_bound,
-												 const std::unique_ptr<ObjectiveFunction>& func,
-												 const size_t n_threads) {
+												 const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads,
+												 const bool verbose) {
 	std::vector<Particle> swarmParticles;
 
 	for (size_t i = 0; i < num_particles; i++) {
@@ -62,20 +62,25 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 		swarm.updateInertia(max_iterations, w_min, w_max);
 		swarm.updateParticles();
 		swarm.findBestFitness();
-		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-		std::cout << "  Current minimum: " << std::endl;
-		utils::print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
-		std::cout << std::endl;
+
+		if (verbose) {
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
+			std::cout << std::endl;
+		}
 	}
 
 	const double end = omp_get_wtime();
 
-	std::cout << std::endl;
-	std::cout << "Minimum found:" << std::endl;
-	utils::print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
-	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
-			  << std::endl;
-	std::cout << std::endl;
+	if (verbose) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, swarm.bestGlobalPosition, swarm.minimum);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
 
 	return {swarm.bestGlobalPosition, swarm.minimum};
 }
@@ -85,7 +90,7 @@ std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimension
 														  const double lower_bound, const double upper_bound,
 														  const double mutation_rate, const double survival_rate,
 														  const std::unique_ptr<ObjectiveFunction>& func,
-														  const size_t n_threads) {
+														  const size_t n_threads, const bool verbose) {
 	std::vector<Creature> creatures;
 
 	{
@@ -112,20 +117,24 @@ std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimension
 		ga.evaluateCreatures();
 		ga.sortCreatures();
 
-		std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-		std::cout << "  Current minimum: " << std::endl;
-		utils::print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
-		std::cout << std::endl;
+		if (verbose) {
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
+			std::cout << std::endl;
+		}
 	}
 
 	const double end = omp_get_wtime();
 
-	std::cout << std::endl;
-	std::cout << "Minimum found:" << std::endl;
-	utils::print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
-	std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
-			  << std::endl;
-	std::cout << std::endl;
+	if (verbose) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, ga.bestCreature.position, ga.bestCreature.fitness);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
 
 	return {ga.bestCreature.position, ga.bestCreature.fitness};
 }
@@ -135,7 +144,8 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 													   const size_t max_iterations, const size_t seed,
 													   const double lower_bound, const double upper_bound,
 													   const double mutation_rate, const double survival_rate,
-													   const std::unique_ptr<ObjectiveFunction>& func) {
+													   const std::unique_ptr<ObjectiveFunction>& func,
+													   const bool verbose) {
 	MPI_Init(NULL, NULL);
 
 	int world_size;
@@ -195,7 +205,7 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 		ga.evaluateCreatures();
 		ga.sortCreatures();
 
-		if (world_rank == 0) {
+		if (verbose && world_rank == 0) {
 			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
 			std::cout << "  Current minimum: " << std::endl;
 			utils::print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),
@@ -209,7 +219,7 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 
 	MPI_Finalize();
 
-	if (world_rank == 0) {
+	if (verbose && world_rank == 0) {
 		std::cout << std::endl;
 		std::cout << "Minimum found:" << std::endl;
 		utils::print_point(dimensions, ga.creature_positions.at(ga.best_creature_index),

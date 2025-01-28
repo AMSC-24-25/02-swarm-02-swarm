@@ -270,15 +270,16 @@ int main(const int argc, const char** argv) {
 	}
 
 	if (algo == minimization_algorithm::SWARM_SEARCH) {
-		algorithm::run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads);
+		algorithm::run_swarm(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound, func, n_threads,
+							 true);
 	} else if (algo == minimization_algorithm::GENETIC_OPENMP) {
 		algorithm::run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
-									  mutation_rate, survival_rate, func, n_threads);
+									  mutation_rate, survival_rate, func, n_threads, true);
 	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		algorithm::run_genetic_mpi(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
-								   mutation_rate, survival_rate, func);
+								   mutation_rate, survival_rate, func, true);
 	}
 #endif	// USE_MPI
 	else {

@@ -30,8 +30,9 @@ TEST(GeneticConvergenceMPI, Sphere) {
 
 	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_mpi(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, s);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_mpi(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+								   mutation_rate, survival_rate, s, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -54,8 +55,9 @@ TEST(GeneticConvergenceMPI, EuclideanDistance) {
 
 	const std::unique_ptr<ObjectiveFunction> ed = std::make_unique<EuclideanDistance>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_mpi(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, ed);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_mpi(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+								   mutation_rate, survival_rate, ed, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -78,8 +80,9 @@ TEST(GeneticConvergenceMPI, Rosenbrock) {
 
 	std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_mpi(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_mpi(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+								   mutation_rate, survival_rate, r, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -105,8 +108,9 @@ TEST(GeneticConvergenceMPI, Rastrigin) {
 
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rastrigin>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_mpi(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_mpi(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+								   mutation_rate, survival_rate, r, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 

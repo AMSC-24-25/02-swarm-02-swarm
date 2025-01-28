@@ -38,8 +38,9 @@ TEST(GeneticConvergenceOpenMP, Sphere) {
 
 	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, s, 1);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_openmp(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+									  mutation_rate, survival_rate, s, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -71,8 +72,9 @@ TEST(GeneticConvergenceOpenMP, EuclideanDistance) {
 
 	const std::unique_ptr<ObjectiveFunction> ed = std::make_unique<EuclideanDistance>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, ed, 1);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_openmp(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+									  mutation_rate, survival_rate, ed, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -104,8 +106,9 @@ TEST(GeneticConvergenceOpenMP, Rosenbrock) {
 
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_openmp(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+									  mutation_rate, survival_rate, r, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -140,8 +143,9 @@ TEST(GeneticConvergenceOpenMP, Rastrigin) {
 
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rastrigin>();
 
-	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
-		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
+	const std::pair<std::vector<double>, double> result =
+		algorithm::run_genetic_openmp(dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound,
+									  mutation_rate, survival_rate, r, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 

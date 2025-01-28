@@ -35,7 +35,7 @@ TEST(SwarmConvergence, Sphere) {
 	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, s, 1);
+		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, s, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -61,7 +61,7 @@ TEST(SwarmConvergence, EuclideanDistance) {
 	const std::unique_ptr<ObjectiveFunction> ed = std::make_unique<EuclideanDistance>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, ed, 1);
+		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, ed, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -87,7 +87,7 @@ TEST(SwarmConvergence, Rosenbrock) {
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, r, 1);
+		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, r, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
@@ -116,7 +116,7 @@ TEST(SwarmConvergence, Rastrigin) {
 	const std::unique_ptr<ObjectiveFunction> ed = std::make_unique<EuclideanDistance>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, ed, 1);
+		algorithm::run_swarm(dimensions, num_particles, max_iterations, seed, lower_bound, upper_bound, ed, 1, false);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
