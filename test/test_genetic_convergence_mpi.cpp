@@ -18,6 +18,8 @@ double absolute_error(const double expected, const double actual) {
 }
 
 TEST(GeneticConvergenceMPI, Sphere) {
+	MPI_Init(NULL, NULL);
+
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
@@ -40,9 +42,13 @@ TEST(GeneticConvergenceMPI, Sphere) {
 	for (size_t i = 0; i < dimensions; i++) {
 		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
+
+	MPI_Finalize();
 }
 
 TEST(GeneticConvergenceMPI, EuclideanDistance) {
+	MPI_Init(NULL, NULL);
+
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
@@ -65,9 +71,13 @@ TEST(GeneticConvergenceMPI, EuclideanDistance) {
 	for (size_t i = 0; i < dimensions; i++) {
 		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
+
+	MPI_Finalize();
 }
 
 TEST(GeneticConvergenceMPI, Rosenbrock) {
+	MPI_Init(NULL, NULL);
+
 	const size_t dimensions = 2;
 	const size_t num_creatures = 1'000;
 	const size_t max_iterations = 1'000;
@@ -93,9 +103,13 @@ TEST(GeneticConvergenceMPI, Rosenbrock) {
 	for (size_t i = 0; i < dimensions; i++) {
 		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 0.1);
 	}
+
+	MPI_Finalize();
 }
 
 TEST(GeneticConvergenceMPI, Rastrigin) {
+	MPI_Init(NULL, NULL);
+
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
@@ -118,4 +132,6 @@ TEST(GeneticConvergenceMPI, Rastrigin) {
 	for (size_t i = 0; i < dimensions; i++) {
 		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
+
+	MPI_Finalize();
 }

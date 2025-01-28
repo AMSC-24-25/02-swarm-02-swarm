@@ -146,8 +146,6 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 													   const double mutation_rate, const double survival_rate,
 													   const std::unique_ptr<ObjectiveFunction>& func,
 													   const bool verbose) {
-	MPI_Init(NULL, NULL);
-
 	int world_size;
 	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
 	int world_rank;
@@ -216,8 +214,6 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 
 	MPI_Barrier(MPI_COMM_WORLD);
 	const double end = MPI_Wtime();
-
-	MPI_Finalize();
 
 	if (verbose && world_rank == 0) {
 		std::cout << std::endl;
