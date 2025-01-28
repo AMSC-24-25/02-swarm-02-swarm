@@ -98,7 +98,7 @@ if(ENABLE_BENCHMARKS)
 
     set(BENCHMARK_SOURCES
         bench/bench_swarm_search.cpp
-        bench/bench_genetic.cpp
+        bench/bench_genetic_omp.cpp
     )
     add_executable(bench ${BENCHMARK_SOURCES})
     target_link_libraries(bench PUBLIC 02-swarm benchmark benchmark_main)

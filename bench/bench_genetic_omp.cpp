@@ -6,7 +6,7 @@
 #include "Algorithm.hpp"
 #include "Rosenbrock.hpp"
 
-static void Genetic_Rosenbrock(benchmark::State& state) {
+static void GeneticOpenMP_Rosenbrock(benchmark::State& state) {
 	const size_t dimensions = 2;
 	const size_t num_creatures = state.range(0);
 	const size_t max_iterations = 100;
@@ -34,4 +34,4 @@ static void Genetic_Rosenbrock(benchmark::State& state) {
 	}
 }
 
-BENCHMARK(Genetic_Rosenbrock)->Range(3, 1'000)->RangeMultiplier(2)->UseManualTime();
+BENCHMARK(GeneticOpenMP_Rosenbrock)->Range(3, 1'000)->RangeMultiplier(2)->UseManualTime();
