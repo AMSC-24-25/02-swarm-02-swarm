@@ -3,7 +3,8 @@
 
 #include <gtest/gtest.h>
 
-#include "GeneticAlgorithm.hpp"
+#include "Algorithm.hpp"
+#include "Creature.hpp"
 #include "Sphere.hpp"
 #include "EuclideanDistance.hpp"
 #include "Rosenbrock.hpp"
@@ -35,25 +36,16 @@ TEST(GeneticConvergenceOpenMP, Sphere) {
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
-	Sphere s;
+	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, s, 1);
+	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
+		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, s, 1);
 
-	ga.evaluateCreatures();
-	ga.sortCreatures();
-
-	for (size_t i{0}; i < max_iterations; i++) {
-		ga.applyCrossover(seed + i);
-		ga.applyMutation(seed + i + 1);
-		ga.evaluateCreatures();
-		ga.sortCreatures();
-	}
-
-	EXPECT_LE(absolute_error(0.0, ga.bestCreature.fitness), 1e-3);
+	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), ga.bestCreature.position.at(i)), 1e-3);
+		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
 }
 
@@ -77,25 +69,16 @@ TEST(GeneticConvergenceOpenMP, EuclideanDistance) {
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
-	EuclideanDistance ed;
+	const std::unique_ptr<ObjectiveFunction> ed = std::make_unique<EuclideanDistance>();
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, ed, 1);
+	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
+		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, ed, 1);
 
-	ga.evaluateCreatures();
-	ga.sortCreatures();
-
-	for (size_t i{0}; i < max_iterations; i++) {
-		ga.applyCrossover(seed + i);
-		ga.applyMutation(seed + i + 1);
-		ga.evaluateCreatures();
-		ga.sortCreatures();
-	}
-
-	EXPECT_LE(absolute_error(0.0, ga.bestCreature.fitness), 1e-3);
+	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), ga.bestCreature.position.at(i)), 1e-3);
+		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
 }
 
@@ -119,28 +102,19 @@ TEST(GeneticConvergenceOpenMP, Rosenbrock) {
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
-	Rosenbrock r;
+	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
+	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
+		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
 
-	ga.evaluateCreatures();
-	ga.sortCreatures();
+	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
-	for (size_t i{0}; i < max_iterations; i++) {
-		ga.applyCrossover(seed + i);
-		ga.applyMutation(seed + i + 1);
-		ga.evaluateCreatures();
-		ga.sortCreatures();
-	}
-
-	EXPECT_LE(absolute_error(0.0, ga.bestCreature.fitness), 1e-3);
-
-	std::vector<double> expected_minimum(dimensions);
+	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (size_t i = 0; i < dimensions; i++) {
-		expected_minimum[i] = std::pow(r.a, static_cast<double>(i + 1));
+		expected_minimum[i] = std::pow(static_cast<Rosenbrock*>(r.get())->a, static_cast<double>(i + 1));
 	}
 	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), ga.bestCreature.position.at(i)), 0.1);
+		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 0.1);
 	}
 }
 
@@ -164,24 +138,15 @@ TEST(GeneticConvergenceOpenMP, Rastrigin) {
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
-	Rastrigin r;
+	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rastrigin>();
 
-	GeneticAlgorithm ga(creatures, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
+	const std::pair<std::vector<double>, double> result = algorithm::run_genetic_openmp(
+		dimensions, num_creatures, max_iterations, seed, lower_bound, upper_bound, mutation_rate, survival_rate, r, 1);
 
-	ga.evaluateCreatures();
-	ga.sortCreatures();
-
-	for (size_t i{0}; i < max_iterations; i++) {
-		ga.applyCrossover(seed + i);
-		ga.applyMutation(seed + i + 1);
-		ga.evaluateCreatures();
-		ga.sortCreatures();
-	}
-
-	EXPECT_LE(absolute_error(0.0, ga.bestCreature.fitness), 1e-3);
+	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
 	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), ga.bestCreature.position.at(i)), 1e-3);
+		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
 	}
 }
