@@ -67,7 +67,13 @@ if(ENABLE_TESTS)
     endmacro()
 
     add_test(swarm_convergence)
-    add_test(genetic_convergence)
+    add_test(genetic_convergence_omp)
+
+    if(USE_MPI)
+        add_executable(test_genetic_convergence_mpi test/test_genetic_convergence_mpi.cpp)
+        target_link_libraries(test_genetic_convergence_mpi PUBLIC 02-swarm gtest gtest_main MPI::MPI_CXX)
+        gtest_discover_tests(test_genetic_convergence_mpi)
+    endif(USE_MPI)
 
     add_executable(TestRastrigin test/TestRastrigin.cpp)
     target_link_libraries(TestRastrigin PUBLIC 02-swarm gtest gtest_main)

@@ -15,7 +15,7 @@ double absolute_error(const double expected, const double actual) {
 	return std::abs(expected - actual);
 }
 
-TEST(GeneticConvergence, Sphere) {
+TEST(GeneticConvergenceOpenMP, Sphere) {
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
@@ -57,7 +57,7 @@ TEST(GeneticConvergence, Sphere) {
 	}
 }
 
-TEST(GeneticConvergence, EuclideanDistance) {
+TEST(GeneticConvergenceOpenMP, EuclideanDistance) {
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
@@ -99,7 +99,7 @@ TEST(GeneticConvergence, EuclideanDistance) {
 	}
 }
 
-TEST(GeneticConvergence, Rosenbrock) {
+TEST(GeneticConvergenceOpenMP, Rosenbrock) {
 	const size_t dimensions = 2;
 	const size_t num_creatures = 1'000;
 	const size_t max_iterations = 1'000;
@@ -144,7 +144,7 @@ TEST(GeneticConvergence, Rosenbrock) {
 	}
 }
 
-TEST(GeneticConvergence, Rastrigin) {
+TEST(GeneticConvergenceOpenMP, Rastrigin) {
 	const size_t dimensions = 2;
 	const size_t num_creatures = 100;
 	const size_t max_iterations = 1'000;
