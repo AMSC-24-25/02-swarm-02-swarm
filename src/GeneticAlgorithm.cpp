@@ -115,7 +115,7 @@ void GeneticAlgorithm::applyMutation(const size_t seed) {
 				continue;
 			}
 
-			creatures.at(i).position[index_dist(rnd)] = position_dist(rnd);
+			creatures.at(i).position.at(index_dist(rnd)) = position_dist(rnd);
 			// Reset its fitness
 			creatures.at(i).fitness = std::numeric_limits<double>::infinity();
 		}
