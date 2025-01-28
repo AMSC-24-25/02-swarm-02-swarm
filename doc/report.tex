@@ -52,6 +52,7 @@
 
 	Usually, a Genetic Algorithm deals with arrays of bits as solutions, or arrays of discretized values, indicating the "genome" of each creature. In our case, however, we are dealing with the continuous landscapes of $n$-dimensional mathematical functions such as Rosenbrock: this different application domain required some modifications in certain key parts of the algorithm which we will discuss in the following sections.
 
+	\clearpage
 	\section{Analysis}
 	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we say that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and discards all the worst $n \cdot (1 - s)$ creatures.
 
@@ -78,12 +79,14 @@
 
 	This phase is embarrassingly parallel since mutating a creature is independent from all other creatures.
 
+	\clearpage
 	\section{Implementation}
 	In this section we will discuss the implementation details and choices we made to overcome some challenges we faced during development.
 
 	\subsection{OpenMP}
 	\subsection{MPI}
 	
+	\clearpage
 	\section{Results}
 	\subsection{Benchmark setup}
 	\subsection{OpenMP results}
