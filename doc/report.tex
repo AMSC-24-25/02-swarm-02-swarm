@@ -3,6 +3,13 @@
 \usepackage[english]{babel}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{xcolor}
+
+% Light gray
+\definecolor{lgrey}{rgb}{0.9,0.9,0.9}
+% Dark green
+\definecolor{dkgreen}{rgb}{0,0.6,0}
 
 \title{%
 	Parallel Genetic Algorithm with OpenMP and MPI \\
@@ -57,6 +64,7 @@
 	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we say that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and discards all the worst $n \cdot (1 - s)$ creatures.
 
 	\subsection{Evaluation}
+	\label{analysis:eval}
 	The evaluation phase requires to compute the value of the objective/fitness function for each creature in the population. We can assume that the evaluation of the objective function on a given creature is independent from all the other creatures in the population so this phase is embarrassingly parallel.
 	We can also optimize this phase by avoiding to re-compute the fitness for creatures which did not change since the last generation.
 
@@ -85,10 +93,173 @@
 
 	The API to use these algorithms is inside \texttt{src/Algorithm.cpp} which handles the initialization of the input structures, performs the actual loop and extracts the result at the end.
 
-	Both implementations regard the same algorithm, so they have a lot in common
+	Both implementations regard the same algorithm but they use two different paradigm of parallel programming, so they have at the same time a lot of common points and differences.
+	For example, both use a single class to handle the state of the algorithm (\texttt{src/GeneticAlgorithm.cpp} for the OpenMP implementation and \texttt{src/DistributedGeneticAlgorithm.cpp} for the MPI implementation) but, while for the shared-memory version an instance of this class represents the global state of the algorithm (which all threads access and use), for the distributed version this class represents just the data local to each process.
+	Another example is the method used to store the population data: the OpenMP implementation uses an \texttt{std::vector} of \texttt{Creature} objects while the MPI one uses two \texttt{std::vector}s containing just the raw data.
 
 	\subsection{OpenMP}
+	As mentioned earlier, the OpenMP implementation uses an \texttt{std::vector} of \texttt{Creature} objects to store the population data.
+	Each \texttt{Creature} (structure visible at \texttt{src/Creature.hpp}) is a simple object containing an \texttt{std::vector} representing its position and a single scalar, called \texttt{fitness}, which represents its fitness score.
+	This AoS design is straightforward and improves the cache efficiency for operations involving single creatures such as the evaluation and the mutation phases.
+	Also, keeping the fitness score together with the set of coordinates which generated it helps with the optimization mentioned in section \ref{analysis:eval} and allows implementing another simple feature: "marking" some creatures to be re-evaluated if they receive a mutation.
+	This feature is implemented by giving the value of double-precision positive infinity (i.e. \texttt{std::numeric\_limits<double>::infinity()}) to each creature which needs to be evaluated.
+
+	\paragraph{Evaluation}
+	As explained in section \ref{analysis:eval}, the evaluation phase is embarrassingly parallel, so we use a single \texttt{pragma omp} directive on the \texttt{for} loop (shown in listing \ref{listing:omp_eval}, extracted from \texttt{src/GeneticAlgorithm.cpp}) with the following parameters:
+	\begin{itemize}
+		\item \texttt{num\_threads(n\_threads)}: use all the available threads.
+		\item \texttt{schedule(static)}: divide iterations evenly \textit{a priori} between threads for minimum runtime overhead.
+		\item \texttt{default(none)}: debugging option to disable implicitly declarating variables as shared inside the parallel region.
+	\end{itemize}
+
+	\begin{lstlisting}[language=C++,
+		directivestyle={\color{black}},
+		backgroundcolor=\color{lgrey},
+    	basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+		numbers=left,
+		numbersep=5pt,
+    	numberstyle=\tiny\color{black},
+    	rulecolor=\color{black},
+    	keywordstyle=\color{purple},
+    	morekeywords={size_t,std},
+    	captionpos=b,
+    	caption={Parallel evaluation phase in OpenMP.},
+    	label={listing:omp_eval}
+	   ]
+void GeneticAlgorithm::evaluateCreatures() {
+  #pragma omp parallel for schedule(static) \
+    num_threads(n_threads) default(none)
+  for (size_t i = 0; i < creatures.size(); i++) {
+    if (std::isfinite(creatures.at(i).fitness)) {
+      continue;
+    }
+
+    creatures.at(i).fitness = func(creatures.at(i).position);
+  }
+}
+	\end{lstlisting}
+	
+	\paragraph{Selection and Crossover}
+	In this implementation the sorting of the creatures is performed serially before entering the crossover phase during which each thread creates its own random number generator with a unique seed before continuing.
+	This can be seen in listing \ref{listing:omp_crossover} in which each "discarded" creature is replaced by a new one.
+
+	\begin{lstlisting}[language=C++,
+		directivestyle={\color{black}},
+		backgroundcolor=\color{lgrey},
+    	basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+		numbers=left,
+		numbersep=5pt,
+    	numberstyle=\tiny\color{black},
+		commentstyle=\color{dkgreen},
+    	rulecolor=\color{black},
+    	keywordstyle=\color{purple},
+    	morekeywords={size_t,std},
+		tabsize=2,
+    	captionpos=b,
+    	caption={Parallel crossover phase in OpenMP.},
+    	label={listing:omp_crossover}
+	   ]
+void GeneticAlgorithm::applyCrossover(const size_t seed) {
+	// ...
+	#pragma omp parallel num_threads(n_threads) default(none) \
+		shared(seed, survived, n_creatures)
+	{
+		const size_t thread_id = omp_get_thread_num();
+
+		std::mt19937 rnd{seed + thread_id};
+		std::uniform_int_distribution<size_t> index_dist{
+			0, survived - 1};
+		std::bernoulli_distribution bool_dist{0.5};
+
+		#pragma omp for schedule(static)
+		for (size_t i = survived; i < n_creatures; i++) {
+			const size_t father_index = index_dist(rnd);
+			const Creature& father = creatures.at(father_index);
+
+			size_t mother_index;
+			do {
+				mother_index = index_dist(rnd);
+			} while (father_index == mother_index);
+			const Creature& mother = creatures.at(mother_index);
+
+			const size_t d = creatures.at(i).position.size();
+			for (size_t j{0}; j < d; j++) {
+				creatures.at(i).position.at(j) =
+					bool_dist(rnd) ?
+						father.position.at(j) :
+						mother.position.at(j);
+			}
+			creatures.at(i).fitness =
+				std::numeric_limits<double>::infinity();
+		}
+	}
+	// ...
+}
+	\end{lstlisting}
+
+	The parents are selected with a uniform distribution among the creatures which survived and the resulting "son" is generated by using a Bernoulli distribution to select the parent to copy the coordinate value from.
+
+	In this phase, we use the same \texttt{pragma omp} options as before but, instead, we separate the creation of the thread pool (\texttt{parallel} region) from its usage in the \texttt{for} loop.
+
+	\paragraph{Mutation}
+	In listing \ref{listing:omp_mutation}, the parallel mutation phase is shown.
+	Also here, each thread creates its own random number generator in the \texttt{parallel} region before entering the \texttt{for} region.
+
+	\begin{lstlisting}[language=C++,
+		directivestyle={\color{black}},
+		backgroundcolor=\color{lgrey},
+    	basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+		numbers=left,
+		numbersep=5pt,
+    	numberstyle=\tiny\color{black},
+		commentstyle=\color{dkgreen},
+    	rulecolor=\color{black},
+    	keywordstyle=\color{purple},
+    	morekeywords={size_t,std},
+		tabsize=2,
+    	captionpos=b,
+    	caption={Parallel mutation phase in OpenMP.},
+    	label={listing:omp_mutation}
+	   ]
+void GeneticAlgorithm::applyMutation(const size_t seed) {
+#pragma omp parallel num_threads(n_threads) default(none) \
+	shared(seed)
+	{
+		const size_t thread_id = omp_get_thread_num();
+
+		std::mt19937 rnd{seed + thread_id};
+		std::bernoulli_distribution bool_dist{mutation_rate};
+		std::uniform_real_distribution<double> position_dist{
+			lower_bound, upper_bound};
+
+		const size_t d = creatures.at(0).position.size();
+		std::uniform_int_distribution<size_t> index_dist{0, d-1};
+
+		#pragma omp for schedule(static)
+		for (size_t i = 0; i < creatures.size(); i++) {
+			if (!bool_dist(rnd)) {
+				continue;
+			}
+
+			creatures.at(i).position.at(index_dist(rnd)) =
+				position_dist(rnd);
+			creatures.at(i).fitness =
+				std::numeric_limits<double>::infinity();
+		}
+	}
+}
+	\end{lstlisting}
+
 	\subsection{MPI}
+	As mentioned earlier in this section, the distributed implementation of the Genetic Algorithm divides the global data already at the class level...
+
+	\paragraph{Evaluation}
+
+	\paragraph{Sorting and Crossover}
+
+	\paragraph{Mutation}
+	Each process creates its own random number generator from the given seed, which is supplied from the outside and is different at every iteration of the algorithm.
+	This way each process can use a unique sequence of random numbers and the user may have reproducible executions of the algorithm.
 	
 	\clearpage
 	\section{Results}
