@@ -1,10 +1,7 @@
-#include <vector>
 #include <iostream>
-#include <iomanip>
-#include <chrono>
-#include <algorithm>
-#include <memory>
 #include <random>
+#include <cmath>
+#include <algorithm>
 #include <omp.h>
 
 #if defined(USE_MPI) && USE_MPI == 1
@@ -287,8 +284,10 @@ int main(const int argc, const char** argv) {
 	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
+		MPI_Init(NULL, NULL);
 		algorithm::run_genetic_mpi(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
 								   mutation_rate, survival_rate, func, verbose);
+		MPI_Finalize();
 	}
 #endif	// USE_MPI
 	else {
