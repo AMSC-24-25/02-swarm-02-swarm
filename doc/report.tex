@@ -47,7 +47,10 @@
 
 	These two parameters help to control the algorithm's behavior and to balance it between exploration and convergence.
 	A low survival rate means that a lot of solutions are discarded at each generation and, therefore, the offspring is generated from a small pool of creatures resulting in a fast convergence towards an optimum.
-	A high mutation rate, on the other hand, makes the algorithm more similar to a random search since many of the creatures of each generation are 
+	A high mutation rate, on the other hand, makes the algorithm more similar to a random search since many of the creatures of each generation are randomly modified.
+	As usual, the best combination of these parameters changes from one problem to another, especially when dealing with high dimensionality.
+
+	Usually, a Genetic Algorithm deals with arrays of bits as solutions, or arrays of discretized values, indicating the "genome" of each creature. In our case, however, we are dealing with the continuous landscapes of $n$-dimensional mathematical functions such as Rosenbrock: this different application domain required some modifications in certain key parts of the algorithm which we will discuss in the following sections.
 
 	\section{Analysis}
 	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we say that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and discards all the worst $n \cdot (1 - s)$ creatures.
@@ -57,12 +60,27 @@
 	We can also optimize this phase by avoiding to re-compute the fitness for creatures which did not change since the last generation.
 
 	\subsection{Selection}
+	In this phase, as mentioned at the beginning of the section, the algorithm needs to sort all creatures in the current generation based on their fitness score and discard the worst ones.
+	In both implementations, this phase is called \texttt{sortCreatures} since most of the computational complexity of this phase comes from the sorting required.
 
 	\subsection{Crossover}
+	During the crossover phase the next generation of creatures is created by randomly combining some of the creatures which survived in the last generation.
+	There are many variations in the literature of this process: some involve different numbers of parents while others mix random values during the crossover.
+	In our implementations, only two unique parents are used and their "genome", their respective solutions are randomly mixed without introducing any modification.
+	To clarify, one can think of this procedure as flipping a fair coin for each coordinate in the solution and choosing the value from the first parent if it's heads or the second parent if it's tails.
+
+	In order to save memory and execution time, this technique is implemented, in both versions of the algorithm, by overwriting the worst solutions.
+
+	The only dependency each thread/process may have with others is the array of creatures on which they operate. The surviving creatures are only read for the crossover and we can divide evenly the remaining "slots" in the population between the threads/processes. For this reason, this phase is embarrassingly parallel.
 
 	\subsection{Mutation}
+	Lastly, each creature has a certain probability (the mutation rate) to be randomly modified. In the continuous domain of our implementations, this random modification means that a random coordinate (chosen uniformly) is replaced by a new random value in the whole domain.
+
+	This phase is embarrassingly parallel since mutating a creature is independent from all other creatures.
 
 	\section{Implementation}
+	In this section we will discuss the implementation details and choices we made to overcome some challenges we faced during development.
+
 	\subsection{OpenMP}
 	\subsection{MPI}
 	
