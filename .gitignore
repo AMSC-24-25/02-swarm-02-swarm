@@ -40,4 +40,5 @@ bin/
 .vscode/
 
 doc/*
-!doc/*.tex
+!doc/report.tex
+!doc/report.pdf
