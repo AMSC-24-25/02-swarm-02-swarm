@@ -11,6 +11,10 @@
 % Dark green
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 
+\usepackage{xspace}
+% Double right angle bracket
+\newcommand{\rrangle}{>\kern-1.2ex~>\xspace}
+
 \title{%
 	Parallel Genetic Algorithm with OpenMP and MPI \\
 	\large Project for Advanced Methods for Scientific Computing \\
@@ -202,8 +206,8 @@ void GeneticAlgorithm::applyCrossover(const size_t seed) {
 	In this phase, we use the same \texttt{pragma omp} options as before but, instead, we separate the creation of the thread pool (\texttt{parallel} region) from its usage in the \texttt{for} loop.
 
 	\paragraph{Mutation}
-	In listing \ref{listing:omp_mutation}, the parallel mutation phase is shown.
-	Also here, each thread creates its own random number generator in the \texttt{parallel} region before entering the \texttt{for} region.
+	Listing \ref{listing:omp_mutation} shows the parallel mutation phase in which, like the crossover phase, each thread creates its own random number generator in the \texttt{parallel} region before entering the \texttt{for} region.
+	For each creature in the population, there is a chance of mutation based on the mutation rate, which is determined using a Bernoulli distribution. If a creature is selected for mutation, a random coordinate in its position vector is chosen using a uniform distribution, and its value is replaced with a new random value within the bounds of the search space (\texttt{lower\_bound} and \texttt{upper\_bound}).
 
 	\begin{lstlisting}[language=C++,
 		directivestyle={\color{black}},
@@ -251,14 +255,177 @@ void GeneticAlgorithm::applyMutation(const size_t seed) {
 	\end{lstlisting}
 
 	\subsection{MPI}
-	As mentioned earlier in this section, the distributed implementation of the Genetic Algorithm divides the global data already at the class level...
+	As mentioned earlier in this section, the distributed implementation of the Genetic Algorithm divides the global data already at the class level, meaning that each instance of the class \texttt{DistributedGeneticAlgorithm} represents just a portion of the whole problem local to a single process.
+
+	\paragraph{Initialization}
+	Unlike the OpenMP implementation, this version of the Genetic Algorithm requires a non-trivial amount of work for the initialization of the creatures of the first generation.
+	Listing \ref{listing:mpi_init} (extracted from \texttt{src/Algorithm.cpp}) shows the scattering of the creatures data to all the processes right after serial initialization with random numbers.
+	The root process (also called \textit{master} or \textit{leader}) sends contiguous portions of the population array to each process individually.
+	This procedure is usually implemented through the MPI collective communication primitive \texttt{MPI\_Scatter} but that would have implied the positions of all the creatures in the population to be stored contiguously in the same vector.
+	Instead, we decided to implement the distributed population as an \texttt{std::vector<std::vector<double\rrangle} keeping the access to each creature straightforward.
+
+	\begin{lstlisting}[language=C++,
+		directivestyle={\color{black}},
+		backgroundcolor=\color{lgrey},
+    	basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+		numbers=left,
+		numbersep=5pt,
+    	numberstyle=\tiny\color{black},
+		commentstyle=\color{dkgreen},
+    	rulecolor=\color{black},
+    	keywordstyle=\color{purple},
+    	morekeywords={size_t,std,MPI_Send,MPI_Recv},
+		tabsize=2,
+    	captionpos=b,
+    	caption={Initialization of population with MPI.},
+    	label={listing:mpi_init}
+	   ]
+// ...
+if (world_rank == 0) {
+	for (int i = 1; i < world_size; i++) {
+		const size_t start = i * local_size;
+		const size_t end = (i + 1) * local_size;
+		for (size_t j{start}; j < end; j++) {
+			MPI_Send(creature_positions[j].data(),
+				dimensions,
+				MPI_DOUBLE,
+				i,
+				0,
+				MPI_COMM_WORLD);
+		}
+	}
+} else {
+	creature_positions.resize(local_size);
+	for (size_t i{0}; i < local_size; i++) {
+		creature_positions[i].resize(dimensions);
+		MPI_Recv(creature_positions[i].data(),
+			dimensions,
+			MPI_DOUBLE,
+			0,
+			0,
+			MPI_COMM_WORLD,
+			MPI_STATUS_IGNORE);
+	}
+}
+// ...
+	\end{lstlisting}
 
 	\paragraph{Evaluation}
+	Here each process already has a portion of the population, so it iterates serially on it without additional procedures required.
 
 	\paragraph{Sorting and Crossover}
+	During this phase, all processes send their creatures to the root process, which sorts them according to their fitness score, then sends back the portions of the sorted population to the respective processes.
+	Listing \ref{listing:mpi_sorting} shows how the initial gather and the final scatter of the population are implemented: the root process waits for all processes to send their creatures data along with the fitness scores (for the gather portion) while each process send this data and waits for it to come back after the sorting.
+
+	\begin{lstlisting}[language=C++,
+		directivestyle={\color{black}},
+		backgroundcolor=\color{lgrey},
+    	basicstyle=\footnotesize \ttfamily \color{black} \bfseries,
+		numbers=left,
+		numbersep=5pt,
+    	numberstyle=\tiny\color{black},
+		commentstyle=\color{dkgreen},
+    	rulecolor=\color{black},
+    	keywordstyle=\color{purple},
+    	morekeywords={size_t,std,MPI_Send,MPI_Recv},
+		tabsize=2,
+    	captionpos=b,
+    	caption={Sorting of the population with MPI.},
+    	label={listing:mpi_sorting}
+	   ]
+void DistributedGeneticAlgorithm::sortCreatures() {
+		// ...
+	if (world_rank == 0) {
+		creature_positions.resize(total_creatures);
+		creature_fitnesses.resize(total_creatures);
+		for (int i = 1; i < world_size; i++) {
+			const size_t start = i * local_size;
+			const size_t end = (i + 1) * local_size;
+			for (size_t j{start}; j < end; j++) {
+				creature_positions.at(j).resize(dimensions);
+				MPI_Recv(creature_positions.at(j).data(),
+					dimensions,
+					MPI_DOUBLE,
+					i,
+					0,
+					MPI_COMM_WORLD,
+					MPI_STATUS_IGNORE);
+			}
+			MPI_Recv(creature_fitnesses.data() + start,
+				local_size,
+				MPI_DOUBLE,
+				i,
+				0,
+				MPI_COMM_WORLD,
+				MPI_STATUS_IGNORE);
+		}
+	} else {
+		for (size_t i{0}; i < creature_positions.size(); i++) {
+			MPI_Send(creature_positions.at(i).data(),
+				dimensions,
+				MPI_DOUBLE,
+				0,
+				0,
+				MPI_COMM_WORLD);
+		}
+		MPI_Send(creature_fitnesses.data(),
+			creature_positions.size(),
+			MPI_DOUBLE,
+			0,
+			0,
+			MPI_COMM_WORLD);
+	}
+
+	// Here the root process sorts the creatures
+
+	if (world_rank == 0) {
+		for (int i = 1; i < world_size; i++) {
+			const size_t start = i * local_size;
+			const size_t end = (i + 1) * local_size;
+			for (size_t j{start}; j < end; j++) {
+				MPI_Send(creature_positions.at(j).data(),
+					dimensions,
+					MPI_DOUBLE,
+					i,
+					0,
+					MPI_COMM_WORLD);
+			}
+			MPI_Send(creature_fitnesses.data() + start,
+				local_size,
+				MPI_DOUBLE,
+				i,
+				0,
+				MPI_COMM_WORLD);
+		}
+	} else {
+		for (size_t i{0}; i < local_size; i++) {
+			creature_positions[i].resize(dimensions);
+			MPI_Recv(creature_positions[i].data(),
+				dimensions,
+				MPI_DOUBLE,
+				0,
+				0,
+				MPI_COMM_WORLD,
+				MPI_STATUS_IGNORE);
+		}
+		MPI_Recv(creature_fitnesses.data(),
+			local_size,
+			MPI_DOUBLE,
+			0,
+			0,
+			MPI_COMM_WORLD,
+			MPI_STATUS_IGNORE);
+	}
+
+	// ...
+}
+	\end{lstlisting}
+
+	After the sorting, the crossover is implemented like the OpenMP one but, obviously, without the preprocessor directives since no shared-memory parallelism is needed here.
+	
 
 	\paragraph{Mutation}
-	Each process creates its own random number generator from the given seed, which is supplied from the outside and is different at every iteration of the algorithm.
+	In this phase, each process creates its own random number generator from the given seed, which is supplied from the outside and is different at every iteration of the algorithm.
 	This way each process can use a unique sequence of random numbers and the user may have reproducible executions of the algorithm.
 	
 	\clearpage
