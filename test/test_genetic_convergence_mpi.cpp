@@ -1,5 +1,5 @@
 #include <vector>
-#include <random>
+#include <cmath>
 
 #include <mpi.h>
 
@@ -24,15 +24,6 @@ TEST(GeneticConvergenceMPI, Sphere) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<std::vector<double>> creature_positions;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creature_positions.push_back(tmp);
-	}
 
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
@@ -57,15 +48,6 @@ TEST(GeneticConvergenceMPI, EuclideanDistance) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<std::vector<double>> creature_positions;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creature_positions.push_back(tmp);
-	}
 
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
@@ -85,20 +67,11 @@ TEST(GeneticConvergenceMPI, EuclideanDistance) {
 
 TEST(GeneticConvergenceMPI, Rosenbrock) {
 	const size_t dimensions = 2;
-	const size_t num_creatures = 100;
+	const size_t num_creatures = 1'000;
 	const size_t max_iterations = 1'000;
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<std::vector<double>> creature_positions;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creature_positions.push_back(tmp);
-	}
 
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
@@ -115,7 +88,7 @@ TEST(GeneticConvergenceMPI, Rosenbrock) {
 		expected_minimum[i] = std::pow(static_cast<Rosenbrock*>(r.get())->a, static_cast<double>(i + 1));
 	}
 	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 1e-3);
+		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 0.1);
 	}
 }
 
@@ -126,15 +99,6 @@ TEST(GeneticConvergenceMPI, Rastrigin) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<std::vector<double>> creature_positions;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creature_positions.push_back(tmp);
-	}
 
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;

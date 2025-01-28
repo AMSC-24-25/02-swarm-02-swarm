@@ -29,7 +29,7 @@ DistributedGeneticAlgorithm::DistributedGeneticAlgorithm(const int world_rank_, 
 	assert(world_rank >= 0 && world_rank <= world_size - 1);
 	assert(total_creatures > 0);
 	assert(creature_positions.size() > 0);
-	assert(creature_positions.size() < total_creatures);
+	assert(creature_positions.size() <= total_creatures);
 	assert(std::all_of(creature_positions.begin(), creature_positions.end(),
 					   [&](const std::vector<double>& pos) { return pos.size() == creature_positions.at(0).size(); }));
 	assert(std::isfinite(lower_bound));
