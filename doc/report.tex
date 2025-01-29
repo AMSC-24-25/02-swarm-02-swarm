@@ -97,6 +97,7 @@
 	In this section we will discuss the implementation details and choices we made to overcome some challenges we faced during development.
 
 	The API to use these algorithms is inside \texttt{src/Algorithm.cpp} which handles the initialization of the input structures, performs the actual loop and extracts the result at the end.
+	The final result of the algorithm is an \texttt{std::pair} containing the vector of coordinates of the minimum found and the value of the function at that point.
 
 	Both implementations regard the same algorithm but they use two different paradigm of parallel programming, so they have at the same time a lot of common points and differences.
 	For example, both use a single class to handle the state of the algorithm (\texttt{src/GeneticAlgorithm.cpp} for the OpenMP implementation and \texttt{src/DistributedGeneticAlgorithm.cpp} for the MPI implementation) but, while for the shared-memory version an instance of this class represents the global state of the algorithm (which all threads access and use), for the distributed version this class represents just the data local to each process.
@@ -427,6 +428,13 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 	\paragraph{Mutation}
 	In this phase, each process creates its own random number generator from the given seed, which is supplied from the outside and is different at every iteration of the algorithm.
 	This way each process can use a unique sequence of random numbers and the user may have reproducible executions of the algorithm.
+
+	\subsection{Objective function}
+	Each algorithm requires a pointer to an object implementing the objective function to be minimized.
+	This is implemented with a pure virtual class (\texttt{include/ObjectiveFunction.hpp}) which declares a single method: the overloaded \texttt{operator()}.
+	This \texttt{const} method takes as input the array of coordinates to be evaluated in the form of an \texttt{std::vector} and returns a single scalar being the value of the function.
+
+	This design allows the user to minimize parameterized functions, such as Rosenbrock and Rastrigin, by declaring their parameters as fields.
 	
 	\clearpage
 	\section{Results}
