@@ -5,6 +5,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 \usepackage{xcolor}
+\usepackage{hyperref}
 
 % Light gray
 \definecolor{lgrey}{rgb}{0.9,0.9,0.9}
@@ -432,7 +433,7 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 	In this section we show the results of some benchmarks we performed to compare the shared-memory implementation and the distributed version of the Genetic Algorithm.
 
 	\subsection{Benchmark setup}
-	All benchmark results reported in the next paragraph have been measured on the same machine for which the relevant hardware specification are reported in the table \ref{hw-specs}, while the versions of various software used for the benchmarks are reported here:
+	All benchmark results reported in the following paragraphs have been measured on the same machine for which the relevant hardware specification are reported in table \ref{hw-specs}, while the versions of various software used for the benchmarks are reported here:
 	
 	\begin{itemize}
 		\item CMake 3.27.5
@@ -458,56 +459,77 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 		\label{hw-specs}
 	\end{table}
 
-	Both benchmark groups used Rosenbrock as objective function, with 10 dimensions and 100 max iterations while they vary the number of threads/processes used and the number of creatures in the population.
+	Both benchmark groups used Rosenbrock as objective function, with 10 dimensions, 100 max iterations, mutation rate 0.2 and survival rate 0.5 while they vary the number of threads/processes used and the population size.
+
+	Both benchmark groups do not use more than 4 threads/processes in order to have a fair comparison between OpenMP and MPI.
+	This limitation is due to the limited number of physical cores on the machine used which did not allow more than 4 MPI processes to be created.
 
 	\subsection{OpenMP results}
+	Tables \ref{table:omp_100k} and \ref{table:omp_1m} show the total execution time of the OpenMP implementation, along with the average time per iteration, with $10^5$ and $10^6$ creatures respectively and an increasing number of threads used.
+
+	The OpenMP implementation shows a good speedup, without any evident plateau, peaking with 4 cores and $10^6$ creatures at 2,32.
+	This result matches our expectations since most of the algorithm is embarrassingly parallel and can therefore use all the available threads.
+
 	\begin{table}[!ht]
-		\begin{tabular}{|l|l|l|l|}
+		\centering
+		\begin{tabular}{|c|c|c|c|}
 		\hline
-		Number of threads & Number of creatures & Total time {[}s{]} & Time per iteration {[}ms{]} \\ \hline
-		1                 & 100'000             & 2,456              & 24,56                       \\ \hline
-		2                 & 100'000             & 1,556              & 15,56                       \\ \hline
-		3                 & 100'000             & 1,267              & 12,67                       \\ \hline
-		4                 & 100'000             & 1,143              & 11,43                       \\ \hline
+		Threads used & Population size & Total time & Time per iteration \\ \hline
+		1                 & 100'000             & 2,456 s            & 24,56 ms                    \\ \hline
+		2                 & 100'000             & 1,556 s            & 15,56 ms                    \\ \hline
+		3                 & 100'000             & 1,267 s            & 12,67 ms                    \\ \hline
+		4                 & 100'000             & 1,143 s            & 11,43 ms                    \\ \hline
 		\end{tabular}
 		\caption{Execution times with 100'000 creatures and increasing number of threads for the OpenMP implementation.}
+		\label{table:omp_100k}
 	\end{table}
 
 	\begin{table}[!ht]
-		\begin{tabular}{|l|l|l|l|}
+		\centering
+		\begin{tabular}{|c|c|c|c|}
 		\hline
-		Number of threads & Number of creatures & Total time {[}s{]} & Time per iteration {[}ms{]} \\ \hline
-		1                 & 1'000'000           & 38,340             & 383,40                      \\ \hline
-		2                 & 1'000'000           & 23,536             & 235,36                      \\ \hline
-		3                 & 1'000'000           & 18,842             & 188,42                      \\ \hline
-		4                 & 1'000'000           & 16,478             & 164,78                      \\ \hline
+		Threads used & Population size & Total time & Time per iteration \\ \hline
+		1                 & 1'000'000           & 38,340 s           & 383,40 ms                   \\ \hline
+		2                 & 1'000'000           & 23,536 s           & 235,36 ms                   \\ \hline
+		3                 & 1'000'000           & 18,842 s           & 188,42 ms                   \\ \hline
+		4                 & 1'000'000           & 16,478 s           & 164,78 ms                   \\ \hline
 		\end{tabular}
 		\caption{Execution times with 1'000'000 creatures and increasing number of threads for the OpenMP implementation.}
+		\label{table:omp_1m}
 	\end{table}
 
 	\subsection{MPI results}
+	Tables \ref{table:mpi_100k} and \ref{table:mpi_1m} show the total execution time of the MPI implementation, along with the average time per iteration, with $10^5$ and $10^6$ creatures respectively and an increasing number of processes used.
+
+	It is clear that this implementation of the algorithm, unlike the OpenMP one, has a great bottleneck which does not allow any speedup at all.
+	This may point towards a high communication overhead, since the difference in execution time increases with the number of processes used.
+
 	\begin{table}[!ht]
-		\begin{tabular}{|l|l|l|l|}
+		\centering
+		\begin{tabular}{|c|c|c|c|}
 		\hline
-		Number of processes & Number of creatures & Total time {[}s{]} & Time per iteration {[}ms{]} \\ \hline
-		1                   & 100'000             & 3,997              & 39,97                       \\ \hline
-		2                   & 100'000             & 4,446              & 44,46                       \\ \hline
-		3                   & 100'000             & 5,211              & 52,11                       \\ \hline
-		4                   & 100'000             & 5,750              & 57,50                       \\ \hline
+		Processes used & Population size & Total time & Time per iteration \\ \hline
+		1                   & 100'000             & 3,997 s            & 39,97 ms                    \\ \hline
+		2                   & 100'000             & 4,446 s            & 44,46 ms                    \\ \hline
+		3                   & 100'000             & 5,211 s            & 52,11 ms                    \\ \hline
+		4                   & 100'000             & 5,750 s            & 57,50 ms                    \\ \hline
 		\end{tabular}
 		\caption{Execution times with 100'000 creatures and increasing number of processes for the MPI implementation.}
+		\label{table:mpi_100k}
 	\end{table}
 
 	\begin{table}[!ht]
-		\begin{tabular}{|l|l|l|l|}
+		\centering
+		\begin{tabular}{|c|c|c|c|}
 		\hline
-		Number of processes & Number of creatures & Total time {[}s{]} & Time per iteration {[}ms{]} \\ \hline
-		1                   & 1'000'000           & 53,442             & 534,42                      \\ \hline
-		2                   & 1'000'000           & 54,872             & 548,72                      \\ \hline
-		3                   & 1'000'000           & 60,380             & 603,80                      \\ \hline
-		4                   & 1'000'000           & 69,860             & 698,60                      \\ \hline
+		Processes used & Population size & Total time & Time per iteration \\ \hline
+		1                   & 1'000'000           & 53,442 s           & 534,42 ms                   \\ \hline
+		2                   & 1'000'000           & 54,872 s           & 548,72 ms                   \\ \hline
+		3                   & 1'000'000           & 60,380 s           & 603,80 ms                   \\ \hline
+		4                   & 1'000'000           & 69,860 s           & 698,60 ms                   \\ \hline
 		\end{tabular}
 		\caption{Execution times with 1'000'000 creatures and increasing number of processes for the MPI implementation.}
+		\label{table:mpi_1m}
 	\end{table}
 
 \end{document}
