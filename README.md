@@ -26,6 +26,8 @@ You can also run the benchmark suite by executing:
 ./build/bench
 ```
 
+GoogleTest and Google Benchmark are automatically downloaded inside the build directory using [CPM](https://github.com/cpm-cmake/CPM.cmake), if they are enabled.
+
 By default, the test suite and the benchmark suite are enabled, but if you do not need them, you can disable them during configuration like so:
 ```bash
 cmake -S . -B build -DENABLE_TESTS=OFF -DENABLE_BENCHMARKS=OFF
