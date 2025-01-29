@@ -38,13 +38,13 @@
 	
 	\section{Genetic Algorithm}
 	A Genetic Algorithm (GA, for short) is a type of derivative-free optimization algorithm which aims to mimic the evolutionary behavior of animal species in order to find the optimum of a given function.
-	In the GA jargon, a \textbf{creature} is a certain solution (i.e. a point in the \textit{n}-dimensional search space) while the \textbf{population} is the collection of all solutions currently handled by the algorithm. Also, to further explain the analogy, it is really common to see Genetic Algorithm descriptions using the term \textbf{generation} to indicate iterations and \textbf{offspring} to indicate the population for the next generation.
+	In the GA jargon, a \textbf{creature} is a certain solution (a point in the \textit{n}-dimensional search space) while the \textbf{population} is the collection of all solutions currently handled by the algorithm. Also, to further clarify the analogy, it is really common to see Genetic Algorithm descriptions using the term \textbf{generation} to indicate iterations and \textbf{offspring} to indicate the population for the next generation.
 	
 	A Genetic Algorithm, at a high level, is divided in 4 steps, to be repeated as many times as needed:
 	\begin{enumerate}
 		\item \textbf{Evaluation}: Each creature/solution is evaluated and assigned a \textbf{fitness score}.
 
-		\item \textbf{Selection}: Based on the results of the evaluation phase, a process is applied to either select the "best" creatures (the ones with better results) or to discard the "worst" creatures. This process emulates the natural selection applied from a certain environment to the animal species which live in it.
+		\item \textbf{Selection}: Based on the results of the evaluation phase, a process is applied to either select the "best" creatures (the ones with better results) or to discard the "worst" ones. This process emulates the natural selection applied from a certain environment to the animal species which live in it.
 		
 		\item \textbf{Crossover/Reproduction}: During this phase, the selected creatures are randomly combined to create new offspring (new solutions) to fill the next generation.
 
@@ -54,7 +54,7 @@
 	A Genetic Algorithm needs a pair of parameters to control its behavior:
 	\begin{itemize}
 		\item The \textbf{survival rate}: a coefficient between 0 and 1 representing the relative amount of creatures surviving from a generation to the next one.
-		\item The \textbf{mutation rate}: a coefficient between 0 and 1 representing the probability of a mutation appearing in a creature.
+		\item The \textbf{mutation rate}: a coefficient between 0 and 1 representing the probability of a mutation appearing in a single creature.
 	\end{itemize}
 
 	These two parameters help to control the algorithm's behavior and to balance it between exploration and convergence.
@@ -66,7 +66,7 @@
 
 	\clearpage
 	\section{Analysis}
-	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we say that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and discards all the worst $n \cdot (1 - s)$ creatures.
+	In our implementation of the GA, we decided to use the selection technique often referred to as \textbf{elitism} which is really straightforward: if we assume that $n$ is the size of the population and $s$ is the survival rate, this technique sorts all the creatures based on their fitness score and selects the best $n \cdot s$ creatures.
 
 	\subsection{Evaluation}
 	\label{analysis:eval}
@@ -106,9 +106,9 @@
 	\subsection{OpenMP}
 	As mentioned earlier, the OpenMP implementation uses an \texttt{std::vector} of \texttt{Creature} objects to store the population data.
 	Each \texttt{Creature} (structure visible at \texttt{src/Creature.hpp}) is a simple object containing an \texttt{std::vector} representing its position and a single scalar, called \texttt{fitness}, which represents its fitness score.
-	This AoS design is straightforward and improves the cache efficiency for operations involving single creatures such as the evaluation and the mutation phases.
+	This AoS (Array-of-Structures) design is straightforward and improves the cache efficiency for operations involving single creatures such as the evaluation and the mutation phases.
 	Also, keeping the fitness score together with the set of coordinates which generated it helps with the optimization mentioned in section \ref{analysis:eval} and allows implementing another simple feature: "marking" some creatures to be re-evaluated if they receive a mutation.
-	This feature is implemented by giving the value of double-precision positive infinity (i.e. \texttt{std::numeric\_limits<double>::infinity()}) to each creature which needs to be evaluated.
+	This feature is implemented by giving the value of double-precision positive infinity (\texttt{std::numeric\_limits<double>::infinity()}) to each creature which needs to be evaluated.
 
 	\paragraph{Evaluation}
 	As explained in section \ref{analysis:eval}, the evaluation phase is embarrassingly parallel, so we use a single \texttt{pragma omp} directive on the \texttt{for} loop (shown in listing \ref{listing:omp_eval}, extracted from \texttt{src/GeneticAlgorithm.cpp}) with the following parameters:
@@ -467,7 +467,7 @@ void DistributedGeneticAlgorithm::sortCreatures() {
 		\label{hw-specs}
 	\end{table}
 
-	Both benchmark groups used Rosenbrock as objective function, with 10 dimensions, 100 max iterations, mutation rate 0.2 and survival rate 0.5 while they vary the number of threads/processes used and the population size.
+	Both benchmark groups used Rosenbrock as objective function, with 10 dimensions, 100 maximum iterations, mutation rate 0.2 and survival rate 0.5 while they vary the number of threads/processes used and the population size.
 
 	Both benchmark groups do not use more than 4 threads/processes in order to have a fair comparison between OpenMP and MPI.
 	This limitation is due to the limited number of physical cores on the machine used which did not allow more than 4 MPI processes to be created.
