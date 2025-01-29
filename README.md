@@ -101,3 +101,11 @@ mpirun -n 4 ./build/main -a genetic_mpi
 ## How to use this library
 Inside the `example` folder you can find a simple example with CMake which declares a custom objective function and executes the OpenMP Genetic Algorithm.
 This example automatically downloads the library from GitHub.
+
+You can compile and execute the example like so:
+```bash
+cd example
+cmake -S . -B build
+cmake --build build -- example
+./build/example
+```
