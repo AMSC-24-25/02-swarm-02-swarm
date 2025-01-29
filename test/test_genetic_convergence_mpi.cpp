@@ -26,7 +26,6 @@ TEST(GeneticConvergenceMPI, Sphere) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -55,7 +54,6 @@ TEST(GeneticConvergenceMPI, EuclideanDistance) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -84,7 +82,6 @@ TEST(GeneticConvergenceMPI, Rosenbrock) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -116,7 +113,6 @@ TEST(GeneticConvergenceMPI, Rastrigin) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 

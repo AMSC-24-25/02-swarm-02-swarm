@@ -23,16 +23,6 @@ TEST(GeneticConvergenceOpenMP, Sphere) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<Creature> creatures;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(Creature(tmp));
-	}
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -57,16 +47,6 @@ TEST(GeneticConvergenceOpenMP, EuclideanDistance) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<Creature> creatures;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(Creature(tmp));
-	}
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -91,16 +71,6 @@ TEST(GeneticConvergenceOpenMP, Rosenbrock) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<Creature> creatures;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(Creature(tmp));
-	}
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
@@ -128,16 +98,6 @@ TEST(GeneticConvergenceOpenMP, Rastrigin) {
 	const size_t seed = 42;
 	const double lower_bound = -10.0;
 	const double upper_bound = 10.0;
-	std::vector<Creature> creatures;
-
-	std::mt19937 rnd{seed};
-	std::uniform_real_distribution<double> dist{lower_bound, upper_bound};
-	for (size_t i{0}; i < num_creatures; i++) {
-		std::vector<double> tmp(dimensions);
-		std::generate(tmp.begin(), tmp.end(), [&dist, &rnd]() { return dist(rnd); });
-		creatures.push_back(Creature(tmp));
-	}
-
 	const double mutation_rate = 0.2;
 	const double survival_rate = 0.5;
 
