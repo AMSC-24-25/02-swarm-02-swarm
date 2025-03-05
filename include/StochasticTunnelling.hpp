@@ -16,6 +16,8 @@ class StochasticTunnelling{
     const double f_thresh;
     const double beta_adjust_factor;
     const double max_iter;
+    std::vector<double> candidate_position;
+    double delta;
 
 
     public:
@@ -26,8 +28,13 @@ class StochasticTunnelling{
                         const double gamma, const double sigma, const double f_thresh, const double beta_adjust_factor,
                         const double max_iter, ObjectiveFunction& func);
 
-    void iteration();
+    void iteration(const size_t seed);
 
+    double mapped_function_value(const std::vector<double>&  posi);
+
+    bool delta_condition(double map_value_new, double map_value_old);
+
+    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta);
 };
 
 
