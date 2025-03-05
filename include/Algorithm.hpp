@@ -33,6 +33,18 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 												 const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads,
 												 const bool verbose);
 
+
+std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t dimensions,
+												 const size_t max_iterations, const size_t seed, const double f_thresh,
+												 const double lower_bound, const double upper_bound, const double sigma,
+												 const  ObjectiveFunction& func, const double gamma,
+												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose);
+
+
+
+
+
+
 /*
  * Runs a parallel genetic algorithm with OpenMP to optimize the given objective function.
  *

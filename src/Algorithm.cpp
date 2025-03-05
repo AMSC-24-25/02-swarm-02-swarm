@@ -15,7 +15,9 @@
 #include "Particle.hpp"
 #include "Swarm.hpp"
 #include "GeneticAlgorithm.hpp"
+#include "StochasticTunnelling.hpp"
 #include "Creature.hpp"
+#include "Position.hpp"
 
 namespace algorithm {
 
@@ -83,6 +85,56 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 	}
 
 	return {swarm.bestGlobalPosition, swarm.minimum};
+}
+
+std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t dimensions,
+												 const size_t max_iterations, const size_t seed, const double f_thresh,
+												 const double lower_bound, const double upper_bound, const double sigma,
+												 const  ObjectiveFunction& func, const double gamma,
+												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose) {
+	double beta = 1.0;
+	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, moving_avg_window);
+
+	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, gamma, sigma, f_thresh, beta_adjust_factor, max_iterations, func);
+
+	const double beginning = omp_get_wtime();
+
+	for (size_t i = 0; i < moving_avg_window; i++) {
+		stun.first_k_iteration(seed, i);
+
+		if (verbose) {
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, stun.pos.position, stun.pos.f0);
+			std::cout << std::endl;
+		}
+	}
+
+	for(size_t i = moving_avg_window; i < max_iterations; i++){
+		stun.iteration(seed);
+
+		if (verbose) {
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
+			std::cout << std::endl;
+		}
+	}
+
+	const double end = omp_get_wtime();
+
+	if (verbose) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, stun.pos.best_position, stun.pos.f0);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
+
+	return {stun.pos.best_position, stun.pos.f0};
+
+	 
 }
 
 std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,

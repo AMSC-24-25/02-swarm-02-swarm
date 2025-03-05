@@ -24,17 +24,19 @@ class StochasticTunnelling{
     Position pos;
     
 
-    StochasticTunnelling(const Position& pos, const double lower_bound, const double upper_bound,
+    StochasticTunnelling(Position& pos, const double lower_bound, const double upper_bound,
                         const double gamma, const double sigma, const double f_thresh, const double beta_adjust_factor,
-                        const double max_iter, ObjectiveFunction& func);
+                        const size_t max_iter, const ObjectiveFunction& func);
 
     void iteration(const size_t seed);
 
     double mapped_function_value(const std::vector<double>&  posi);
 
-    bool delta_condition(double map_value_new, double map_value_old);
+    bool delta_condition(double delt);
 
     bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta);
+
+    void first_k_iteration(const size_t seed, const size_t k);
 };
 
 

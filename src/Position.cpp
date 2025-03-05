@@ -25,11 +25,12 @@ Position::Position(const size_t dimensions_, const double lower_bound, const dou
 	}
 
     position = position_;
+    best_position = position_;
     beta = beta_;
     f0 = func(position);
     
     std::vector<double> mean(moving_avg_window);
-    for(int i = 0; i< moving_avg_window; i++){
+    for(size_t i = 0; i< moving_avg_window; i++){
         mean[i] = 0;
     }
 
@@ -37,7 +38,7 @@ Position::Position(const size_t dimensions_, const double lower_bound, const dou
 }
 
 
-const std::vector<double> Position::generate_new_position(const ObjectiveFunction& func, const double lower_bound,
+const std::vector<double> Position::generate_new_position(const double lower_bound,
 				const double upper_bound, const size_t seed,const double sigma){
 
     std::mt19937 gen(seed); 
@@ -56,17 +57,18 @@ const std::vector<double> Position::generate_new_position(const ObjectiveFunctio
 void Position::update_position(std::vector<double> position_, const ObjectiveFunction& func){
     if(func(position_) < f0){
         f0 = func(position);
+        best_position = position;
     }
     
     position = position_;
 }
 
-void Position::increase_avg_window_at_position(double stun_func_value, int index){
+void Position::increase_avg_window_at_position(double stun_func_value, const size_t index){
     avg_function[index] = stun_func_value;
 }
 
 void Position::update_avg_window(double stun_func_value){
-    for(int i = 0; i < moving_avg_window - 1; i++){
+    for(size_t i = 0; i < moving_avg_window - 1; i++){
         avg_function[i] = avg_function[i + 1];
     }
 
@@ -76,7 +78,7 @@ void Position::update_avg_window(double stun_func_value){
 double Position::compute_avg_window_value(){
     double avg = 0.0;
     
-    for(int i = 0; i < moving_avg_window; i++){
+    for(size_t i = 0; i < moving_avg_window; i++){
         avg += avg_function[i];
     }
 
