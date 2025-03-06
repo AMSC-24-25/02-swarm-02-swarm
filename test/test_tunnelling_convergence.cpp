@@ -21,17 +21,18 @@ TEST(TunnellingConvergence, Sphere){
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
 	const size_t seed = 42;
-	const size_t max_iterations = 200;
+	const size_t max_iterations = 1000;
 	const double f_thresh = 0.3;
-	const double sigma = 10.0;
-	const double gamma = 0.4;
+	double sigma_max = 5.0;
+	double sigma_min = 1.e-6;
+	const double gamma = 0.000005;
 	const double beta_adjust_factor = 0.9;
 	const size_t moving_avg_window = 30;
 
 	const ObjectiveFunction& s = Sphere();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, f_thresh, lower_bound, upper_bound, sigma, s, gamma, beta_adjust_factor, moving_avg_window, true);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, f_thresh, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 

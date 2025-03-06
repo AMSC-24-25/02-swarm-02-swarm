@@ -39,16 +39,18 @@ Position::Position(const size_t dimensions_, const double lower_bound, const dou
 
 
 const std::vector<double> Position::generate_new_position(const double lower_bound,
-				const double upper_bound, const size_t seed,const double sigma){
+				const double upper_bound, const size_t seed, const double sigma){
 
-    std::mt19937 gen(seed); 
+    static std::mt19937 gen(seed); 
     std::normal_distribution<double> dist(0.0, sigma);
     std::vector<double> posit(dimensions);
     
     for (size_t i = 0; i< dimensions; i++){
         posit[i] = position[i];
-        posit[i] += dist(gen);
+        double delta = dist(gen);
+        posit[i] += delta;
         posit[i] = std::clamp(posit[i], lower_bound, upper_bound);
+        std::cout<<"delta: "<<delta<<std::endl;
     }
     
     return posit;
@@ -56,8 +58,8 @@ const std::vector<double> Position::generate_new_position(const double lower_bou
 
 void Position::update_position(std::vector<double> position_, const ObjectiveFunction& func){
     if(func(position_) < f0){
-        f0 = func(position);
-        best_position = position;
+        f0 = func(position_);
+        best_position = position_;
     }
     
     position = position_;

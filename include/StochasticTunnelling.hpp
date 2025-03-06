@@ -12,7 +12,8 @@ class StochasticTunnelling{
     const double upper_bound;
     const ObjectiveFunction& func;
     const double gamma;
-    const double sigma;
+    const double sigma_max;
+    const double sigma_min;
     const double f_thresh;
     const double beta_adjust_factor;
     const double max_iter;
@@ -24,11 +25,11 @@ class StochasticTunnelling{
     Position pos;
     
 
-    StochasticTunnelling(Position& pos, const double lower_bound, const double upper_bound,
-                        const double gamma, const double sigma, const double f_thresh, const double beta_adjust_factor,
+    StochasticTunnelling(Position& pos, const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
+                        const double gamma, const double f_thresh, const double beta_adjust_factor,
                         const size_t max_iter, const ObjectiveFunction& func);
 
-    void iteration(const size_t seed);
+    void iteration(const size_t seed, const size_t k);
 
     double mapped_function_value(const std::vector<double>&  posi);
 
@@ -37,6 +38,8 @@ class StochasticTunnelling{
     bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta);
 
     void first_k_iteration(const size_t seed, const size_t k);
+
+    double compute_sigma(size_t i);
 };
 
 
