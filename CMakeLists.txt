@@ -40,6 +40,7 @@ set(SOURCES
     src/Swarm.cpp
     src/StochasticTunnelling.cpp
     src/Position.cpp
+    src/DifferentialEvolution.cpp
 )
 if(USE_MPI)
     list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
