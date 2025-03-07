@@ -41,6 +41,7 @@ set(SOURCES
     src/StochasticTunnelling.cpp
     src/Position.cpp
     src/DifferentialEvolution.cpp
+    src/Candidate.cpp
 )
 if(USE_MPI)
     list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
