@@ -9,7 +9,7 @@
 #include <numeric>
 #include <omp.h>
 
-#include "../include/DifferentialEvolution.hpp"
+#include "DifferentialEvolution.hpp"
 
 DifferentialEvolution::DifferentialEvolution(){}
 
