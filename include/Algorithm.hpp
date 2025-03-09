@@ -40,6 +40,12 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 												 const  ObjectiveFunction& func, const double gamma,
 												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose);
 
+std::pair<std::vector<double>, double> run_differential_evolution(const size_t dimensions,
+													const size_t num_candidates, const double lower_bound,
+													const double upper_bound, const size_t seed,
+													const size_t max_gen, const double F,
+													const double CR, const std::unique_ptr<ObjectiveFunction>& func,
+													const size_t n_threads, const bool verbose);
 
 
 

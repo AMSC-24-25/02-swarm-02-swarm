@@ -12,6 +12,10 @@
 #endif	// USE_MPI
 
 #include "Algorithm.hpp"
+
+#include <Candidate.hpp>
+#include <DifferentialEvolution.hpp>
+
 #include "Particle.hpp"
 #include "Swarm.hpp"
 #include "GeneticAlgorithm.hpp"
@@ -85,7 +89,9 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 	}
 
 	return {swarm.bestGlobalPosition, swarm.minimum};
-}
+};
+
+
 
 std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t dimensions,
 												 const size_t max_iterations, const size_t seed, const double f_thresh,
@@ -136,6 +142,45 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 
 	 
 }
+
+std::pair<std::vector<double>, double> run_differential_evolution(const size_t dimensions, const size_t num_candidates, const double lower_bound, const double upper_bound, const size_t seed, const size_t max_gen, const double F, const double CR, const std::unique_ptr<ObjectiveFunction>& func, const size_t n_threads, const bool verbose) {
+	std::vector<Candidate> deCandidates;
+
+	for (size_t i = 0; i < num_candidates; i++) {
+		deCandidates.push_back(Candidate(dimensions, lower_bound, upper_bound, seed + i,*func));
+	}
+	DifferentialEvolution de = DifferentialEvolution(deCandidates, dimensions,lower_bound,upper_bound,seed,max_gen,F,CR,*func,n_threads);
+
+	const double beginning = omp_get_wtime();
+
+	size_t iteration=0;
+	while (iteration<max_gen) {
+		iteration++;
+		de.findSol();
+		de.updateCandidate();
+
+		if (verbose) {
+			std::cout << "Iteration n. " << (iteration + 1) << " / " << max_gen << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, de.bestCandidate->candidate, de.bestCandidate->f0);
+			std::cout << std::endl;
+		}
+	}
+
+	const double end = omp_get_wtime();
+
+	if (verbose) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, de.bestCandidate->candidate, de.bestCandidate->f0);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
+
+	return {de.bestCandidate->candidate, de.bestCandidate->f0};
+}
+
 
 std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,
 														  const size_t max_iterations, const size_t seed,

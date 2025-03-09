@@ -86,6 +86,7 @@ if(ENABLE_TESTS)
     add_test(swarm_convergence)
     add_test(genetic_convergence_omp)
     add_test(tunnelling_convergence)
+    add_test(de_convergence)
 
     if(USE_MPI)
         add_executable(test_genetic_convergence_mpi test/test_genetic_convergence_mpi.cpp)

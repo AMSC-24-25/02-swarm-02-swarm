@@ -25,11 +25,12 @@ Candidate::Candidate(const size_t dimensions_, const double lower_bound_, const 
 };
 
 Candidate::Candidate(const std::vector<double> candidate_, const ObjectiveFunction &func_)
-    :candidate(candidate_), f0(std::numeric_limits<double>::infinity()), func(func_) {
+    :f0(std::numeric_limits<double>::infinity()),candidate(candidate_),  func(func_) {
     f0 = func_(candidate);
 };
 
-void Candidate::updatePosition(const std::vector<double> position) {
+
+void Candidate::updatePosition(const std::vector<double>& position) {
     candidate = position;
     f0 = func(candidate);
 }
