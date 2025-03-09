@@ -30,7 +30,7 @@ TEST(DeConvergence, Sphere) {
 	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,s,1,true);
+		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,s,1,false);
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
@@ -49,10 +49,10 @@ TEST(DeConvergence, EuclideanDistance) {
 	const double F = 0.5; //Tipico valore: 0.4 - 1.0
 	const double CR = 0.8; //Tipico valore: 0.7 - 0.9
 
-	const std::unique_ptr<ObjectiveFunction> s = std::make_unique<EuclideanDistance>();
+	const std::unique_ptr<ObjectiveFunction> e = std::make_unique<EuclideanDistance>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,s,1,true);
+		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,e,1,false);
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
@@ -74,7 +74,7 @@ TEST(DeConvergence, Rosenbrock) {
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,r,1,true);
+		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,r,1,false);
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
@@ -99,7 +99,7 @@ TEST(DeConvergence, Rastrigin) {
 	const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rastrigin>();
 
 	const std::pair<std::vector<double>, double> result =
-		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,r,1,true);
+		algorithm::run_differential_evolution(dimensions, num_candidates ,lower_bound, upper_bound, seed,max_iterations,F,CR,r,1,false);
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
 
 	std::vector<double> expected_minimum(dimensions, 0.0);
