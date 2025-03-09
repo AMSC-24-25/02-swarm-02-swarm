@@ -13,9 +13,22 @@
 
 #include <memory>
 
+// Constructor for DifferentialEvolution.
+// Initializes key parameters and verifies that the bounds and control parameters are valid.
 DifferentialEvolution::DifferentialEvolution(const std::vector<Candidate>& candidates_, const size_t dimensions_, const double lower_bound_, const double upper_bound_, const size_t seed_, const size_t max_gen_, const double F_, const double CR_, ObjectiveFunction& func_, const size_t n_threads_)
-    : candidates(candidates_), dimensions(dimensions_),lower_bound(lower_bound_),upper_bound(upper_bound_), seed(seed_),F(F_), CR(CR_),max_gen(max_gen_) , func(func_), n_threads(n_threads_),gen(seed_), bestCandidate(nullptr) {};
+    : candidates(candidates_), dimensions(dimensions_),lower_bound(lower_bound_),upper_bound(upper_bound_), seed(seed_),F(F_), CR(CR_),max_gen(max_gen_) , func(func_), n_threads(n_threads_),gen(seed_), bestCandidate(nullptr) {
+    assert(candidates.size() >0);
+    assert(std::isfinite(lower_bound));
+    assert(std::isfinite(upper_bound));
+    assert(lower_bound < upper_bound);
+    assert(F>=0.0 && F <=1.0);
+    assert(CR>=0.0 && CR<=1.0);
 
+};
+
+//-----------------------------------------------------------------
+// Selects three distinct random indices (different from the target index)
+// from the candidate pool for mutation operations.
 void DifferentialEvolution::select_three_random(int excluded_index,int& i1, int& i2, int& i3) {
     std::uniform_int_distribution<int> dist(0,candidates.size()-1);
     do {
@@ -31,16 +44,23 @@ void DifferentialEvolution::select_three_random(int excluded_index,int& i1, int&
     }while (i3 == excluded_index || i3 == i1 || i3 == i2);
 };
 
+//-----------------------------------------------------------------
+// Generates a mutant vector using the DE/rand/1 strategy.
+// Each component is computed as: r1 + F * (r2 - r3) and clamped within bounds.
 void DifferentialEvolution::mutate(std::vector<double>& mutantPos, const Candidate &r1, const Candidate &r2, const Candidate &r3) {
     for (size_t i = 0; i < dimensions; i++) {
         mutantPos[i] =std::clamp(r1.candidate[i] + F * (r2.candidate[i] - r3.candidate[i]), lower_bound, upper_bound);
     }
 };
 
-void DifferentialEvolution::crossover(Candidate& original, Candidate& mutant) {
+//-----------------------------------------------------------------
+// Performs crossover between the original candidate and the mutant.
+// Ensures that at least one dimension (j_rand) comes from the mutant vector.
+// If the trial candidate has a better objective value, it replaces the original.
+void DifferentialEvolution::crossover(Candidate& original,const Candidate& mutant) {
     std::vector<double> mergedPos= original.candidate;
     std::uniform_int_distribution<int> intDist(0,dimensions-1);
-    size_t j_rand = intDist(gen);
+    size_t j_rand = intDist(gen); // Guarantee at least one mutant gene is selected
 
     std::uniform_real_distribution<double> realDist(0.0,1.0);
     for (size_t j = 0; j< dimensions; j++) {
@@ -48,15 +68,18 @@ void DifferentialEvolution::crossover(Candidate& original, Candidate& mutant) {
             mergedPos[j] = mutant.candidate[j];
         }
     }
-    std::shared_ptr<Candidate> merged= std::make_unique<Candidate>(mergedPos,func);
-    if (merged->f0 < original.f0) {
+    Candidate merged(mergedPos, func);
+    if (merged.f0 < original.f0) {
         original.updatePosition(mergedPos);
     }
 }
 
+//-----------------------------------------------------------------
+// Evolves each candidate in the population in parallel using OpenMP.
+// For every candidate, three random distinct candidates are chosen for mutation,
+// followed by the mutation and crossover steps to generate a trial candidate.
 void DifferentialEvolution::updateCandidate() {
-
-
+#pragma omp parallel for num_threads(n_threads) schedule(static)
     for (size_t i = 0; i < candidates.size(); i++) {
         int i1;
         int i2;
@@ -70,12 +93,15 @@ void DifferentialEvolution::updateCandidate() {
         std::vector<double> mutantPos;
         mutantPos.resize(dimensions);
         mutate(mutantPos,r1,r2,r3);
-        std::shared_ptr<Candidate> mutant= std::make_unique<Candidate>(mutantPos,func);
+        Candidate mutant(mutantPos, func);
 
-        crossover(candidates[i], (*mutant));
+        crossover(candidates[i], mutant);
     }
 };
 
+//-----------------------------------------------------------------
+// Searches for the candidate with the best (minimum) objective value
+// and stores a reference to it
 void DifferentialEvolution::findSol() {
 
     double min = std::numeric_limits<double>::infinity();

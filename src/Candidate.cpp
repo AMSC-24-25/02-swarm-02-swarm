@@ -6,6 +6,8 @@
 
 #include "Candidate.hpp"
 
+// Constructor: Initializes a candidate with random values within given bounds
+// and computes its initial objective value.
 Candidate::Candidate(const size_t dimensions_, const double lower_bound_, const double upper_bound_, const size_t seed,  const ObjectiveFunction& func_)
         :f0(std::numeric_limits<double>::infinity()), func(func_) {
     assert(dimensions_ > 0);
@@ -24,12 +26,16 @@ Candidate::Candidate(const size_t dimensions_, const double lower_bound_, const 
     f0 = func_(candidate);
 };
 
+//-----------------------------------------------------------------
+// Constructor: Creates a candidate from a pre-defined vector and evaluates it.
 Candidate::Candidate(const std::vector<double> candidate_, const ObjectiveFunction &func_)
     :f0(std::numeric_limits<double>::infinity()),candidate(candidate_),  func(func_) {
     f0 = func_(candidate);
 };
 
-
+//-----------------------------------------------------------------
+// Updates the candidate's position with a new vector and recomputes its objective value.
+// This is typically called after a successful crossover.
 void Candidate::updatePosition(const std::vector<double>& position) {
     candidate = position;
     f0 = func(candidate);

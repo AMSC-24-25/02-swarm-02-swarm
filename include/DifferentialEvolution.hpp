@@ -24,7 +24,7 @@ class DifferentialEvolution{
 
     void select_three_random(int excluded_index,int& i1, int& i2, int& i3);
     void mutate(std::vector<double>& mutantPos, const Candidate& r1, const Candidate& r2, const Candidate& r3);
-    void crossover(Candidate& original, Candidate& mutant);
+    void crossover(Candidate& original,const Candidate& mutant);
 
 
     public:
