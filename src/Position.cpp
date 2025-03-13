@@ -50,7 +50,6 @@ const std::vector<double> Position::generate_new_position(const double lower_bou
         double delta = dist(gen);
         posit[i] += delta;
         posit[i] = std::clamp(posit[i], lower_bound, upper_bound);
-        std::cout<<"delta: "<<delta<<std::endl;
     }
     
     return posit;

@@ -38,12 +38,10 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
   
 
   delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
-  std::cout<< func(candidate_position) - func(pos.position)<<std::endl;
-  std::cout<<"delta: "<<delta<<std::endl;
+
 
   //if(delta_condition(delta) || metropolis_condition(delta, seed, pos.beta)){
-  if(delta_condition(delta)){
-    std::cout<<"ok"<<std::endl;
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta)){
     pos.update_position(candidate_position, func);
     
     pos.update_avg_window(mapped_function_value(pos.position));
@@ -60,10 +58,8 @@ void StochasticTunnelling::first_k_iteration(const size_t seed, const size_t k){
 
 
   delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
-  std::cout<< func(candidate_position) - func(pos.position)<<std::endl;
 
-  if(delta_condition(delta)){
-    std::cout<<"ok"<<std::endl;
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta)){
     pos.update_position(candidate_position, func);
     
     pos.increase_avg_window_at_position(mapped_function_value(pos.position), k);
@@ -92,6 +88,10 @@ bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const
         double random_value = dist(gen);
 
         double exp_value = std::exp(-beta * delta_f_stun);
+
+        bool a = random_value < exp_value;
+
+        std::cout<<a<<std::endl;
 
         return random_value < exp_value;
 }
