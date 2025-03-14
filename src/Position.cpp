@@ -87,9 +87,12 @@ double Position::compute_avg_window_value(){
 }
 
 void Position::update_beta(double thresholing, double beta_adjust_factor){
+    std::cout<<"the func median values is: "<<compute_avg_window_value()<<std::endl;
     if(compute_avg_window_value() > thresholing) {
         beta *= beta_adjust_factor;
+        std::cout<<"beta: "<<beta<<std::endl;
     }else{
         beta /= beta_adjust_factor;
+        std::cout<<"beta: "<<beta<<std::endl;
     }
 }

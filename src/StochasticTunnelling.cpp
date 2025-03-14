@@ -46,8 +46,9 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
     
     pos.update_avg_window(mapped_function_value(pos.position));
 
-    pos.update_beta(f_thresh, beta_adjust_factor);
   }
+
+  pos.update_beta(f_thresh, beta_adjust_factor);
   
 }
 
@@ -89,9 +90,7 @@ bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const
 
         double exp_value = std::exp(-beta * delta_f_stun);
 
-        bool a = random_value < exp_value;
-
-        std::cout<<a<<std::endl;
+        std::cout<<"percentage: "<<exp_value<<std::endl;
 
         return random_value < exp_value;
 }
