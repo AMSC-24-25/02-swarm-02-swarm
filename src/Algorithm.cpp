@@ -94,14 +94,14 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 
 
 std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t dimensions,
-												 const size_t max_iterations, const size_t seed, const double f_thresh,
+												 const size_t max_iterations, const size_t seed,
 												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
 												 const  ObjectiveFunction& func, const double gamma,
-												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose) {
-	double beta = 10000.0;
+												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose,double beta) {
+
 	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, moving_avg_window);
 
-	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, f_thresh, beta_adjust_factor, max_iterations, func);
+	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func);
 
 	const double beginning = omp_get_wtime();
 
@@ -109,10 +109,11 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 		stun.first_k_iteration(seed, i);
 
 		if (verbose) {
+			std::cout<<"--------------------------------------------"<<std::endl;
 			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			std::cout << "  Current minimum: " << std::endl;
+			/*std::cout << "  Current minimum: " << std::endl;
 			utils::print_point(dimensions, stun.pos.position, stun.pos.f0);
-			std::cout << std::endl;
+			std::cout << std::endl;*/
 		}
 	}
 
@@ -120,10 +121,11 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 		stun.iteration(seed, i);
 
 		if (verbose) {
+			std::cout<<"--------------------------------------------"<<std::endl;
 			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			std::cout << "  Current minimum: " << std::endl;
+			/*std::cout << "  Current minimum: " << std::endl;
 			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
-			std::cout << std::endl;
+			std::cout << std::endl;*/
 		}
 	}
 

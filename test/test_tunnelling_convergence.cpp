@@ -22,17 +22,17 @@ TEST(TunnellingConvergence, Sphere){
 	const double upper_bound = 100.0;
 	const size_t seed = 42;
 	const size_t max_iterations = 700;
-	const double f_thresh = 0.3;
 	double sigma_max = 5.0;
 	double sigma_min = 1.e-6;
 	const double gamma = 0.000005;
 	const double beta_adjust_factor = 0.9;
 	const size_t moving_avg_window = 30;
+	double beta = 1000.0;
 
 	const ObjectiveFunction& s = Sphere();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, f_thresh, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true,beta);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 
@@ -51,17 +51,17 @@ TEST(TunnellingConvergence, Rosenbrock){
 	const double upper_bound = 100.0;
 	const size_t seed = 42;
 	const size_t max_iterations = 700;
-	const double f_thresh = 0.3;
 	double sigma_max = 5.0;
 	double sigma_min = 1.e-6;
-	const double gamma = 0.000005;
-	const double beta_adjust_factor = 0.9;
+	const double gamma = 0.0001;
+	const double beta_adjust_factor = 0.99;
 	const size_t moving_avg_window = 30;
+	double beta = 800.0;
 
 	const ObjectiveFunction& s = Rosenbrock();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, f_thresh, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 
@@ -79,18 +79,18 @@ TEST(TunnellingConvergence, Rastrigin){
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
 	const size_t seed = 42;
-	const size_t max_iterations = 700;
-	const double f_thresh = 0.3;
+	const size_t max_iterations = 1000;
 	double sigma_max = 5.0;
 	double sigma_min = 1.e-6;
-	const double gamma = 0.000005;
-	const double beta_adjust_factor = 0.9;
-	const size_t moving_avg_window = 30;
+	const double gamma = 0.0000295;
+	const double beta_adjust_factor = 0.99;
+	const size_t moving_avg_window = 15;
+	double beta = 60000.0;
 
 	const ObjectiveFunction& s = Rastrigin();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, f_thresh, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 

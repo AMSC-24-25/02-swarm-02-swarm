@@ -14,7 +14,6 @@ class StochasticTunnelling{
     const double gamma;
     const double sigma_max;
     const double sigma_min;
-    const double f_thresh;
     const double beta_adjust_factor;
     const double max_iter;
     std::vector<double> candidate_position;
@@ -26,7 +25,7 @@ class StochasticTunnelling{
     
 
     StochasticTunnelling(Position& pos, const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
-                        const double gamma, const double f_thresh, const double beta_adjust_factor,
+                        const double gamma, const double beta_adjust_factor,
                         const size_t max_iter, const ObjectiveFunction& func);
 
     void iteration(const size_t seed, const size_t k);

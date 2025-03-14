@@ -86,13 +86,23 @@ double Position::compute_avg_window_value(){
     return avg /= moving_avg_window;
 }
 
-void Position::update_beta(double thresholing, double beta_adjust_factor){
+double Position::compute_thresholding(){
+    double avg = 0.0;
+    
+    for(size_t i = 0; i < 4; i++){
+        avg += avg_function[4];
+    }
+
+    return avg /= (7);
+}
+
+void Position::update_beta(double beta_adjust_factor){
     std::cout<<"the func median values is: "<<compute_avg_window_value()<<std::endl;
-    if(compute_avg_window_value() > thresholing) {
+    std::cout<<"the thresholding is: "<<compute_thresholding()<<std::endl;
+
+    if(compute_avg_window_value() > compute_thresholding()) {
         beta *= beta_adjust_factor;
-        std::cout<<"beta: "<<beta<<std::endl;
     }else{
         beta /= beta_adjust_factor;
-        std::cout<<"beta: "<<beta<<std::endl;
     }
 }

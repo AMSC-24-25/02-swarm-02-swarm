@@ -32,7 +32,9 @@ class Position {
 
         double compute_avg_window_value();
 
-        void update_beta(double thresholing, double beta_adjust_factor);
+        void update_beta(double beta_adjust_factor);
+
+        double compute_thresholding();
     
 };
 
