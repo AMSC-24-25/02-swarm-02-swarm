@@ -101,8 +101,8 @@ void Position::update_beta(double beta_adjust_factor){
     std::cout<<"the thresholding is: "<<compute_thresholding()<<std::endl;
 
     if(compute_avg_window_value() > compute_thresholding()) {
-        beta *= beta_adjust_factor;
-    }else{
         beta /= beta_adjust_factor;
+    }else{
+        beta *= beta_adjust_factor;
     }
 }

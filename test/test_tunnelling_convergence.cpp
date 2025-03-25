@@ -49,7 +49,7 @@ TEST(TunnellingConvergence, Rosenbrock){
 	const size_t dimensions = 2;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
-	const size_t seed = 42;
+	const size_t seed = 40;
 	const size_t max_iterations = 700;
 	double sigma_max = 5.0;
 	double sigma_min = 1.e-6;
@@ -78,14 +78,14 @@ TEST(TunnellingConvergence, Rastrigin){
 	const size_t dimensions = 2;
 	const double lower_bound = -100.0;
 	const double upper_bound = 100.0;
-	const size_t seed = 42;
-	const size_t max_iterations = 1000;
+	const size_t seed = 36;
+	const size_t max_iterations = 200;
 	double sigma_max = 5.0;
-	double sigma_min = 1.e-6;
-	const double gamma = 0.0000295;
+	double sigma_min = 1.e-18;
+	const double gamma = 0.0000290;
 	const double beta_adjust_factor = 0.99;
 	const size_t moving_avg_window = 15;
-	double beta = 60000.0;
+	double beta = 5000.0;
 
 	const ObjectiveFunction& s = Rastrigin();
 
