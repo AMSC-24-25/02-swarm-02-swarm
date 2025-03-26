@@ -18,8 +18,11 @@ class Position {
         const size_t moving_avg_window;
         std::vector<double> avg_function;
         std::vector<double> best_position;
+        std::vector<int> avg_tunnelling;
 
-        Position(const size_t dimensions, const double lower_bound, const double upper_bound, const size_t seed, double beta, const ObjectiveFunction& func, const int moving_avg_window);
+        const size_t window_tunnelling;
+
+        Position(const size_t dimensions, const double lower_bound, const double upper_bound, const size_t seed, double beta, const ObjectiveFunction& func, const int moving_avg_window, const size_t window_tunnelling);
 
         const std::vector<double> generate_new_position(const double lower_bound,
 				const double upper_bound, const size_t seed, const double sigma);
@@ -35,6 +38,11 @@ class Position {
         void update_beta(double beta_adjust_factor);
 
         double compute_thresholding();
+
+        double compute_avg_tunnelling();
+
+        void update_betan(double beta_adjust_factor, double beta_thresholding);
+
     
 };
 

@@ -28,11 +28,12 @@ TEST(TunnellingConvergence, Sphere){
 	const double beta_adjust_factor = 0.9;
 	const size_t moving_avg_window = 30;
 	double beta = 1000.0;
+	const size_t tunnelling = 10;
 
 	const ObjectiveFunction& s = Sphere();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true,beta);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true,beta, tunnelling);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 
@@ -57,11 +58,12 @@ TEST(TunnellingConvergence, Rosenbrock){
 	const double beta_adjust_factor = 0.99;
 	const size_t moving_avg_window = 30;
 	double beta = 800.0;
+	const size_t tunnelling = 10;
 
 	const ObjectiveFunction& s = Rosenbrock();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta, tunnelling);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 
@@ -86,11 +88,12 @@ TEST(TunnellingConvergence, Rastrigin){
 	const double beta_adjust_factor = 0.99;
 	const size_t moving_avg_window = 15;
 	double beta = 5000.0;
+	const size_t tunnelling = 10;
 
 	const ObjectiveFunction& s = Rastrigin();
 
 	const std::pair<std::vector<double>, double> result = 
-		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta);
+		algorithm::run_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min, s, gamma, beta_adjust_factor, moving_avg_window, true, beta, tunnelling);
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 

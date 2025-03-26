@@ -97,9 +97,9 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 												 const size_t max_iterations, const size_t seed,
 												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
 												 const  ObjectiveFunction& func, const double gamma,
-												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose,double beta) {
+												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose,double beta, const size_t tunnelling) {
 
-	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, moving_avg_window);
+	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, moving_avg_window, tunnelling);
 
 	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func);
 
