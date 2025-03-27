@@ -45,7 +45,7 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
 
 
   //if(delta_condition(delta) || metropolis_condition(delta, seed, pos.beta)){
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position), pos)){
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
     pos.update_position(candidate_position, func);
     
     pos.update_avg_window(mapped_function_value(pos.position));
@@ -68,7 +68,7 @@ void StochasticTunnelling::first_k_iteration(const size_t seed, const size_t k){
   delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
   std::cout<<"delta function mapped: "<<delta<<std::endl;
 
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position), pos)){
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
     pos.update_position(candidate_position, func);
     
     pos.increase_avg_window_at_position(mapped_function_value(pos.position), k);
@@ -83,13 +83,17 @@ double StochasticTunnelling::mapped_function_value(const std::vector<double>& po
 
 bool StochasticTunnelling::delta_condition(double delt){
   if(delt <= 0){
+    pos.update_window_tunnelling(1);
+    pos.update_betan(beta_adjust_factor, beta_thresholding);
     return true;
   }else{
+    pos.update_window_tunnelling(0);
+    pos.update_betan(beta_adjust_factor, beta_thresholding);
     return false;
   }
 }
 
-bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, Position p) {
+bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta) {
         static std::mt19937 gen(seed); 
         
         std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -109,11 +113,12 @@ bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const
           bool ris = random_value < exp_value;
 
           if(ris == true){
-            p.update_window_tunnelling(1);
+            pos.update_window_tunnelling(1);
           }else{
-            p.update_window_tunnelling(0);
+            pos.update_window_tunnelling(0);
           }
-          p.update_betan(beta_adjust_factor, beta_thresholding);
+
+          pos.update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }else{
@@ -125,11 +130,12 @@ bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const
           bool ris = random_value < exp_value;
 
           if(ris == true){
-            p.update_window_tunnelling(1);
+            pos.update_window_tunnelling(1);
           }else{
-            p.update_window_tunnelling(0);
+            pos.update_window_tunnelling(0);
           }
-          p.update_betan(beta_adjust_factor, beta_thresholding);
+
+          pos.update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }

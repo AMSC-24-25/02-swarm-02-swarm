@@ -116,10 +116,11 @@ void Position::update_beta(double beta_adjust_factor){
 
 
 void Position::update_betan(double beta_adjust_factor, double beta_thresholding){
+    std::cout<<"average tunnelling: "<<compute_avg_tunnelling() <<std::endl;
     if(compute_avg_tunnelling() > beta_thresholding) {
-        beta *= beta_adjust_factor;
-    }else{
         beta /= beta_adjust_factor;
+    }else{
+        beta *= beta_adjust_factor;
     }
 
 }
@@ -131,13 +132,17 @@ double Position::compute_avg_tunnelling(){
     }
 
     avg /= window_tunnelling;
+    std::cout<<"window tunnelling: "<<window_tunnelling<<std::endl;
     
     return avg;
 }
-
+ 
 void Position::update_window_tunnelling(int tunnelled){
-    for(size_t i = 1; i < window_tunnelling; i++){
-        avg_tunnelling[i - 1] = avg_tunnelling[i];
+
+    std::cout<<"tunneled: "<<tunnelled<<std::endl;
+
+    for(size_t i = 0; i < window_tunnelling - 1; i++){
+        avg_tunnelling[i] = avg_tunnelling[i + 1];
     }
 
     avg_tunnelling[window_tunnelling - 1] = tunnelled;

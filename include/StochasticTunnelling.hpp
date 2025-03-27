@@ -35,7 +35,7 @@ class StochasticTunnelling{
 
     bool delta_condition(double delt);
 
-    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, Position p);
+    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta);
 
     void first_k_iteration(const size_t seed, const size_t k);
 
