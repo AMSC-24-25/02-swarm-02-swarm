@@ -43,6 +43,8 @@ class Position {
 
         void update_betan(double beta_adjust_factor, double beta_thresholding);
 
+        void update_window_tunnelling(int tunnelled);
+
     
 };
 

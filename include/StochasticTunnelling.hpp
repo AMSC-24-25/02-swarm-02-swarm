@@ -18,6 +18,7 @@ class StochasticTunnelling{
     const double max_iter;
     std::vector<double> candidate_position;
     double delta;
+    const double beta_thresholding;
 
 
     public:
@@ -26,7 +27,7 @@ class StochasticTunnelling{
 
     StochasticTunnelling(Position& pos, const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
                         const double gamma, const double beta_adjust_factor,
-                        const size_t max_iter, const ObjectiveFunction& func);
+                        const size_t max_iter, const ObjectiveFunction& func, double beta_thresholding);
 
     void iteration(const size_t seed, const size_t k);
 
@@ -34,7 +35,7 @@ class StochasticTunnelling{
 
     bool delta_condition(double delt);
 
-    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta);
+    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, Position p);
 
     void first_k_iteration(const size_t seed, const size_t k);
 

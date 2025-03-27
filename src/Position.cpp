@@ -134,3 +134,11 @@ double Position::compute_avg_tunnelling(){
     
     return avg;
 }
+
+void Position::update_window_tunnelling(int tunnelled){
+    for(size_t i = 1; i < window_tunnelling; i++){
+        avg_tunnelling[i - 1] = avg_tunnelling[i];
+    }
+
+    avg_tunnelling[window_tunnelling - 1] = tunnelled;
+}

@@ -13,7 +13,7 @@
 
 StochasticTunnelling::StochasticTunnelling(Position& pos_, const double lower_bound_, const double upper_bound_,const double sigma_max_, const double sigma_min_,
                         const double gamma_, const double beta_adjust_factor_,
-                        const size_t max_iter_, const ObjectiveFunction& func_)
+                        const size_t max_iter_, const ObjectiveFunction& func_, double beta_thresholding_)
     : lower_bound(lower_bound_),
       upper_bound(upper_bound_),
       func(func_),
@@ -22,6 +22,7 @@ StochasticTunnelling::StochasticTunnelling(Position& pos_, const double lower_bo
       sigma_min(sigma_min_),
       beta_adjust_factor(beta_adjust_factor_),
       max_iter(max_iter_),
+      beta_thresholding(beta_thresholding_),
       pos(pos_) {
     assert(std::isfinite(lower_bound));
 	  assert(std::isfinite(upper_bound));
@@ -44,15 +45,14 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
 
 
   //if(delta_condition(delta) || metropolis_condition(delta, seed, pos.beta)){
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position), pos)){
     pos.update_position(candidate_position, func);
     
     pos.update_avg_window(mapped_function_value(pos.position));
 
   }
 
-  pos.update_beta(beta_adjust_factor);
-  
+  //pos.update_beta(beta_adjust_factor);
 }
 
 
@@ -68,7 +68,7 @@ void StochasticTunnelling::first_k_iteration(const size_t seed, const size_t k){
   delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
   std::cout<<"delta function mapped: "<<delta<<std::endl;
 
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
+  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position), pos)){
     pos.update_position(candidate_position, func);
     
     pos.increase_avg_window_at_position(mapped_function_value(pos.position), k);
@@ -89,7 +89,7 @@ bool StochasticTunnelling::delta_condition(double delt){
   }
 }
 
-bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta) {
+bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, Position p) {
         static std::mt19937 gen(seed); 
         
         std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -106,14 +106,32 @@ bool StochasticTunnelling::metropolis_condition(const double delta_f_stun, const
 
           std::cout<<"percentage: "<<exp_value<<std::endl;
 
-          return random_value < exp_value;
+          bool ris = random_value < exp_value;
+
+          if(ris == true){
+            p.update_window_tunnelling(1);
+          }else{
+            p.update_window_tunnelling(0);
+          }
+          p.update_betan(beta_adjust_factor, beta_thresholding);
+
+          return ris;
         }else{
           
           double exp_value = std::exp(-beta * gamma * std::exp(gamma * old_delta));
 
           std::cout<<"percentage approximated: "<<exp_value<<std::endl;
         
-          return random_value < exp_value;
+          bool ris = random_value < exp_value;
+
+          if(ris == true){
+            p.update_window_tunnelling(1);
+          }else{
+            p.update_window_tunnelling(0);
+          }
+          p.update_betan(beta_adjust_factor, beta_thresholding);
+
+          return ris;
         }
 }
 
