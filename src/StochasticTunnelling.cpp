@@ -47,8 +47,6 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
   //if(delta_condition(delta) || metropolis_condition(delta, seed, pos.beta)){
   if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
     pos.update_position(candidate_position, func);
-    
-    pos.update_avg_window(mapped_function_value(pos.position));
 
   }
 
@@ -56,25 +54,6 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
 }
 
 
-void StochasticTunnelling::first_k_iteration(const size_t seed, const size_t k){
-  double sigma = compute_sigma(k);
-  candidate_position = pos.generate_new_position(lower_bound, upper_bound, seed, sigma);
-  std::cout<<"current position: "<<pos.position[0]<<" "<<pos.position[1]<<std::endl;
-  std::cout<<"value func: "<<func(pos.position)<<" value mapped: "<<mapped_function_value(pos.position)<<std::endl;
-  std::cout<<"new position: "<<candidate_position[0]<<" "<<candidate_position[1]<<std::endl;
-  std::cout<<"new value func: "<<func(candidate_position)<<" new value mapped: "<<mapped_function_value(candidate_position)<<std::endl;
-
-
-  delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
-  std::cout<<"delta function mapped: "<<delta<<std::endl;
-
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
-    pos.update_position(candidate_position, func);
-    
-    pos.increase_avg_window_at_position(mapped_function_value(pos.position), k);
-
-  }
-}
 
 
 double StochasticTunnelling::mapped_function_value(const std::vector<double>& posi){  

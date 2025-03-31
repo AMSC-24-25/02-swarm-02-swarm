@@ -2,6 +2,7 @@
 #define DISTRIBUTED_GENETIC_ALGORITHM_HPP
 
 #include <vector>
+#include <cstddef>
 
 #include "ObjectiveFunction.hpp"
 

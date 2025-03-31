@@ -97,27 +97,16 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 												 const size_t max_iterations, const size_t seed,
 												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
 												 const  ObjectiveFunction& func, const double gamma,
-												 const double beta_adjust_factor, const size_t moving_avg_window, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding) {
+												 const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding) {
 
-	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, moving_avg_window, tunnelling);
+	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling);
 
 	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding);
 
 	const double beginning = omp_get_wtime();
 
-	for (size_t i = 0; i < moving_avg_window; i++) {
-		stun.first_k_iteration(seed, i);
 
-		if (verbose) {
-			std::cout<<"--------------------------------------------"<<std::endl;
-			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			/*std::cout << "  Current minimum: " << std::endl;
-			utils::print_point(dimensions, stun.pos.position, stun.pos.f0);
-			std::cout << std::endl;*/
-		}
-	}
-
-	for(size_t i = moving_avg_window; i < max_iterations; i++){
+	for(size_t i = 0; i < max_iterations; i++){
 		if(i == floor(max_iterations*(1/3))){
 			stun.update_beta_thresholding(1);
 		}else if(i == floor(max_iterations*(2/3))){
