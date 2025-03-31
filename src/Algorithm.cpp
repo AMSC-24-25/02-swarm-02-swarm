@@ -20,6 +20,7 @@
 #include "Swarm.hpp"
 #include "GeneticAlgorithm.hpp"
 #include "StochasticTunnelling.hpp"
+#include "MultiStochasticTunnelling.hpp"
 #include "Creature.hpp"
 #include "Position.hpp"
 
@@ -99,7 +100,7 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 												 const  ObjectiveFunction& func, const double gamma,
 												 const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding) {
 
-	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling);
+	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, 0);
 
 	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding);
 
@@ -135,6 +136,66 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 	}
 
 	return {stun.pos.best_position, stun.pos.f0};
+
+	 
+}
+
+
+std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,
+												 const size_t max_iterations, const size_t seed,
+												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
+												 const  ObjectiveFunction& func, const double gamma,
+												 const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding,
+												 const size_t num_positions, const size_t time_step_updating) {
+
+	std::vector<Position> pos;
+
+	for(size_t i = 0; i < num_positions; i++){
+		pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, i));
+		std::cout<<pos[i].f0<<std::endl;
+	}
+
+	for(size_t i = 0; i < num_positions; i++){
+		std::cout<<pos[i].f0<<std::endl;
+	}
+
+
+	MultiStochasticTunnelling stun = MultiStochasticTunnelling(pos, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding, num_positions, time_step_updating, dimensions);
+
+
+	const double beginning = omp_get_wtime();
+
+
+	for(size_t i = 0; i < max_iterations; i++){
+		if(i == floor(max_iterations*(1/3))){
+			stun.update_beta_thresholding(1);
+		}else if(i == floor(max_iterations*(2/3))){
+			stun.update_beta_thresholding(2);
+		}
+		std::cout<<i<<std::endl;
+		stun.iteration(seed, i);
+
+		if (verbose) {
+			std::cout<<"--------------------------------------------"<<std::endl;
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			/*std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
+			std::cout << std::endl;*/
+		}
+	}
+
+	const double end = omp_get_wtime();
+
+	if (verbose) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, stun.pos[0].best_position, stun.pos[0].f0);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
+
+	return {stun.pos[0].best_position, stun.pos[0].f0};
 
 	 
 }

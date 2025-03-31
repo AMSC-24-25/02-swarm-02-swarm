@@ -20,7 +20,7 @@ class Position {
 
         const size_t window_tunnelling;
 
-        Position(const size_t dimensions, const double lower_bound, const double upper_bound, const size_t seed, double beta, const ObjectiveFunction& func, const size_t window_tunnelling);
+        Position(const size_t dimensions, const double lower_bound, const double upper_bound, const size_t seed, double beta, const ObjectiveFunction& func, const size_t window_tunnelling, size_t a);
 
         const std::vector<double> generate_new_position(const double lower_bound,
 				const double upper_bound, const size_t seed, const double sigma);

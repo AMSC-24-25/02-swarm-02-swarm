@@ -21,6 +21,7 @@ class MultiStochasticTunnelling{
     double beta_thresholding;
     const size_t num_positions;
     const size_t time_step_updating;
+    const size_t dimension;
 
 
     public:
@@ -29,7 +30,7 @@ class MultiStochasticTunnelling{
 
     MultiStochasticTunnelling(std::vector<Position>& pos, const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
                         const double gamma, const double beta_adjust_factor,
-                        const size_t max_iter, const ObjectiveFunction& func, double beta_thresholding, const size_t num_positions, const size_t time_step_updating);
+                        const size_t max_iter, const ObjectiveFunction& func, double beta_thresholding, const size_t num_positions, const size_t time_step_updating, const size_t dimension);
 
     void iteration(const size_t seed, const size_t k);
 

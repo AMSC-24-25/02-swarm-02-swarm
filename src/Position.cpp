@@ -6,7 +6,7 @@
 
 #include "Position.hpp"
 
-Position::Position(const size_t dimensions_, const double lower_bound, const double upper_bound, const size_t seed, const double beta_, const ObjectiveFunction& func, const size_t window_tunnelling_)
+Position::Position(const size_t dimensions_, const double lower_bound, const double upper_bound, const size_t seed, const double beta_, const ObjectiveFunction& func, const size_t window_tunnelling_, size_t a)
     : f0(std::numeric_limits<double>::infinity()), dimensions(dimensions_), window_tunnelling(window_tunnelling_) {
     assert(dimensions_ > 0);
 	assert(std::isfinite(lower_bound));
@@ -15,7 +15,7 @@ Position::Position(const size_t dimensions_, const double lower_bound, const dou
 
     std::vector<double> position_(dimensions);
 
-    std::mt19937 rnd{seed};
+    std::mt19937 rnd{seed + a};
 	std::uniform_real_distribution<double> position_dist{lower_bound, upper_bound};
 
 

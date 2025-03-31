@@ -39,6 +39,7 @@ set(SOURCES
     src/Sphere.cpp
     src/Swarm.cpp
     src/StochasticTunnelling.cpp
+    src/MultiStochasticTunnelling.cpp
     src/Position.cpp
     src/DifferentialEvolution.cpp
     src/Candidate.cpp
@@ -86,6 +87,7 @@ if(ENABLE_TESTS)
     add_test(swarm_convergence)
     add_test(genetic_convergence_omp)
     add_test(tunnelling_convergence)
+    add_test(multi_tunnelling_convergence)
     add_test(de_convergence)
 
     if(USE_MPI)
