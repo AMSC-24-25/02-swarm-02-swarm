@@ -33,6 +33,9 @@ class Position {
 
         void update_window_tunnelling(int tunnelled);
 
+        void update_best_position(std::vector<double> position_, double best_fit);
+
+
     
 };
 

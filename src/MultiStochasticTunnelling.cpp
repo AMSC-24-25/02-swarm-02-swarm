@@ -13,7 +13,7 @@
 
 MultiStochasticTunnelling::MultiStochasticTunnelling(std::vector<Position>& pos_, const double lower_bound_, const double upper_bound_,const double sigma_max_, const double sigma_min_,
                         const double gamma_, const double beta_adjust_factor_,
-                        const size_t max_iter_, const ObjectiveFunction& func_, double beta_thresholding_)
+                        const size_t max_iter_, const ObjectiveFunction& func_, double beta_thresholding_, const size_t num_positions_, const size_t time_step_updating_)
     : lower_bound(lower_bound_),
       upper_bound(upper_bound_),
       func(func_),
@@ -23,77 +23,78 @@ MultiStochasticTunnelling::MultiStochasticTunnelling(std::vector<Position>& pos_
       beta_adjust_factor(beta_adjust_factor_),
       max_iter(max_iter_),
       beta_thresholding(beta_thresholding_),
+      num_positions(num_positions_),
+      time_step_updating(time_step_updating_),
       pos(pos_) {
     assert(std::isfinite(lower_bound));
-	  assert(std::isfinite(upper_bound));
+	assert(std::isfinite(upper_bound));
     assert(lower_bound < upper_bound);
     assert(beta_adjust_factor > 0.0 && beta_adjust_factor < 1.0);
+    assert(num_positions > 0);
+
+    std::vector<std::vector<double>> candidate_positions(num_positions);
+    std::vector<double> delta(num_positions);
+    for(size_t i = 0; i < num_positions; i++){
+        delta[i] = 0.0;
+        candidate_positions[i] = std::vector<double>(pos[0].dimensions);
+        for(size_t j = 0; j < pos[0].dimensions; j++){
+            candidate_positions[i][j] = 0.0;
+        }
+    }
+
 }
 
 
 void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
   double sigma = compute_sigma(k);
-  candidate_position = pos.generate_new_position(lower_bound, upper_bound, seed, sigma);
-  std::cout<<"current position: "<<pos.position[0]<<" "<<pos.position[1]<<std::endl;
-  std::cout<<"value func: "<<func(pos.position)<<" value mapped: "<<mapped_function_value(pos.position)<<std::endl;
-  std::cout<<"new position: "<<candidate_position[0]<<" "<<candidate_position[1]<<std::endl;
-  std::cout<<"new value func: "<<func(candidate_position)<<" new value mapped: "<<mapped_function_value(candidate_position)<<std::endl;
-  
 
-  delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
-  std::cout<<"delta function mapped: "<<delta<<std::endl;
+  if(k % time_step_updating == 0){
+    double best_fit = std::numeric_limits<double>::infinity();
+    std::vector<double> best_location = pos[0].position;
 
+    for(size_t i = 0; i < num_positions; i++){
+        if(pos[i].f0 < best_fit){
+            best_fit = pos[i].f0;
+            best_location = pos[i].best_position;
+        }
+    }
 
-  //if(delta_condition(delta) || metropolis_condition(delta, seed, pos.beta)){
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
-    pos.update_position(candidate_position, func);
-    
-    pos.update_avg_window(mapped_function_value(pos.position));
-
+    for(size_t i = 0; i < num_positions; i++){
+        pos[i].update_best_position(best_location, best_fit);
+    }
   }
 
-  //pos.update_beta(beta_adjust_factor);
+  for(size_t i = 0; i < num_positions; i++){
+
+    candidate_positions[i] = pos[i].generate_new_position(lower_bound, upper_bound, seed, sigma);
+    delta[i] = mapped_function_value(candidate_positions[i], i) - mapped_function_value(pos[i].position, i);
+
+
+    if(delta_condition(delta[i], i) or metropolis_condition(delta[i], seed, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position), i)){
+        pos[i].update_position(candidate_positions[i], func);
+    }
+  }    
 }
 
 
-void MultiStochasticTunnelling::first_k_iteration(const size_t seed, const size_t k){
-  double sigma = compute_sigma(k);
-  candidate_position = pos.generate_new_position(lower_bound, upper_bound, seed, sigma);
-  std::cout<<"current position: "<<pos.position[0]<<" "<<pos.position[1]<<std::endl;
-  std::cout<<"value func: "<<func(pos.position)<<" value mapped: "<<mapped_function_value(pos.position)<<std::endl;
-  std::cout<<"new position: "<<candidate_position[0]<<" "<<candidate_position[1]<<std::endl;
-  std::cout<<"new value func: "<<func(candidate_position)<<" new value mapped: "<<mapped_function_value(candidate_position)<<std::endl;
 
-
-  delta = mapped_function_value(candidate_position) - mapped_function_value(pos.position);
-  std::cout<<"delta function mapped: "<<delta<<std::endl;
-
-  if(delta_condition(delta) or metropolis_condition(delta, seed, pos.beta, func(candidate_position) - func(pos.position), func(pos.best_position) - func(pos.position))){
-    pos.update_position(candidate_position, func);
-    
-    pos.increase_avg_window_at_position(mapped_function_value(pos.position), k);
-
-  }
+double MultiStochasticTunnelling::mapped_function_value(const std::vector<double>& posi, size_t i){  
+  return (1.0 - std::exp(-gamma * (func(posi) - pos[i].f0)));
 }
 
-
-double MultiStochasticTunnelling::mapped_function_value(const std::vector<double>& posi){  
-  return (1.0 - std::exp(-gamma * (func(posi) - pos.f0)));
-}
-
-bool StochasticTunnelling::delta_condition(double delt){
+bool MultiStochasticTunnelling::delta_condition(double delt, size_t i){
   if(delt <= 0){
-    pos.update_window_tunnelling(1);
-    pos.update_betan(beta_adjust_factor, beta_thresholding);
+    pos[i].update_window_tunnelling(1);
+    pos[i].update_betan(beta_adjust_factor, beta_thresholding);
     return true;
   }else{
-    pos.update_window_tunnelling(0);
-    pos.update_betan(beta_adjust_factor, beta_thresholding);
+    pos[i].update_window_tunnelling(0);
+    pos[i].update_betan(beta_adjust_factor, beta_thresholding);
     return false;
   }
 }
 
-bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta) {
+bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, size_t i) {
         static std::mt19937 gen(seed); 
         
         std::uniform_real_distribution<double> dist(0.0, 1.0);
@@ -113,12 +114,12 @@ bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, 
           bool ris = random_value < exp_value;
 
           if(ris == true){
-            pos.update_window_tunnelling(1);
+            pos[i].update_window_tunnelling(1);
           }else{
-            pos.update_window_tunnelling(0);
+            pos[i].update_window_tunnelling(0);
           }
 
-          pos.update_betan(beta_adjust_factor, beta_thresholding);
+          pos[i].update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }else{
@@ -130,12 +131,12 @@ bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, 
           bool ris = random_value < exp_value;
 
           if(ris == true){
-            pos.update_window_tunnelling(1);
+            pos[i].update_window_tunnelling(1);
           }else{
-            pos.update_window_tunnelling(0);
+            pos[i].update_window_tunnelling(0);
           }
 
-          pos.update_betan(beta_adjust_factor, beta_thresholding);
+          pos[i].update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }

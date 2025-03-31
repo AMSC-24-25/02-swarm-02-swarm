@@ -95,3 +95,8 @@ void Position::update_window_tunnelling(int tunnelled){
 
     avg_tunnelling[window_tunnelling - 1] = tunnelled;
 }
+
+void Position::update_best_position(std::vector<double> forced_best_position, double best_fit){
+    best_position = forced_best_position;
+    f0 = best_fit;
+}

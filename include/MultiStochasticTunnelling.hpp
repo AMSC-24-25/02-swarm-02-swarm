@@ -17,8 +17,10 @@ class MultiStochasticTunnelling{
     const double beta_adjust_factor;
     const double max_iter;
     std::vector<std::vector<double>> candidate_positions;
-    double delta;
+    std::vector<double> delta;
     double beta_thresholding;
+    const size_t num_positions;
+    const size_t time_step_updating;
 
 
     public:
@@ -27,17 +29,15 @@ class MultiStochasticTunnelling{
 
     MultiStochasticTunnelling(std::vector<Position>& pos, const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
                         const double gamma, const double beta_adjust_factor,
-                        const size_t max_iter, const ObjectiveFunction& func, double beta_thresholding);
+                        const size_t max_iter, const ObjectiveFunction& func, double beta_thresholding, const size_t num_positions, const size_t time_step_updating);
 
     void iteration(const size_t seed, const size_t k);
 
-    double mapped_function_value(const std::vector<double>&  posi);
+    double mapped_function_value(const std::vector<double>&  posi, size_t i);
 
-    bool delta_condition(double delt);
+    bool delta_condition(double delt, size_t i);
 
-    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta);
-
-    void first_k_iteration(const size_t seed, const size_t k);
+    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, size_t i);
 
     double compute_sigma(size_t i);
 
