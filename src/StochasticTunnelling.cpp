@@ -145,3 +145,13 @@ double StochasticTunnelling::compute_sigma(size_t i){
   return sigma_max - (((sigma_max - sigma_min)/ max_iter))*i;
 }
 
+void StochasticTunnelling::update_beta_thresholding(size_t k){
+  if(k == 1){
+    beta_thresholding = beta_thresholding * 2/3;
+  }
+
+  if(k==2){
+    beta_thresholding = beta_thresholding / 2;
+  }
+}
+

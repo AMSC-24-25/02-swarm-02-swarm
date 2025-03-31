@@ -18,7 +18,7 @@ class StochasticTunnelling{
     const double max_iter;
     std::vector<double> candidate_position;
     double delta;
-    const double beta_thresholding;
+    double beta_thresholding;
 
 
     public:
@@ -40,6 +40,8 @@ class StochasticTunnelling{
     void first_k_iteration(const size_t seed, const size_t k);
 
     double compute_sigma(size_t i);
+
+    void update_beta_thresholding(size_t k);
 };
 
 

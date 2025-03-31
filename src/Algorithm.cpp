@@ -118,6 +118,11 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 	}
 
 	for(size_t i = moving_avg_window; i < max_iterations; i++){
+		if(i == floor(max_iterations*(1/3))){
+			stun.update_beta_thresholding(1);
+		}else if(i == floor(max_iterations*(2/3))){
+			stun.update_beta_thresholding(2);
+		}
 		stun.iteration(seed, i);
 
 		if (verbose) {

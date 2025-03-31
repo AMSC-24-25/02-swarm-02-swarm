@@ -132,8 +132,6 @@ double Position::compute_avg_tunnelling(){
     }
 
     avg /= window_tunnelling;
-    std::cout<<"window tunnelling: "<<window_tunnelling<<std::endl;
-    
     return avg;
 }
  
