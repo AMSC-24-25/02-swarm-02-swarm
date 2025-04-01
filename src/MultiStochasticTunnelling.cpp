@@ -58,13 +58,19 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
     double best_fit = std::numeric_limits<double>::infinity();
     std::vector<double> best_location(dimension);
 
+    #pragma omp parallel for reduction(min:best_fit)
+
     for(size_t i = 0; i < num_positions; i++){
-        std::cout<<pos[i].f0<<std::endl;
-        if(pos[i].f0 < best_fit){
-            best_fit = pos[i].f0;
-            best_location = pos[i].best_position;
+        //std::cout<<pos[i].f0<<std::endl;à
+        #pragma omp critical
+        {
+          if(pos[i].f0 < best_fit){
+              best_fit = pos[i].f0;
+              best_location = pos[i].best_position;
+          }
         }
     }
+    #pragma omp parallel for schedule(static) num_threads(num_positions) shared(best_location, best_fit)
     for(size_t i = 0; i < num_positions; i++){
         pos[i].update_best_position(best_location, best_fit);
     }
@@ -72,15 +78,15 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
 
   for(size_t i = 0; i < num_positions; i++){
 
-    std::cout<<"current position: "<<pos[i].position[0]<<" "<<pos[i].position[1]<<std::endl;
+  /*  std::cout<<"current position: "<<pos[i].position[0]<<" "<<pos[i].position[1]<<std::endl;
   std::cout<<"value func: "<<func(pos[i].position)<<" value mapped: "<<mapped_function_value(pos[i].position, i)<<std::endl;
-
+  */
 
     candidate_positions[i] = pos[i].generate_new_position(lower_bound, upper_bound, seed, sigma);
     delta[i] = mapped_function_value(candidate_positions[i], i) - mapped_function_value(pos[i].position, i);
 
-  std::cout<<"new position: "<<candidate_positions[i][0]<<" "<<candidate_positions[i][1]<<std::endl;
-  std::cout<<"new value func: "<<func(candidate_positions[i])<<" new value mapped: "<<mapped_function_value(candidate_positions[i], i)<<std::endl;
+  /*std::cout<<"new position: "<<candidate_positions[i][0]<<" "<<candidate_positions[i][1]<<std::endl;
+  std::cout<<"new value func: "<<func(candidate_positions[i])<<" new value mapped: "<<mapped_function_value(candidate_positions[i], i)<<std::endl;*/
 
 
     if(delta_condition(delta[i], i) or metropolis_condition(delta[i], seed, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position), i)){
@@ -114,15 +120,15 @@ bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, 
         
         double random_value = dist(gen);
 
-        std::cout<<"gamma * delta_f: "<<gamma*delta_f<<std::endl;
+        //std::cout<<"gamma * delta_f: "<<gamma*delta_f<<std::endl;
 
         if(gamma*delta_f >= 1.e-6){
 
           double exp_value = std::exp(-beta * delta_f_stun);
 
-          std::cout<<"beta: "<<beta<<std::endl;
+          //std::cout<<"beta: "<<beta<<std::endl;
 
-          std::cout<<"percentage: "<<exp_value<<std::endl;
+          //std::cout<<"percentage: "<<exp_value<<std::endl;
 
           bool ris = random_value < exp_value;
 
@@ -139,7 +145,7 @@ bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, 
           
           double exp_value = std::exp(-beta * gamma * std::exp(gamma * old_delta));
 
-          std::cout<<"percentage approximated: "<<exp_value<<std::endl;
+          //std::cout<<"percentage approximated: "<<exp_value<<std::endl;
         
           bool ris = random_value < exp_value;
 
