@@ -76,23 +76,27 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
     }
   }
 
-  for(size_t i = 0; i < num_positions; i++){
+  #pragma omp parallel num_threads(num_positions) shared(seed, sigma, upper_bound, lower_bound, delta, pos, candidate_positions)
+  {
+    const size_t thread_id = omp_get_thread_num();
+    #pragma omp for schedule(static)
+    for(size_t i = 0; i < num_positions; i++){
 
   /*  std::cout<<"current position: "<<pos[i].position[0]<<" "<<pos[i].position[1]<<std::endl;
   std::cout<<"value func: "<<func(pos[i].position)<<" value mapped: "<<mapped_function_value(pos[i].position, i)<<std::endl;
   */
-
-    candidate_positions[i] = pos[i].generate_new_position(lower_bound, upper_bound, seed, sigma);
-    delta[i] = mapped_function_value(candidate_positions[i], i) - mapped_function_value(pos[i].position, i);
+      candidate_positions[i] = pos[i].generate_new_position(lower_bound, upper_bound, seed + thread_id, sigma);
+      delta[i] = mapped_function_value(candidate_positions[i], i) - mapped_function_value(pos[i].position, i);
 
   /*std::cout<<"new position: "<<candidate_positions[i][0]<<" "<<candidate_positions[i][1]<<std::endl;
   std::cout<<"new value func: "<<func(candidate_positions[i])<<" new value mapped: "<<mapped_function_value(candidate_positions[i], i)<<std::endl;*/
 
 
-    if(delta_condition(delta[i], i) or metropolis_condition(delta[i], seed, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position), i)){
-        pos[i].update_position(candidate_positions[i], func);
-    }
-  }    
+      if(delta_condition(delta[i], i) or metropolis_condition(delta[i], seed + thread_id, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position), i)){
+          pos[i].update_position(candidate_positions[i], func);
+      }
+    }    
+  }
 }
 
 

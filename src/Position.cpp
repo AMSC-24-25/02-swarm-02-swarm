@@ -66,7 +66,7 @@ void Position::update_position(std::vector<double> position_, const ObjectiveFun
 
 
 void Position::update_betan(double beta_adjust_factor, double beta_thresholding){
-    std::cout<<"average tunnelling: "<<compute_avg_tunnelling() <<std::endl;
+    //std::cout<<"average tunnelling: "<<compute_avg_tunnelling() <<std::endl;
     if(compute_avg_tunnelling() > beta_thresholding) {
         beta /= beta_adjust_factor;
     }else{
@@ -87,7 +87,7 @@ double Position::compute_avg_tunnelling(){
  
 void Position::update_window_tunnelling(int tunnelled){
 
-    std::cout<<"tunneled: "<<tunnelled<<std::endl;
+    //std::cout<<"tunneled: "<<tunnelled<<std::endl;
 
     for(size_t i = 0; i < window_tunnelling - 1; i++){
         avg_tunnelling[i] = avg_tunnelling[i + 1];

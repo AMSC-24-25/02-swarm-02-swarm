@@ -115,13 +115,13 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 		}
 		stun.iteration(seed, i);
 
-		if (verbose) {
+		/*if (verbose) {
 			std::cout<<"--------------------------------------------"<<std::endl;
 			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			/*std::cout << "  Current minimum: " << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
 			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
-			std::cout << std::endl;*/
-		}
+			std::cout << std::endl;
+		}*/
 	}
 
 	const double end = omp_get_wtime();
@@ -152,11 +152,6 @@ std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const siz
 
 	for(size_t i = 0; i < num_positions; i++){
 		pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, i));
-		std::cout<<pos[i].f0<<std::endl;
-	}
-
-	for(size_t i = 0; i < num_positions; i++){
-		std::cout<<pos[i].f0<<std::endl;
 	}
 
 
@@ -172,16 +167,15 @@ std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const siz
 		}else if(i == floor(max_iterations*(2/3))){
 			stun.update_beta_thresholding(2);
 		}
-		std::cout<<i<<std::endl;
 		stun.iteration(seed, i);
 
-		if (verbose) {
+		/*if (verbose) {
 			std::cout<<"--------------------------------------------"<<std::endl;
 			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			/*std::cout << "  Current minimum: " << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
 			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
-			std::cout << std::endl;*/
-		}
+			std::cout << std::endl;
+		}*/
 	}
 
 	const double end = omp_get_wtime();
