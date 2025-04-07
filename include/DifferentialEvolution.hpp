@@ -19,12 +19,11 @@ class DifferentialEvolution{
     const size_t max_gen;
     const ObjectiveFunction& func;
     size_t n_threads;
-    std::mt19937 gen;
 
 
-    void select_three_random(int excluded_index,int& i1, int& i2, int& i3);
+    void select_three_random(int excluded_index,int& i1, int& i2, int& i3, std::mt19937& local_gen);
     void mutate(std::vector<double>& mutantPos, const Candidate& r1, const Candidate& r2, const Candidate& r3);
-    void crossover(Candidate& original,const Candidate& mutant);
+    void crossover(Candidate& original,const Candidate& mutant,std::mt19937& local_gen);
 
 
     public:
