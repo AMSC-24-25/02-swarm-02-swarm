@@ -332,6 +332,79 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 
 	return {ga.creature_positions.at(ga.best_creature_index), ga.creature_fitnesses.at(ga.best_creature_index)};
 }
+
+//////////////////////////////////
+
+
+
+
+std::pair<std::vector<double>, double> run_tunnelling_mpi(const size_t dimensions,
+												 const size_t max_iterations, const size_t seed,
+												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
+												 const  ObjectiveFunction& func, const double gamma,
+												 const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding,
+												 const size_t num_positions, const size_t time_step_updating) {
+	int world_size;
+	MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+	int world_rank;
+	MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+	const size_t local_size = num_creatures / static_cast<size_t>(world_size);
+
+
+
+	std::vector<Position> pos;
+
+	// The root process resizes its local vector
+	if (world_rank == 0) {
+		for(size_t i = 0; i < num_positions; i++){
+			pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, i));
+		}
+	}
+
+
+	DistributedMultiStochasticTunnelling stun = DistributedMultiStochasticTunnelling(world_rank, world_size, pos, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding, num_positions, time_step_updating, dimensions);
+
+
+
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	const double end = MPI_Wtime();
+
+	for(size_t i = 0; i < max_iterations; i++){
+		if(i == floor(max_iterations*(1/3))){
+			stun.update_beta_thresholding(1);
+		}else if(i == floor(max_iterations*(2/3))){
+			stun.update_beta_thresholding(2);
+		}
+		stun.iteration(seed, i);
+
+		/*if (verbose) {
+			std::cout<<"--------------------------------------------"<<std::endl;
+			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
+			std::cout << "  Current minimum: " << std::endl;
+			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
+			std::cout << std::endl;
+		}*/
+	}
+
+	MPI_Barrier(MPI_COMM_WORLD);
+	const double end = MPI_Wtime();
+
+	if (verbose && world_rank == 0) {
+		std::cout << std::endl;
+		std::cout << "Minimum found:" << std::endl;
+		utils::print_point(dimensions, stun.pos[0].best_position, stun.pos[0].f0);
+		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+				  << std::endl;
+		std::cout << std::endl;
+	}
+
+	return {stun.pos[0].best_position, stun.pos[0].f0};
+
+}
+
+
+
 #endif	// USE_MPI
 
 }  // namespace algorithm
