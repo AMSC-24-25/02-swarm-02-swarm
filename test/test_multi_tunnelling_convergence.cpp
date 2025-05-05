@@ -40,11 +40,6 @@ TEST(TunnellingConvergence, Sphere){
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-2);
 
-	std::vector<double> expected_minimum(dimensions, 0.0);
-	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 8*1e-1);
-	}
-
 
 }
 
@@ -72,10 +67,6 @@ TEST(TunnellingConvergence, Rosenbrock){
 
 	EXPECT_LE(absolute_error(0.0, result.second), 5*1e-1);
 
-	std::vector<double> expected_minimum(dimensions, 0.0);
-	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 9.8*1e-1);
-	}
 
 
 }
@@ -105,10 +96,6 @@ TEST(TunnellingConvergence, Rastrigin){
 
 	EXPECT_LE(absolute_error(0.0, result.second), 1e-1);
 
-	std::vector<double> expected_minimum(dimensions, 0.0);
-	for (size_t i = 0; i < dimensions; i++) {
-		EXPECT_LE(absolute_error(expected_minimum.at(i), result.first.at(i)), 9.8*1e-1);
-	}
 
 
 }

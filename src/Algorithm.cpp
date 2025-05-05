@@ -94,51 +94,6 @@ std::pair<std::vector<double>, double> run_swarm(const size_t dimensions, const 
 
 
 
-std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t dimensions,
-												 const size_t max_iterations, const size_t seed,
-												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
-												 const  ObjectiveFunction& func, const double gamma,
-												 const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding) {
-
-	Position p = Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, 0);
-
-	StochasticTunnelling stun = StochasticTunnelling(p, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding);
-
-	const double beginning = omp_get_wtime();
-
-
-	for(size_t i = 0; i < max_iterations; i++){
-		if(i == floor(max_iterations*(1/3))){
-			stun.update_beta_thresholding(1);
-		}else if(i == floor(max_iterations*(2/3))){
-			stun.update_beta_thresholding(2);
-		}
-		stun.iteration(seed, i);
-
-		/*if (verbose) {
-			std::cout<<"--------------------------------------------"<<std::endl;
-			std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-			std::cout << "  Current minimum: " << std::endl;
-			utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
-			std::cout << std::endl;
-		}*/
-	}
-
-	const double end = omp_get_wtime();
-
-	if (verbose) {
-		std::cout << std::endl;
-		std::cout << "Minimum found:" << std::endl;
-		utils::print_point(dimensions, stun.pos.best_position, stun.pos.f0);
-		std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
-				  << std::endl;
-		std::cout << std::endl;
-	}
-
-	return {stun.pos.best_position, stun.pos.f0};
-
-	 
-}
 
 
 std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,

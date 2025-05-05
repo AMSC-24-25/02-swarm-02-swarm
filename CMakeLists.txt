@@ -38,7 +38,6 @@ set(SOURCES
     src/Rosenbrock.cpp
     src/Sphere.cpp
     src/Swarm.cpp
-    src/StochasticTunnelling.cpp
     src/MultiStochasticTunnelling.cpp
     src/Position.cpp
     src/DifferentialEvolution.cpp
@@ -87,7 +86,6 @@ if(ENABLE_TESTS)
 
     add_test(swarm_convergence)
     add_test(genetic_convergence_omp)
-    add_test(tunnelling_convergence)
     add_test(multi_tunnelling_convergence)
     add_test(de_convergence)
 
@@ -129,7 +127,8 @@ if(ENABLE_BENCHMARKS)
     set(BENCHMARK_SOURCES
         bench/bench_swarm_search.cpp
         bench/bench_genetic_omp.cpp
-        bench/bench_de.cpp
+        bench/bench_tunnelling_omp.cpp
+        #bench/bench_de.cpp
     )
     add_executable(bench ${BENCHMARK_SOURCES})
     target_link_libraries(bench PUBLIC 02-swarm benchmark benchmark_main)
