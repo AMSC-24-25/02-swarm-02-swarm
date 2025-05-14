@@ -103,9 +103,12 @@ if(ENABLE_TESTS)
         #target_link_libraries(test_tunnelling_convergence_mpi PUBLIC 02-swarm gtest gtest_main MPI::MPI_CXX)
         #gtest_discover_tests(test_tunnelling_convergence_mpi)
 
-        add_executable(test_de_convergence_mpi test/test_de_convergence_mpi.cpp)
+        add_executable(test_de_convergence_mpi
+                test/test_de_convergence_mpi.cpp
+                test/main_test_de_mpi.cpp
+        )
         target_compile_definitions(test_de_convergence_mpi PUBLIC USE_MPI=1)
-        target_link_libraries(test_de_convergence_mpi PUBLIC 02-swarm gtest gtest_main MPI::MPI_CXX)
+        target_link_libraries(test_de_convergence_mpi PUBLIC 02-swarm gtest MPI::MPI_CXX)
         gtest_discover_tests(test_de_convergence_mpi)
 
     endif(USE_MPI)
