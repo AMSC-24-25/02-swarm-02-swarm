@@ -20,6 +20,7 @@ private:
     const double CR;
     const size_t max_gen;
     const ObjectiveFunction& func;
+    std::mt19937 gen;
 
 
     void select_three_random(int excluded_index,int& i1, int& i2, int& i3, std::mt19937& local_gen);

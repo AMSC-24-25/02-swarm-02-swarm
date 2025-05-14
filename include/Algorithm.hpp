@@ -115,6 +115,13 @@ std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, 
 													   const double mutation_rate, const double survival_rate,
 													   const std::unique_ptr<ObjectiveFunction>& func,
 													   const bool verbose);
+
+std::pair<std::vector<double>, double> run_de_mpi(const size_t dimensions, const size_t num_candidates,
+                                                  const double lower_bound, const double upper_bound,
+                                                  const size_t seed, const size_t max_gen,
+                                                  const double F, const double CR,
+                                                  const std::unique_ptr<ObjectiveFunction>& func,
+                                                  const bool verbose);
 #endif	// USE_MPI
 
 }  // namespace algorithm

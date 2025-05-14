@@ -16,7 +16,7 @@
 // Constructor for DifferentialEvolution.
 // Initializes key parameters and verifies that the bounds and control parameters are valid.
 DistributedDifferentialEvolution::DistributedDifferentialEvolution(const std::vector<Candidate>& candidates_, const size_t dimensions_, const double lower_bound_, const double upper_bound_, const size_t seed_, const size_t max_gen_, const double F_, const double CR_, ObjectiveFunction& func_)
-        : candidates(candidates_),dimensions(dimensions_),lower_bound(lower_bound_),upper_bound(upper_bound_), seed(seed_),F(F_), CR(CR_),max_gen(max_gen_) , func(func_),  bestCandidate(nullptr) {
+        : candidates(candidates_),dimensions(dimensions_),lower_bound(lower_bound_),upper_bound(upper_bound_), seed(seed_),F(F_), CR(CR_),max_gen(max_gen_) , func(func_), gen(seed_), bestCandidate(nullptr) {
     // nb se rank 0 candidates contiene i candidati,
     // altrimenti vuoto, a ogni processo servira solo il suo e quello di altri 3 random per fare mutation
     assert(std::isfinite(lower_bound));
@@ -85,8 +85,7 @@ void DistributedDifferentialEvolution::updateCandidate() {
         int i2;
         int i3;
 
-        std::mt19937 local_gen(seed + omp_get_thread_num());
-        select_three_random(i,i1,i2,i3,local_gen);
+        select_three_random(i,i1,i2,i3,gen);
 
         Candidate r1 = candidates[i1];
         Candidate r2 = candidates[i2];
@@ -97,7 +96,7 @@ void DistributedDifferentialEvolution::updateCandidate() {
         mutate(mutantPos,r1,r2,r3);
         Candidate mutant(mutantPos, func);
 
-        crossover(candidates[i], mutant, local_gen);
+        crossover(candidates[i], mutant, gen);
     }
 };
 

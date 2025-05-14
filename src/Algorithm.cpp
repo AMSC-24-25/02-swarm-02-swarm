@@ -169,11 +169,10 @@ namespace algorithm {
         size_t iteration=0;
         while (iteration<max_gen) {
             iteration++;
-            de.findSol();
             de.updateCandidate();
-
+            de.findSol();
             if (verbose) {
-                std::cout << "Iteration n. " << (iteration + 1) << " / " << max_gen << std::endl;
+                std::cout << "Iteration n. " << iteration << " / " << max_gen << std::endl;
                 std::cout << "  Current minimum: " << std::endl;
                 utils::print_point(dimensions, de.bestCandidate->candidate, de.bestCandidate->f0);
                 std::cout << std::endl;
@@ -371,7 +370,7 @@ namespace algorithm {
 
         DistributedDifferentialEvolution de(
                 deCandidates, dimensions, lower_bound, upper_bound,
-                seed, max_gen, F, CR, *func
+                my_seed, max_gen, F, CR, *func
         );
 
 
@@ -384,8 +383,8 @@ namespace algorithm {
 
         while (iteration<max_gen) {
             iteration++;
-            de.findSol();
             de.updateCandidate();
+            de.findSol();
             local_best.first = de.bestCandidate->f0;
             local_best.second = world_rank;
 
