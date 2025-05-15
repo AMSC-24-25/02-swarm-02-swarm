@@ -17,7 +17,7 @@
 // Initializes key parameters and verifies that the bounds and control parameters are valid.
 DifferentialEvolution::DifferentialEvolution(const std::vector<Candidate>& candidates_, const size_t dimensions_, const double lower_bound_, const double upper_bound_, const size_t seed_, const size_t max_gen_, const double F_, const double CR_, ObjectiveFunction& func_, const size_t n_threads_)
     : candidates(candidates_), dimensions(dimensions_),lower_bound(lower_bound_),upper_bound(upper_bound_), seed(seed_),F(F_), CR(CR_),max_gen(max_gen_) , func(func_), n_threads(n_threads_),gens(n_threads_), bestCandidate(nullptr) {
-    assert(candidates.size() >0);
+    assert(candidates.size() >= 4 && "Differential Evolution requires at least 4 candidates");
     assert(std::isfinite(lower_bound));
     assert(std::isfinite(upper_bound));
     assert(lower_bound < upper_bound);

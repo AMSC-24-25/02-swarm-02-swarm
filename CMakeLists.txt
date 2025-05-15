@@ -138,7 +138,7 @@ if(ENABLE_BENCHMARKS)
         bench/bench_swarm_search.cpp
         bench/bench_genetic_omp.cpp
         bench/bench_tunnelling_omp.cpp
-        #bench/bench_de.cpp
+        bench/bench_de_omp.cpp
     )
     add_executable(bench ${BENCHMARK_SOURCES})
     target_link_libraries(bench PUBLIC 02-swarm benchmark benchmark_main)

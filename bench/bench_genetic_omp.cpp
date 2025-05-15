@@ -34,4 +34,4 @@ static void GeneticOpenMP_Rosenbrock(benchmark::State& state) {
 	}
 }
 
-BENCHMARK(GeneticOpenMP_Rosenbrock)->Range(3, 1'000)->RangeMultiplier(2)->UseManualTime();
+BENCHMARK(GeneticOpenMP_Rosenbrock)->Range(4, 1'000)->RangeMultiplier(2)->UseManualTime();

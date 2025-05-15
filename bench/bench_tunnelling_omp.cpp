@@ -37,4 +37,4 @@ static void TunnellingOpenMP_Rosenbrock(benchmark::State& state) {
 	}
 }
 
-BENCHMARK(TunnellingOpenMP_Rosenbrock)->Range(3, 1'000)->RangeMultiplier(2)->UseManualTime();
+BENCHMARK(TunnellingOpenMP_Rosenbrock)->Range(4, 1'000)->RangeMultiplier(2)->UseManualTime();

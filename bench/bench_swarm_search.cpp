@@ -51,4 +51,4 @@ static void SwarmSearch_Rosenbrock(benchmark::State& state) {
 	}
 }
 
-BENCHMARK(SwarmSearch_Rosenbrock)->Range(1, 1'000)->RangeMultiplier(2)->UseManualTime();
+BENCHMARK(SwarmSearch_Rosenbrock)->Range(4, 1'000)->RangeMultiplier(2)->UseManualTime();
