@@ -17,10 +17,12 @@
 
 enum class minimization_algorithm {
 	SWARM_SEARCH,
-	GENETIC_OPENMP
+	GENETIC_OPENMP,
+    DE_OPENMP,
+
 #if defined(USE_MPI) && USE_MPI == 1
-	,
-	GENETIC_MPI
+	GENETIC_MPI,
+    DE_MPI
 #endif	// USE_MPI
 };
 
@@ -33,10 +35,17 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
 			os << "genetic_omp";
 			break;
 
+        case minimization_algorithm::DE_OPENMP:
+            os << "differential_omp";
+            break;
+
 #if defined(USE_MPI) && USE_MPI == 1
 		case minimization_algorithm::GENETIC_MPI:
 			os << "genetic_mpi";
 			break;
+        case minimization_algorithm::DE_MPI:
+            os << "differential_mpi";
+            break;
 #endif	// USE_MPI
 
 		default:
@@ -86,8 +95,16 @@ int main(const int argc, const char** argv) {
 	size_t max_iterations = 100;
 	double lower_bound = -100.0;
 	double upper_bound = 100.0;
+
+    /* -------------------------------*/
+    /* GENETIC PARAMETERS*/
 	double mutation_rate = 0.2;
 	double survival_rate = 0.5;
+    /* DIFFERENTIAL EVOLUTION PARAMETERS*/
+    double F = 0.5;
+    double CR = 0.8;
+    /* -------------------------------*/
+
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
 	size_t n_threads = 1;
@@ -106,9 +123,9 @@ int main(const int argc, const char** argv) {
 			std::cout << " -h,  --help          Prints this message and exits." << std::endl;
 			std::cout << " -a,  --algorithm     Sets the minimization algorithm to be used." << std::endl;
 			std::cout << "                      Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
-					  << minimization_algorithm::GENETIC_OPENMP
+					  << minimization_algorithm::GENETIC_OPENMP << ", " << minimization_algorithm::DE_OPENMP
 #if defined(USE_MPI) && USE_MPI == 1
-					  << ", " << minimization_algorithm::GENETIC_MPI
+					  << ", " << minimization_algorithm::GENETIC_MPI << ", " << minimization_algorithm::DE_MPI
 #endif	// USE_MPI
 					  << "." << std::endl;
 			std::cout << "                      Default: " << algo << "." << std::endl;
@@ -164,12 +181,16 @@ int main(const int argc, const char** argv) {
 			if (algo_name == "swarm_search") {
 				algo = minimization_algorithm::SWARM_SEARCH;
 			} else if (algo_name == "genetic_omp") {
-				algo = minimization_algorithm::GENETIC_OPENMP;
-			}
+                algo = minimization_algorithm::GENETIC_OPENMP;
+            } else if (algo_name == "differential_omp"){
+                algo = minimization_algorithm::DE_OPENMP;
+            }
 #if defined(USE_MPI) && USE_MPI == 1
 			else if (algo_name == "genetic_mpi") {
 				algo = minimization_algorithm::GENETIC_MPI;
-			}
+			}else if(algo_name == "differential_mpi"){
+                algo = minimization_algorithm::DE_MPI;
+            }
 #endif	// USE_MPI
 			else {
 				die("Error: '" + algo_name + "' is not a known algorithm.");
@@ -281,14 +302,20 @@ int main(const int argc, const char** argv) {
 	} else if (algo == minimization_algorithm::GENETIC_OPENMP) {
 		algorithm::run_genetic_openmp(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
 									  mutation_rate, survival_rate, func, n_threads, verbose);
-	}
+	} else if(algo == minimization_algorithm::DE_OPENMP){
+        algorithm::run_differential_evolution(dimensions,num_points,lower_bound,upper_bound,seed,max_iterations,F,CR,func,n_threads,verbose);
+    }
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		MPI_Init(NULL, NULL);
 		algorithm::run_genetic_mpi(dimensions, num_points, max_iterations, seed, lower_bound, upper_bound,
 								   mutation_rate, survival_rate, func, verbose);
 		MPI_Finalize();
-	}
+	}else if (algo == minimization_algorithm::DE_MPI){
+        MPI_Init(NULL,NULL);
+        algorithm::run_de_mpi(dimensions,num_points,lower_bound,upper_bound,seed,max_iterations,F,CR,func,verbose);
+        MPI_Finalize();
+    }
 #endif	// USE_MPI
 	else {
 		die("Error: unknown algorithm.");
