@@ -8,7 +8,8 @@
 
 class DifferentialEvolution{
 
-    private:
+private:
+
     std::vector<Candidate> candidates;
     const size_t dimensions;
     const double lower_bound;
@@ -19,6 +20,7 @@ class DifferentialEvolution{
     const size_t max_gen;
     const ObjectiveFunction& func;
     size_t n_threads;
+    std::vector<std::mt19937> gens;
 
 
     void select_three_random(int excluded_index,int& i1, int& i2, int& i3, std::mt19937& local_gen);
@@ -26,11 +28,12 @@ class DifferentialEvolution{
     void crossover(Candidate& original,const Candidate& mutant,std::mt19937& local_gen);
 
 
-    public:
+public:
     DifferentialEvolution(const std::vector<Candidate>& candidates,const size_t dimensions_, const double lower_bound_, const double upper_bound_, const size_t seed_, const size_t max_gen_, const double F_, const double CR_, ObjectiveFunction& func_, const size_t n_threads_);
     void updateCandidate();
     void findSol();
     Candidate* bestCandidate;
+
 };
 
 
