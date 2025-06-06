@@ -25,6 +25,8 @@
 #include "MultiStochasticTunnelling.hpp"
 #include "Creature.hpp"
 #include "Position.hpp"
+#include "State.hpp"
+#include "SimulatedAnnealing.hpp"
 
 namespace algorithm {
 
@@ -192,6 +194,58 @@ namespace algorithm {
 
         return {de.bestCandidate->candidate, de.bestCandidate->f0};
     }
+
+std::pair<std::vector<double>, double> run_simulated_annealing(
+                                                                    const size_t dimensions,
+                                                                    const size_t max_iterations,
+                                                                    const size_t dwell_iterations,
+                                                                    const double initial_temperature,
+                                                                    const double temperature_scale,
+                                                                    const double initial_step_size,
+                                                                    const double step_size_scale,
+                                                                    const double boltzmann_constant,
+                                                                    const std::vector<double>& initial_guess,
+                                                                    const double lower_bound,
+                                                                    const double upper_bound,
+                                                                    const std::unique_ptr<ObjectiveFunction>& func,
+                                                                    const size_t seed,
+                                                                    const bool verbose)
+{
+    SimulatedAnnealing sa(
+        *func,
+        static_cast<int>(dimensions),
+        static_cast<int>(max_iterations),
+        static_cast<int>(dwell_iterations),
+        initial_temperature,
+        temperature_scale,
+        initial_step_size,
+        step_size_scale,
+        boltzmann_constant,
+        initial_guess,
+        lower_bound,
+        upper_bound,
+        seed
+    );
+
+    const double beginning = omp_get_wtime();
+    sa.melt(); 
+    sa.anneal();
+    const double end = omp_get_wtime();
+
+    const State& best = sa.getBestState();
+
+    if (verbose) {
+        std::cout << std::endl;
+        std::cout << "Minimum found:" << std::endl;
+        algorithm::utils::print_point(dimensions, best.values, best.cost);
+        std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
+                  << std::endl;
+        std::cout << std::endl;
+    }
+
+    return {best.values, best.cost};
+}
+
 
 
     std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,

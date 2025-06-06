@@ -42,6 +42,8 @@ set(SOURCES
         src/Position.cpp
         src/DifferentialEvolution.cpp
         src/Candidate.cpp
+        src/SimulatedAnnealing.cpp
+        src/State.cpp
 )
 if(USE_MPI)
     list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
@@ -90,6 +92,7 @@ if(ENABLE_TESTS)
     add_test(genetic_convergence_omp)
     add_test(multi_tunnelling_convergence)
     add_test(de_convergence)
+    add_test(sa_convergence)
 
 
     if(USE_MPI)
