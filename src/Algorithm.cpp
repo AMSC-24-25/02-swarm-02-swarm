@@ -196,7 +196,7 @@ namespace algorithm {
     }
 
 std::pair<std::vector<double>, double> run_simulated_annealing(
-                                                                    const size_t dimensions,
+                                                                   const size_t dimensions,
                                                                     const size_t max_iterations,
                                                                     const size_t dwell_iterations,
                                                                     const double initial_temperature,
@@ -209,9 +209,10 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
                                                                     const double upper_bound,
                                                                     const std::unique_ptr<ObjectiveFunction>& func,
                                                                     const size_t seed,
+                                                                    const size_t n_threads,
                                                                     const bool verbose)
 {
-    SimulatedAnnealing sa(
+    /*SimulatedAnnealing sa(
         *func,
         static_cast<int>(dimensions),
         static_cast<int>(max_iterations),
@@ -243,10 +244,62 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
         std::cout << std::endl;
     }
 
-    return {best.values, best.cost};
+    return {best.values, best.cost};*/
+
+    std::vector<State> bestStates;
+std::vector<double> bestCosts;
+
+const double start_time = omp_get_wtime();
+
+#pragma omp parallel num_threads(n_threads)
+{
+    int tid = omp_get_thread_num();
+    size_t local_seed = seed + tid;
+
+    SimulatedAnnealing sa(
+        *func,
+        static_cast<int>(dimensions),
+        static_cast<int>(max_iterations),
+        static_cast<int>(dwell_iterations),
+        initial_temperature,
+        temperature_scale,
+        initial_step_size,
+        step_size_scale,
+        boltzmann_constant,
+        initial_guess,
+        lower_bound,
+        upper_bound,
+        local_seed
+    );
+
+    sa.melt();
+    sa.anneal();
+
+    State best = sa.getBestState();
+    double cost = best.cost;
+
+    #pragma omp critical
+    {
+        bestStates.push_back(std::move(best));
+        bestCosts.push_back(cost);
+    }
 }
 
+    // Trova il minimo tra tutte le soluzioni trovate in parallelo
+    auto min_it = std::min_element(bestCosts.begin(), bestCosts.end());
+    int best_idx = std::distance(bestCosts.begin(), min_it);
 
+    const double end_time = omp_get_wtime();
+
+    if (verbose) {
+        std::cout << "\nMinimum found:\n";
+        algorithm::utils::print_point(dimensions, bestStates[best_idx].values, bestStates[best_idx].cost);
+        std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end_time - start_time) << " seconds\n\n";
+    }
+
+    return {bestStates[best_idx].values, bestStates[best_idx].cost};
+
+}
 
     std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimensions, const size_t num_creatures,
                                                               const size_t max_iterations, const size_t seed,

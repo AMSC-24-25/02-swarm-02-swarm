@@ -60,7 +60,8 @@ std::pair<std::vector<double>, double> run_simulated_annealing(const size_t dime
 												const double initial_step_size, const double step_size_scale,
 												const double boltzmann_constant, const std::vector<double>& initial_guess,
 												const double lower_bound,const double upper_bound,
-												const std::unique_ptr<ObjectiveFunction>& func, const size_t seed, const bool verbose);
+												const std::unique_ptr<ObjectiveFunction>& func, const size_t seed, const size_t n_threads,
+											    const bool verbose);
 
 													
 

@@ -32,6 +32,7 @@ TEST(SaConvergence, Sphere) {
     const double lower_bound = -10.0;
     const double upper_bound = 10.0;
     const size_t seed = 42;
+    const size_t n_threads = 5;
 
     std::vector<double> initial_guess(dimensions, 5.0);
     const std::unique_ptr<ObjectiveFunction> s = std::make_unique<Sphere>();
@@ -42,7 +43,7 @@ TEST(SaConvergence, Sphere) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, initial_guess, lower_bound, upper_bound,
-            s, seed, true
+            s, seed, n_threads, true
         );
 
     EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
@@ -65,6 +66,7 @@ TEST(SaConvergence, EuclideanDistance) {
     const double lower_bound = -10.0;
     const double upper_bound = 10.0;
     const size_t seed = 42;
+    const size_t n_threads = 5;
 
     std::vector<double> initial_guess(dimensions, 5.0);
     const std::unique_ptr<ObjectiveFunction> e = std::make_unique<EuclideanDistance>();
@@ -75,7 +77,7 @@ TEST(SaConvergence, EuclideanDistance) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, initial_guess, lower_bound, upper_bound,
-            e, seed, true
+            e, seed, n_threads, true
         );
 
     EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
@@ -98,6 +100,7 @@ TEST(SaConvergence, Rosenbrock) {
     const double lower_bound = -10.0;
     const double upper_bound = 10.0;
     const size_t seed = 42;
+    const size_t n_threads = 5;
 
     std::vector<double> initial_guess(dimensions, -5.0);
     const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rosenbrock>();
@@ -108,7 +111,7 @@ TEST(SaConvergence, Rosenbrock) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, initial_guess, lower_bound, upper_bound,
-            r, seed, true
+            r, seed, n_threads, true
         );
 
     EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
@@ -134,6 +137,7 @@ TEST(SaConvergence, Rastrigin) {
     const double lower_bound = -5.12;
     const double upper_bound = 5.12;
     const size_t seed = 42;
+    const size_t n_threads = 5;
 
     std::vector<double> initial_guess(dimensions, 3.0);
     const std::unique_ptr<ObjectiveFunction> r = std::make_unique<Rastrigin>();
@@ -144,7 +148,7 @@ TEST(SaConvergence, Rastrigin) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, initial_guess, lower_bound, upper_bound,
-            r, seed, true
+            r, seed, n_threads, true
         );
 
     EXPECT_LE(absolute_error(0.0, result.second), 3e-3);
