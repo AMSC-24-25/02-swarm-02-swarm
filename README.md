@@ -48,7 +48,7 @@ Summary of command line arguments and their purpose:
 Command-line arguments:
  -h,  --help          Prints this message and exits.
  -a,  --algorithm     Sets the minimization algorithm to be used.
-                      Must be one of: swarm_search, genetic_omp, genetic_mpi.
+                      Must be one of: swarm_search, genetic_omp, genetic_mpi, differential_mpi.
                       Default: genetic_omp.
  -d,  --dimensions    Sets the number of dimensions.
                       Must be >0.
