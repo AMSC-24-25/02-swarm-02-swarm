@@ -111,5 +111,3 @@ cmake --build build -- example
 ./build/example
 ```
 
-![Testo alternativo](percorso/immagine.png)
-
