@@ -3,6 +3,43 @@
 ## Multithreading version (omp)
 ### Main
 
+#### Execution
+An example invocation of the `main` executable for the OpenMP Differential Evolution implementation (all the detailed flag for main execution are in the main readme page):
+
+```bash
+./build/main -a differential_omp -d 2 -n 100 -i 100 -f sphere
+```
+
+#### Sample output
+```console
+Iteration n. 1 / 100
+  Current minimum:
+  f(-7.798279e-01, 2.117076e+00) = 5.090143e+00
+
+Iteration n. 2 / 100
+  Current minimum:
+  f(-7.798279e-01, 2.117076e+00) = 5.090143e+00
+
+…
+
+Iteration n. 99 / 100
+  Current minimum:
+  f(1.976930e-13, 1.210598e-13) = 5.373799e-26
+
+Iteration n. 100 / 100
+  Current minimum:
+  f(1.976930e-13, 1.210598e-13) = 5.373799e-26
+
+Minimum found:
+  f(1.976930e-13, 1.210598e-13) = 5.373799e-26
+Total execution time: 0.020753 seconds
+```
+#### Comments
+
+- **Progress reporting**: Each iteration prints the current best solution (coordinates and objective value).  
+- **Convergence behavior**: The objective value decreases rapidly, reaching ~5×10⁻²⁶ by iteration 100.  
+- **Performance**: 100 iterations on a 2-D Sphere function with 100 candidates and 5 threads complete in ~0.02 s.
+
 ### Test
 
 A comprehensive test suite is provided to verify the correctness and convergence properties of the Differential Evolution implementation. All tests are written in C++17 using the GoogleTest framework and exercise the algorithm on four classic benchmark functions.
@@ -47,6 +84,7 @@ auto result = algorithm::run_differential_evolution(
 #### Test result 
 All four tests passed:
 
+```console
 [==========] Running 4 tests from 1 test suite.
 [----------] Global test environment set-up.
 [ RUN      ] DeConvergence.Sphere
@@ -59,6 +97,7 @@ All four tests passed:
 [       OK ] DeConvergence.Rastrigin (66 ms)
 [----------] 4 tests from DeConvergence (280 ms total)
 [  PASSED  ] 4 tests.
+```
 
 
 #### Summary of test duration
