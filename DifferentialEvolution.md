@@ -15,7 +15,7 @@ This plot shows how the execution time (in seconds, log scale) varies as the num
 
 ## ⚡ Strong Speedup vs Number of Threads
 
-![](benchResult/figures/speedup_vs_threads.png.png)
+![](benchResult/figures/speedup_vs_threads.png)
 
 This plot shows **strong scaling**, i.e., how speedup changes as the number of threads increases, for a fixed number of creatures (4, 512, and 1024):
 
