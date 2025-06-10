@@ -1,7 +1,9 @@
 #  Differential Evolution Heuristic
 
-## Multithreading version (omp)
+## Multithreading version (OMP)
 ### Main
+> ⚙️ **Executable Overview** – This section explains how to run the main OpenMP Differential Evolution implementation.
+
 
 #### Execution
 An example invocation of the `main` executable for the OpenMP Differential Evolution implementation (all the detailed flag for main execution are in the main readme page):
@@ -41,6 +43,8 @@ Total execution time: 0.020753 seconds
 - **Performance**: 100 iterations on a 2-D Sphere function with 100 candidates and 5 threads complete in ~0.02 s.
 
 ### Test
+> ✅ **Test Suite Summary** – Automated tests  to validate correctness and convergence.
+
 
 A comprehensive test suite is provided to verify the correctness and convergence properties of the Differential Evolution implementation. All tests are written in C++17 using the GoogleTest framework and exercise the algorithm on four classic benchmark functions.
 
@@ -110,7 +114,9 @@ All four tests passed:
 | **Total elapsed time** |   280 ms |
 
 
-###  Benchmark
+### Benchmark
+> 📊 **Performance Benchmarking** – Evaluate speedup and scaling on different workloads and thread counts.
+
 The algorithm was tested with varying numbers of threads and different population sizes (called "creatures").
 
 ####  Time vs Number of Creatures
@@ -139,5 +145,25 @@ This plot shows **strong scaling**, i.e., how speedup changes as the number of t
 - Parallel execution is effective only when the number of creatures is large enough to amortize thread management overhead.
 - For small problem sizes, single-threaded execution remains more efficient.
 - The algorithm demonstrates **scalability potential**, especially on larger workloads.
+
+
+## Multiprocessing version (MPI)
+
+> **Note:**
+> Follow the instructions in the main readme page to compile properly to use MPI.
+> This MPI-based implementation is provided for educational purposes. In practice, MPI shines on distributed systems or clusters, whereas on a single multi-core machine it can incur additional communication overhead. As a result, we do not include a full benchmark suite here (and the Google Benchmark integration currently causes conflicts). What remains is:
+> 1. an MPI-enabled `main` that runs Differential Evolution across multiple processes, and  
+> 2. the same convergence tests you’ve already seen (using GoogleTest).
+
+The algorithm is partitioned so that each MPI rank evolves its own subset of the population. At each generation:
+1. every rank runs one DE update on its local candidates,  
+2. each rank computes its best local solution,  
+3. an `MPI_Allreduce` (with `MPI_MINLOC`) finds the global-best fitness and the rank that holds it,  
+4. that rank broadcasts its best candidate vector to all others,  
+5. the next generation proceeds using that shared global best.  
+
+This design minimizes inter-process communication (only one `Allreduce` and one `Bcast` per iteration), at the cost of never mixing candidates between ranks.
+
+
 
 
