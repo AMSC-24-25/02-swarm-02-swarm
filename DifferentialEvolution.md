@@ -44,6 +44,8 @@ auto result = algorithm::run_differential_evolution(
     /* verbose= */ false
 );
 ```
+#### Test result 
+All four tests passed:
 
 [==========] Running 4 tests from 1 test suite.
 [----------] Global test environment set-up.
@@ -57,6 +59,7 @@ auto result = algorithm::run_differential_evolution(
 [       OK ] DeConvergence.Rastrigin (66 ms)
 [----------] 4 tests from DeConvergence (280 ms total)
 [  PASSED  ] 4 tests.
+
 
 #### Summary of test duration
 | Test                   | Duration |
