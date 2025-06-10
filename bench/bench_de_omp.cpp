@@ -2,13 +2,14 @@
 
 #include <random>
 #include <chrono>
-
 #include "Algorithm.hpp"
 #include "Rosenbrock.hpp"
 
 static void DeOpenMP_Rosenbrock(benchmark::State& state) {
     const size_t dimensions = 2;
     const size_t num_creatures = state.range(0);
+    const size_t num_threads = state.range(1);
+
     const size_t max_iterations = 100;
     const size_t seed = 42;
     const double lower_bound = -10.0;
@@ -22,7 +23,7 @@ static void DeOpenMP_Rosenbrock(benchmark::State& state) {
 
         std::pair<std::vector<double>, double> result =
                 algorithm::run_differential_evolution(dimensions, num_creatures, lower_bound, upper_bound,seed,max_iterations,
-                                                      F, CR, r, 1, false);
+                                                      F, CR, r, num_threads, false);
 
         benchmark::DoNotOptimize(result);
         benchmark::ClobberMemory();
@@ -34,4 +35,11 @@ static void DeOpenMP_Rosenbrock(benchmark::State& state) {
     }
 }
 
-BENCHMARK(DeOpenMP_Rosenbrock)->Range(4, 1'000)->RangeMultiplier(2)->UseManualTime();
+BENCHMARK(DeOpenMP_Rosenbrock)
+    ->ArgNames({"creatures","threads"})
+    // creatures: 4, 8, 16, 32, 64, 128, 256, 512, 1024
+    ->Ranges({{4, 1024},    // range di creatures, raddoppia automaticamente
+              {1, 16}})     // range di threads: 1,2,4,8,16
+    ->RangeMultiplier(2)
+    ->UseManualTime();
+

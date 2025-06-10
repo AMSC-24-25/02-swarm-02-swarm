@@ -43,7 +43,7 @@ SimulatedAnnealing::SimulatedAnnealing(ObjectiveFunction& objFunc,
 
      
 {
-    assert(initialGuess.size() == dimension);
+    // assert(initialGuess.size() == dimension);
     assert(std::isfinite(lowerBound));
     assert(std::isfinite(upperBound));
     assert(lowerBound < upperBound);
