@@ -1,4 +1,4 @@
-# 🧪  Differential Evolution Heuristic
+#  Differential Evolution Heuristic
 
 ## Benchmark
 The algorithm was tested with varying numbers of threads and different population sizes (called "creatures").
