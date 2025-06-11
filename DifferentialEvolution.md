@@ -164,6 +164,58 @@ The algorithm is partitioned so that each MPI rank evolves its own subset of the
 
 This design minimizes inter-process communication (only one `Allreduce` and one `Bcast` per iteration), at the cost of never mixing candidates between ranks.
 
+### Main  
+You can run it like so (full detail flag usage in main readme page):
+```bash
+mpirun -n 4 ./build/main -a differential_mpi -d 2 -n 100 -i 100 -f sphere -j 1
+```
+Sample output (only a few iterations shown):
+```console
+Iteration n. 1 / 100
+  Current minimum:
+  f(-8.384779e+00, 2.789538e+00) = 7.808604e+01
 
+Iteration n. 2 / 100
+  Current minimum:
+  f(-7.100683e+00, 5.125734e+00) = 7.669284e+01
 
+…
+
+Iteration n. 98 / 100
+  Current minimum:
+  f(-1.217977e-12, -9.401532e-13) = 2.367357e-24
+
+Iteration n. 99 / 100
+  Current minimum:
+  f(-1.217977e-12, -9.401532e-13) = 2.367357e-24
+
+Iteration n. 100 / 100
+  Current minimum:
+  f(2.020037e-13, -1.754170e-13) = 7.157664e-26
+
+Minimum found:
+  f(2.020037e-13, -1.754170e-13) = 7.157664e-26  
+Total execution time: 0.001724 seconds
+```
+### Test
+You can run the tests like so:
+```bash
+mpirun -n 4 test_de_convergence_mpi
+```
+
+All the test are passed even in the multiprocessing version of the algorithm:
+```console
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[ RUN      ] DeConvergenceMPI.Sphere
+[       OK ] DeConvergenceMPI.Sphere ( 8 ms)
+[ RUN      ] DeConvergenceMPI.EuclideanDistance
+[       OK ] DeConvergenceMPI.EuclideanDistance ( 9 ms)
+[ RUN      ] DeConvergenceMPI.Rosenbrock
+[       OK ] DeConvergenceMPI.Rosenbrock ( 5 ms)
+[ RUN      ] DeConvergenceMPI.Rastrigin
+[       OK ] DeConvergenceMPI.Rastrigin ( 5 ms)
+[----------] 4 tests from DeConvergenceMPI (28 ms total)
+[  PASSED  ] 4 tests.
+```
 
