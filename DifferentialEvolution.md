@@ -211,15 +211,68 @@ All the test are passed even in the multiprocessing version of the algorithm:
 ```console
 [==========] Running 4 tests from 1 test suite.
 [----------] Global test environment set-up.
+[----------] 4 tests from DeConvergenceMPI
 [ RUN      ] DeConvergenceMPI.Sphere
-[       OK ] DeConvergenceMPI.Sphere ( 8 ms)
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from DeConvergenceMPI
+[ RUN      ] DeConvergenceMPI.Sphere
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from DeConvergenceMPI
+[ RUN      ] DeConvergenceMPI.Sphere
+[==========] Running 4 tests from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 4 tests from DeConvergenceMPI
+[ RUN      ] DeConvergenceMPI.Sphere
+[       OK ] DeConvergenceMPI.Sphere (8 ms)
 [ RUN      ] DeConvergenceMPI.EuclideanDistance
-[       OK ] DeConvergenceMPI.EuclideanDistance ( 9 ms)
+[       OK ] DeConvergenceMPI.Sphere (8 ms)
+[ RUN      ] DeConvergenceMPI.EuclideanDistance
+[       OK ] DeConvergenceMPI.Sphere (8 ms)
+[ RUN      ] DeConvergenceMPI.EuclideanDistance
+[       OK ] DeConvergenceMPI.Sphere (8 ms)
+[ RUN      ] DeConvergenceMPI.EuclideanDistance
+[       OK ] DeConvergenceMPI.EuclideanDistance (9 ms)
 [ RUN      ] DeConvergenceMPI.Rosenbrock
-[       OK ] DeConvergenceMPI.Rosenbrock ( 5 ms)
+[       OK ] DeConvergenceMPI.EuclideanDistance (9 ms)
+[ RUN      ] DeConvergenceMPI.Rosenbrock
+[       OK ] DeConvergenceMPI.EuclideanDistance (9 ms)
+[ RUN      ] DeConvergenceMPI.Rosenbrock
+[       OK ] DeConvergenceMPI.EuclideanDistance (9 ms)
+[ RUN      ] DeConvergenceMPI.Rosenbrock
+[       OK ] DeConvergenceMPI.Rosenbrock (5 ms)
 [ RUN      ] DeConvergenceMPI.Rastrigin
-[       OK ] DeConvergenceMPI.Rastrigin ( 5 ms)
+[       OK ] DeConvergenceMPI.Rosenbrock (5 ms)
+[ RUN      ] DeConvergenceMPI.Rastrigin
+[       OK ] DeConvergenceMPI.Rosenbrock (5 ms)
+[ RUN      ] DeConvergenceMPI.Rastrigin
+[       OK ] DeConvergenceMPI.Rosenbrock (5 ms)
+[ RUN      ] DeConvergenceMPI.Rastrigin
+[       OK ] DeConvergenceMPI.Rastrigin (5 ms)
 [----------] 4 tests from DeConvergenceMPI (28 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (28 ms total)
 [  PASSED  ] 4 tests.
+[       OK ] DeConvergenceMPI.Rastrigin (5 ms)
+[----------] 4 tests from DeConvergenceMPI (28 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (28 ms total)
+[  PASSED  ] 4 tests.
+[       OK ] DeConvergenceMPI.Rastrigin (5 ms)
+[----------] 4 tests from DeConvergenceMPI (28 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (28 ms total)
+[  PASSED  ] 4 tests.
+[       OK ] DeConvergenceMPI.Rastrigin (5 ms)
+[----------] 4 tests from DeConvergenceMPI (28 ms total)
+
+[----------] Global test environment tear-down
+[==========] 4 tests from 1 test suite ran. (28 ms total)
+[  PASSED  ] 4 tests.
+
 ```
 
