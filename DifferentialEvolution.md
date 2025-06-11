@@ -1,5 +1,9 @@
 #  Differential Evolution Heuristic
+Differential Evolution (DE) is a population-based optimization algorithm designed for solving nonlinear and non-differentiable continuous functions. Inspired by evolutionary strategies, DE maintains a population of candidate solutions that evolves over generations using biologically inspired operations: mutation, crossover, and selection.
 
+At each iteration, for every candidate vector xixi​, the algorithm creates a mutant vector by adding the weighted difference of two other randomly selected population vectors to a third one. This mutant is then combined with the original candidate through crossover to form a trial vector. Finally, selection chooses between the trial and the original candidate based on which has the better fitness (i.e., lower objective value). This process iteratively refines the population, driving it toward the global minimum.
+
+DE is valued for its simplicity, parallelizability, and strong performance on a wide range of black-box optimization problems, especially in high-dimensional or rugged search landscapes.
 ## Multithreading version (OMP)
 ### Main
 > ⚙️ **Executable Overview** – This section explains how to run the main OpenMP Differential Evolution implementation.
