@@ -10,6 +10,7 @@
 
 #include "DistributedGeneticAlgorithm.hpp"
 #include "DistributedDifferentialEvolution.hpp"
+#include "DistributedSimulatedAnnealing.hpp"
 #endif	// USE_MPI
 
 #include "Algorithm.hpp"
@@ -212,41 +213,8 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
                                                                     const size_t n_threads,
                                                                     const bool verbose)
 {
-    /*SimulatedAnnealing sa(
-        *func,
-        static_cast<int>(dimensions),
-        static_cast<int>(max_iterations),
-        static_cast<int>(dwell_iterations),
-        initial_temperature,
-        temperature_scale,
-        initial_step_size,
-        step_size_scale,
-        boltzmann_constant,
-        initial_guess,
-        lower_bound,
-        upper_bound,
-        seed
-    );
 
-    const double beginning = omp_get_wtime();
-    sa.melt(); 
-    sa.anneal();
-    const double end = omp_get_wtime();
-
-    const State& best = sa.getBestState();
-
-    if (verbose) {
-        std::cout << std::endl;
-        std::cout << "Minimum found:" << std::endl;
-        algorithm::utils::print_point(dimensions, best.values, best.cost);
-        std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
-                  << std::endl;
-        std::cout << std::endl;
-    }
-
-    return {best.values, best.cost};*/
-
-    std::vector<State> bestStates;
+std::vector<State> bestStates;
 std::vector<double> bestCosts;
 
 const double start_time = omp_get_wtime();
@@ -446,7 +414,7 @@ const double start_time = omp_get_wtime();
         return {ga.creature_positions.at(ga.best_creature_index), ga.creature_fitnesses.at(ga.best_creature_index)};
     }
 
-//////////////////////////////////
+
     std::pair<std::vector<double>, double> run_de_mpi(const size_t dimensions, const size_t num_candidates,
                                                       const double lower_bound, const double upper_bound,
                                                       const size_t seed, const size_t max_gen,
@@ -543,6 +511,82 @@ const double start_time = omp_get_wtime();
 
         return {global_best_pos, global_best.first};
     }
+
+std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
+												const size_t max_iterations, const size_t dwell_iterations,
+												const double initial_temperature, const double temperature_scale,
+												const double initial_step_size, const double step_size_scale,
+												const double boltzmann_constant,
+												const double lower_bound,const double upper_bound,
+												const std::unique_ptr<ObjectiveFunction>& func, const size_t seed,
+											    const bool verbose) {
+    int world_size;
+    MPI_Comm_size(MPI_COMM_WORLD, &world_size);
+    int world_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
+
+   // Inizializzazione randomica diversa per ogni processo
+    std::vector<double> my_guess(dimensions);
+    std::mt19937 local_gen(seed + world_rank * 99991);
+    std::uniform_real_distribution<double> dist(lower_bound, upper_bound);
+    for (size_t i = 0; i < dimensions; ++i) {
+        my_guess[i] = dist(local_gen);
+    }
+
+    // Costruzione oggetto SA locale
+    DistributedSimulatedAnnealing sa(*func,
+                                     dimensions,
+                                     max_iterations,
+                                     dwell_iterations,
+                                     initial_temperature,
+                                     temperature_scale,
+                                     initial_step_size,
+                                     step_size_scale,
+                                     boltzmann_constant,
+                                     my_guess,
+                                     lower_bound,
+                                     upper_bound,
+                                     seed + world_rank * 1000);
+
+    const double start_time = omp_get_wtime();
+
+    sa.melt();    // fase di melt
+    sa.anneal();  // fase di raffreddamento
+
+    const State& local_best = sa.getBestState();
+    std::pair<double, int> local_result = {local_best.cost, world_rank};
+    std::pair<double, int> global_result;
+
+    // Trova la migliore soluzione globale
+    MPI_Allreduce(
+        &local_result,
+        &global_result,
+        1,
+        MPI_DOUBLE_INT,
+        MPI_MINLOC,
+        MPI_COMM_WORLD
+    );
+
+    std::vector<double> global_best_position(dimensions);
+    if (world_rank == global_result.second) {
+        std::copy(local_best.values.begin(), local_best.values.end(), global_best_position.begin());
+    }
+
+    // Trasmette la miglior soluzione a tutti
+    MPI_Bcast(global_best_position.data(), static_cast<int>(dimensions), MPI_DOUBLE, global_result.second, MPI_COMM_WORLD);
+
+    const double end_time = omp_get_wtime();
+
+    if (verbose && world_rank == 0) {
+        std::cout << "Best solution found by process " << global_result.second << ":" << std::endl;
+        utils::print_point(dimensions, global_best_position, global_result.first);
+        std::cout << "Execution time: " << std::fixed << std::setprecision(6) << (end_time - start_time) << " seconds" << std::endl;
+    }
+
+    return {global_best_position, global_result.first};
+}
+
+
 
 
 

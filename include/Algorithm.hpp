@@ -133,6 +133,15 @@ std::pair<std::vector<double>, double> run_de_mpi(const size_t dimensions, const
                                                   const double F, const double CR,
                                                   const std::unique_ptr<ObjectiveFunction>& func,
                                                   const bool verbose);
+
+std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
+												const size_t max_iterations, const size_t dwell_iterations,
+												const double initial_temperature, const double temperature_scale,
+												const double initial_step_size, const double step_size_scale,
+												const double boltzmann_constant,
+												const double lower_bound,const double upper_bound,
+												const std::unique_ptr<ObjectiveFunction>& func, const size_t seed,
+											    const bool verbose);												  
 #endif	// USE_MPI
 
 }  // namespace algorithm

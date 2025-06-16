@@ -49,6 +49,7 @@ if(USE_MPI)
     list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
     #list(APPEND SOURCES src/DistributedMultiStochasticTunnelling.cpp)
     list(APPEND SOURCES src/DistributedDifferentialEvolution.cpp)
+    list(APPEND SOURCES src/DistributedSimulatedAnnealing.cpp)
 
 endif()
 
