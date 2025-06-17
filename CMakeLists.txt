@@ -115,6 +115,14 @@ if(ENABLE_TESTS)
         target_link_libraries(test_de_convergence_mpi PUBLIC 02-swarm gtest MPI::MPI_CXX)
         gtest_discover_tests(test_de_convergence_mpi)
 
+        add_executable(test_sa_convergence_mpi
+                test/test_sa_convergence_mpi.cpp
+                test/main_test_sa_mpi.cpp
+        )
+        target_compile_definitions(test_sa_convergence_mpi PUBLIC USE_MPI=1)
+        target_link_libraries(test_sa_convergence_mpi PUBLIC 02-swarm gtest MPI::MPI_CXX)
+        gtest_discover_tests(test_sa_convergence_mpi)
+
     endif(USE_MPI)
 
     add_executable(TestRastrigin test/TestRastrigin.cpp)
