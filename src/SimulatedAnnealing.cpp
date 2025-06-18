@@ -127,7 +127,7 @@ double SimulatedAnnealing::anneal() {
         equilibrate(currentTemperature, dwellIterations);
         updateTemperature();
         updateStepSize();
-
+        
 
     }
     return currentTemperature;

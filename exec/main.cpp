@@ -19,11 +19,14 @@ enum class minimization_algorithm {
 	SWARM_SEARCH,
 	GENETIC_OPENMP,
     DE_OPENMP,
+	SA_OPENMP,
 
 #if defined(USE_MPI) && USE_MPI == 1
 	GENETIC_MPI,
-    DE_MPI
+    DE_MPI,
+	SA_MPI
 #endif	// USE_MPI
+
 };
 
 std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
@@ -38,6 +41,10 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
         case minimization_algorithm::DE_OPENMP:
             os << "differential_omp";
             break;
+		
+		case minimization_algorithm::SA_OPENMP:
+            os << "simulated_omp";
+            break;	
 
 #if defined(USE_MPI) && USE_MPI == 1
 		case minimization_algorithm::GENETIC_MPI:
@@ -45,6 +52,9 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
 			break;
         case minimization_algorithm::DE_MPI:
             os << "differential_mpi";
+            break;
+		case minimization_algorithm::SA_MPI:
+            os << "simulated_mpi";
             break;
 #endif	// USE_MPI
 
@@ -90,6 +100,7 @@ int main(const int argc, const char** argv) {
 	std::random_device dev;
 
 	minimization_algorithm algo = minimization_algorithm::GENETIC_OPENMP;
+	
 	size_t dimensions = 2;
 	size_t num_points = 100;
 	size_t max_iterations = 100;
@@ -103,6 +114,14 @@ int main(const int argc, const char** argv) {
     /* DIFFERENTIAL EVOLUTION PARAMETERS*/
     double F = 0.5;
     double CR = 0.8;
+	/* SIMULATED ANNEALING PARAMETERS*/
+    int dwell=1000;
+	double initial_temperature = 10.0;
+	double temperature_scale = 0.98;
+	double initial_step_size = 1.0;
+	double step_size_scale = 0.98;
+	double boltzmann_constant = 1.0;
+	std::vector<double> initial_guess(dimensions, 5.0);
     /* -------------------------------*/
 
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
@@ -123,9 +142,11 @@ int main(const int argc, const char** argv) {
 			std::cout << " -h,  --help          Prints this message and exits." << std::endl;
 			std::cout << " -a,  --algorithm     Sets the minimization algorithm to be used." << std::endl;
 			std::cout << "                      Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
-					  << minimization_algorithm::GENETIC_OPENMP << ", " << minimization_algorithm::DE_OPENMP
+					  << minimization_algorithm::GENETIC_OPENMP << ", " << minimization_algorithm::DE_OPENMP << ", " 
+					  << minimization_algorithm::SA_OPENMP
 #if defined(USE_MPI) && USE_MPI == 1
-					  << ", " << minimization_algorithm::GENETIC_MPI << ", " << minimization_algorithm::DE_MPI
+					  << ", " << minimization_algorithm::GENETIC_MPI << ", " << minimization_algorithm::DE_MPI  << ", "
+	   << minimization_algorithm::SA_MPI
 #endif	// USE_MPI
 					  << "." << std::endl;
 			std::cout << "                      Default: " << algo << "." << std::endl;
@@ -184,12 +205,16 @@ int main(const int argc, const char** argv) {
                 algo = minimization_algorithm::GENETIC_OPENMP;
             } else if (algo_name == "differential_omp"){
                 algo = minimization_algorithm::DE_OPENMP;
-            }
+            }else if (algo_name == "simulated_omp") {
+				algo = minimization_algorithm::SA_OPENMP;
+			}
 #if defined(USE_MPI) && USE_MPI == 1
 			else if (algo_name == "genetic_mpi") {
 				algo = minimization_algorithm::GENETIC_MPI;
 			}else if(algo_name == "differential_mpi"){
                 algo = minimization_algorithm::DE_MPI;
+            }else if (algo_name == "simulated_mpi") {
+	            algo = minimization_algorithm::SA_MPI;
             }
 #endif	// USE_MPI
 			else {
@@ -304,7 +329,10 @@ int main(const int argc, const char** argv) {
 									  mutation_rate, survival_rate, func, n_threads, verbose);
 	} else if(algo == minimization_algorithm::DE_OPENMP){
         algorithm::run_differential_evolution(dimensions,num_points,lower_bound,upper_bound,seed,max_iterations,F,CR,func,n_threads,verbose);
-    }
+    }else if (algo == minimization_algorithm::SA_OPENMP) {
+  algorithm::run_simulated_annealing(dimensions, max_iterations, dwell, initial_temperature,
+									 temperature_scale, initial_step_size, step_size_scale, boltzmann_constant,	initial_guess,
+									lower_bound, upper_bound, func, seed, n_threads, verbose);}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		MPI_Init(NULL, NULL);
@@ -315,7 +343,12 @@ int main(const int argc, const char** argv) {
         MPI_Init(NULL,NULL);
         algorithm::run_de_mpi(dimensions,num_points,lower_bound,upper_bound,seed,max_iterations,F,CR,func,verbose);
         MPI_Finalize();
-    }
+    }else if( algo == minimization_algorithm::SA_MPI) {
+		MPI_Init(NULL, NULL);
+  		algorithm::run_sa_mpi(dimensions, max_iterations, dwell, initial_temperature, temperature_scale,
+		initial_step_size, step_size_scale, boltzmann_constant, lower_bound, upper_bound, func, seed, verbose);
+  		MPI_Finalize();
+   }
 #endif	// USE_MPI
 	else {
 		die("Error: unknown algorithm.");
