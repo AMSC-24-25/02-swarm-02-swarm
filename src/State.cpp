@@ -10,6 +10,4 @@ State::State(const std::vector<double>& initialValues, const ObjectiveFunction& 
 void State::update(const std::vector<double>& newValues) {
     values = newValues;
     cost = objective(values);
-    
-    std::cout << std::endl;
 }
