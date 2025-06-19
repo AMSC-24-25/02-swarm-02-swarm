@@ -3,6 +3,7 @@ This is the project for the group 02. It implements some algorithms for which yo
  - [Swarm Search](https://github.com/AMSC-24-25/02-swarm-02-swarm/blob/main/SwarmSearch.md)
  - [Genetic Algorithm](https://github.com/AMSC-24-25/02-swarm-02-swarm/blob/main/GeneticAlgorithm.md)
  - [Differential Evolution](https://github.com/AMSC-24-25/02-swarm-02-swarm/blob/main/DifferentialEvolution.md)
+ - [Stochastic Tunnelling](https://github.com/AMSC-24-25/02-swarm-02-swarm/blob/main/StochasticTunnelling.md)
 
 For a detailed description of the Genetic Algorithm implementations, there is [a report](https://github.com/AMSC-24-25/02-swarm-02-swarm/blob/main/doc/report.pdf) available in the `doc` folder.
 
