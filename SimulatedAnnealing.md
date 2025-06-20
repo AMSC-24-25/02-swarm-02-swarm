@@ -10,9 +10,9 @@ The algorithm simulates how a material cools and gradually settles into a low-en
 
 At each iteration, a new candidate solution is generated. If it improves the objective function, it is accepted unconditionally. Otherwise, it is accepted with probability:
 
-\[
+$$ \[
 P(\text{accept}) = \exp\left(-\frac{\Delta f}{k \cdot T}\right)
-\]
+\] $$
 
 where:
 
