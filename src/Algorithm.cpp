@@ -213,6 +213,41 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
                                                                     const size_t n_threads,
                                                                     const bool verbose)
 {
+    
+if (n_threads == 1) {
+    const double start_time = omp_get_wtime();
+    
+    SimulatedAnnealing sa(
+        *func,
+        dimensions,
+        max_iterations,  
+        dwell_iterations,
+        initial_temperature,
+        temperature_scale,
+        initial_step_size,
+        step_size_scale,
+        boltzmann_constant,
+        initial_guess,
+        lower_bound,
+        upper_bound,
+        seed
+    );
+
+    sa.melt();
+    sa.anneal();
+    
+    const double end_time = omp_get_wtime();
+    auto best = sa.getBestState();
+
+    if (verbose) {
+        std::cout << "\nMinimum found (single-thread):\n";
+        algorithm::utils::print_point(dimensions, best.values, best.cost);
+        std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) 
+                    << (end_time - start_time) << " seconds\n\n";
+    }
+
+    return {best.values, best.cost};
+}
 
 const size_t n_particles= n_threads; // Number of threads is equal to the number of particles
 

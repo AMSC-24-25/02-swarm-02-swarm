@@ -8,7 +8,6 @@
 #include <limits>
 #include <cassert>
 
-//Costruttore: inizializza i parametri dell'algoritmo
 
 DistributedSimulatedAnnealing::DistributedSimulatedAnnealing(ObjectiveFunction& objFunc,
                                        int dim,
@@ -53,11 +52,9 @@ DistributedSimulatedAnnealing::DistributedSimulatedAnnealing(ObjectiveFunction& 
     }
 }
 
-
-
-// Proposta di una nuova soluzione: genera una nuova soluzione perturbata in base alla soluzione corrente e alla dimensione del passo
-// La nuova soluzione è generata aggiungendo un valore casuale alla soluzione corrente
-// La distribuzione uniforme è utilizzata per generare un numero casuale compreso tra -currentStepSize e currentStepSize
+// Generates a new candidate solution by randomly perturbing the current state
+// Adds uniformly distributed random values (range: ±currentStepSize) to each dimension
+// Maintains search within specified bounds through clamping
 
 void DistributedSimulatedAnnealing::proposeNewSolution() {
     std::uniform_real_distribution<> dist(-currentStepSize, currentStepSize);
@@ -69,14 +66,11 @@ void DistributedSimulatedAnnealing::proposeNewSolution() {
     newState.update(candidateValues);
 }
 
-// Equilibrio: accetta o rifiuta la nuova soluzione in base alla probabilità di accettazione (Metropolis criterion). Se la nuova soluzione è migliore, viene accettata. 
-//Se è peggiore, viene accettata con una certa probabilità in base alla temperatura corrente e alla costante di Boltzmann
-//Iterare un po' di volte per ottenere l'equilibrio termico
-// Se la nuova soluzione è migliore, accettala, altrimenti accettala con una certa probabilità pari a exp(-delta / (k * temperature)) 
-// std::generate_canonical<double, 10>(gen) genera un numero casuale tra 0 e 1 e serve per confrontare con la probabilità. Se la probabilità è più alta 
-//del numero casuale → accettiamo comunque la soluzione peggiore perchè all'inizio (temperatura alta), l’algoritmo esplora più liberamente, mentre alla fine 
-//(temperatura bassa), si concentra sulle soluzioni migliori così si evitano minimi locali.
-        
+// Metropolis acceptance: 
+// - Always accepts improving moves (ΔE < 0)
+// - Accepts degrading moves with P = exp(-ΔE/(k·T)) where:
+//   ΔE = energy difference, k = Boltzmann constant, T = current temperature
+// compare against uniform random [0,1] for probabilistic acceptance      
         
 int DistributedSimulatedAnnealing::equilibrate(double temperature, int iterations) {
     int accepted = 0;
@@ -100,11 +94,10 @@ int DistributedSimulatedAnnealing::equilibrate(double temperature, int iteration
 }
 
 
-// Funzione di fusione: aumenta la temperatura corrente fino a quando il sistema "si scioglie" (il numero di soluzioni accettate è sufficientemente alto)
-// La temperatura viene aumentata di 1.0 ad ogni iterazione fino a quando il numero di soluzioni accettate è inferiore a un decimo delle iterazioni di equilibrio
-// La temperatura corrente viene aggiornata alla fine della fusione
-// La funzione restituisce la temperatura finale
-/* equilibrium is defined as a 10% or smaller change in 10 iterations */
+// Heating phase - raises temperature until:
+// 1. Acceptance ratio drops below 10% of dwell iterations
+// 2. Temperature increases linearly (+1.0 per iteration)
+// Updates and returns final pre-annealing temperature
 
 
 double DistributedSimulatedAnnealing::melt() {
@@ -120,7 +113,7 @@ double DistributedSimulatedAnnealing::melt() {
     return temp;
 }
 
-//Raffreddamento: riduce la temperatura corrente in base al fattore di scala della temperatura
+// Annealing process: gradually cools system by multiplying temperature by scaling factor
 
 double DistributedSimulatedAnnealing::anneal() {
     for (int i = 0; i < maxIterations; ++i) {
@@ -128,20 +121,17 @@ double DistributedSimulatedAnnealing::anneal() {
         updateTemperature();
         updateStepSize();
 
-
     }
     return currentTemperature;
 }
 
-// Funzione per aggiornare la temperatura corrente in base al fattore di scala della temperatura
+// Updates current temperature using the temperature scaling factor (geometric cooling)
 
 void DistributedSimulatedAnnealing::updateTemperature() {
     currentTemperature *= temperatureScale;
 }
 
-// Funzione per aggiornare la dimensione del passo corrente in base al fattore di scala della dimensione del passo
-// La dimensione del passo viene ridotta ad ogni iterazione per consentire una ricerca più fine delle soluzioni migliori
-
+// Updates step size using the scaling factor (geometric reduction for finer search)
 
 void DistributedSimulatedAnnealing::updateStepSize() {
     currentStepSize *= stepSizeScale;
