@@ -214,8 +214,10 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
                                                                     const bool verbose)
 {
 
-std::vector<State> bestStates;
-std::vector<double> bestCosts;
+const size_t n_particles= n_threads; // Number of threads is equal to the number of particles
+
+std::vector<std::unique_ptr<State>> bestStates(n_particles);
+std::vector<double> bestCosts(n_threads, std::numeric_limits<double>::max());
 
 const double start_time = omp_get_wtime();
 
@@ -226,9 +228,9 @@ const double start_time = omp_get_wtime();
 
     SimulatedAnnealing sa(
         *func,
-        static_cast<int>(dimensions),
-        static_cast<int>(max_iterations),
-        static_cast<int>(dwell_iterations),
+        dimensions,
+        max_iterations/n_particles,
+        dwell_iterations/n_particles,
         initial_temperature,
         temperature_scale,
         initial_step_size,
@@ -243,29 +245,24 @@ const double start_time = omp_get_wtime();
     sa.melt();
     sa.anneal();
 
-    State best = sa.getBestState();
-    double cost = best.cost;
-
-    #pragma omp critical
-    {
-        bestStates.push_back(std::move(best));
-        bestCosts.push_back(cost);
-    }
+    bestStates[tid] = std::make_unique<State>(sa.getBestState());
+    bestCosts[tid] = bestStates[tid]->cost;
 }
-
-    // Trova il minimo tra tutte le soluzioni trovate in parallelo
-    auto min_it = std::min_element(bestCosts.begin(), bestCosts.end());
-    int best_idx = std::distance(bestCosts.begin(), min_it);
-
     const double end_time = omp_get_wtime();
+    // Find minimum
+
+    auto min_it = std::min_element(bestCosts.begin(), bestCosts.end());
+    size_t best_idx = std::distance(bestCosts.begin(), min_it);
+
+    
 
     if (verbose) {
         std::cout << "\nMinimum found:\n";
-        algorithm::utils::print_point(dimensions, bestStates[best_idx].values, bestStates[best_idx].cost);
+        algorithm::utils::print_point(dimensions, bestStates[best_idx]->values, bestStates[best_idx]->cost);
         std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end_time - start_time) << " seconds\n\n";
     }
 
-    return {bestStates[best_idx].values, bestStates[best_idx].cost};
+    return {bestStates[best_idx]->values, bestCosts[best_idx]};
 
 }
 
