@@ -10,15 +10,15 @@ The algorithm simulates how a material cools and gradually settles into a low-en
 
 At each iteration, a new candidate solution is generated. If it improves the objective function, it is accepted unconditionally. Otherwise, it is accepted with probability:
 
-$$ \[
+$$ \
 P(\text{accept}) = \exp\left(-\frac{\Delta f}{k \cdot T}\right)
-\] $$
+\ $$
 
 where:
 
-- \(\Delta f\) is the increase in the objective function value,
-- \(k\) is a constant analogous to Boltzmann’s constant,
-- \(T\) is the current temperature.
+- $$\(\Delta f\)$$ is the increase in the objective function value,
+- $$\(k\)$$ is a constant analogous to Boltzmann’s constant,
+- $$\(T\)$$ is the current temperature.
 
 This acceptance rule, known as the *Metropolis criterion*, allows the algorithm to balance exploration and exploitation, gradually focusing the search as the temperature decreases.
 
