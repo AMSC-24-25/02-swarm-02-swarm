@@ -43,9 +43,9 @@ std::pair<std::vector<double>, double> run_stochastic_tunnelling(const size_t di
 std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,
 												 const size_t max_iterations, const size_t seed,
 												 const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
-												 const  ObjectiveFunction& func, const double gamma,
+												 const std::unique_ptr<ObjectiveFunction>& func, const double gamma,
 												 const double beta_adjust_factor, const bool verbose, double beta, const size_t tunnelling, 
-												 const double beta_thresholding, const size_t num_positions, const size_t time_step_updating);												 
+												 const double beta_thresholding, const size_t num_positions, const size_t time_step_updating, const size_t n_threads = 4);												 
 
 std::pair<std::vector<double>, double> run_differential_evolution(const size_t dimensions,
 													const size_t num_candidates, const double lower_bound,
@@ -141,7 +141,13 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
 												const double boltzmann_constant,
 												const double lower_bound,const double upper_bound,
 												const std::unique_ptr<ObjectiveFunction>& func, const size_t seed,
-											    const bool verbose);												  
+											    const bool verbose);	
+std::pair<std::vector<double>, double> run_tunnelling_mpi(const size_t dimensions,
+                                                              const size_t max_iterations, const size_t seed,
+                                                              const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
+                                                              const  ObjectiveFunction& func, const double gamma,
+                                                              const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding,
+                                                              const size_t num_positions, const size_t time_step_updating);												  
 #endif	// USE_MPI
 
 }  // namespace algorithm

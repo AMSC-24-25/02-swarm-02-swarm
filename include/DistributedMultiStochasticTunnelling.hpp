@@ -26,7 +26,7 @@ class DistributedMultiStochasticTunnelling {
     const size_t dimension;
 
    public:
-    std::vector<Position> pos;;
+    std::vector<Position> pos;
 
     DistributedMultiStochasticTunnelling(const int world_rank, const int world_size, std::vector<Position>& pos, const double lower_bound, const double upper_bound,
                         const double sigma_max, const double sigma_min, const double gamma, const double beta_adjust_factor,const size_t max_iter, const ObjectiveFunction& func,

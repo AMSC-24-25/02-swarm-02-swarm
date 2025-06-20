@@ -13,7 +13,7 @@
 
 MultiStochasticTunnelling::MultiStochasticTunnelling(std::vector<Position>& pos_, const double lower_bound_, const double upper_bound_,const double sigma_max_, const double sigma_min_,
                         const double gamma_, const double beta_adjust_factor_,
-                        const size_t max_iter_, const ObjectiveFunction& func_, double beta_thresholding_, const size_t num_positions_, const size_t time_step_updating_, const size_t dimension_)
+                        const size_t max_iter_, const ObjectiveFunction& func_, double beta_thresholding_, const size_t num_positions_, const size_t time_step_updating_, const size_t dimension_, const size_t n_threads_)
     : lower_bound(lower_bound_),
       upper_bound(upper_bound_),
       func(func_),
@@ -26,6 +26,7 @@ MultiStochasticTunnelling::MultiStochasticTunnelling(std::vector<Position>& pos_
       num_positions(num_positions_),
       time_step_updating(time_step_updating_),
       dimension(dimension_),
+      n_threads(n_threads_),
       pos(pos_) {
     assert(std::isfinite(lower_bound));
 	assert(std::isfinite(upper_bound));
@@ -70,13 +71,13 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
           }
         }
     }
-    #pragma omp parallel for schedule(static) num_threads(num_positions) shared(best_location, best_fit)
+    #pragma omp parallel for schedule(static) num_threads(n_threads) shared(best_location, best_fit)
     for(size_t i = 0; i < num_positions; i++){
         pos[i].update_best_position(best_location, best_fit);
     }
   }
 
-  #pragma omp parallel num_threads(num_positions) shared(seed, sigma, upper_bound, lower_bound, delta, pos, candidate_positions)
+  #pragma omp parallel num_threads(n_threads) shared(seed, sigma, upper_bound, lower_bound, delta, pos, candidate_positions)
   {
     const size_t thread_id = omp_get_thread_num();
     #pragma omp for schedule(static)

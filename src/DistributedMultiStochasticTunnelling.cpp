@@ -57,10 +57,10 @@ void DistributedMultiStochasticTunnelling::iteration(const size_t seed, const si
   double sigma = compute_sigma(k);
     const size_t local_size = num_positions / world_size;
     const size_t remainder = num_positions % world_size;
-    const size_t start = (world_rank < remainder) ? 
+    const size_t start = (static_cast<size_t>(world_rank) < remainder) ? 
                         world_rank * (local_size + 1) : 
                         remainder * (local_size + 1) + (world_rank - remainder) * local_size;
-    const size_t end = start + local_size + (world_rank < remainder ? 1 : 0);
+    const size_t end = start + local_size + (static_cast<size_t>(world_rank) < remainder ? 1 : 0);
 
     MPI_Barrier(MPI_COMM_WORLD);
 

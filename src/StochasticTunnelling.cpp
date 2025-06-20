@@ -49,6 +49,7 @@ void StochasticTunnelling::iteration(const size_t seed, const size_t k){
     pos.update_position(candidate_position, func);
 
   }
+  
 
   //pos.update_beta(beta_adjust_factor);
 }
