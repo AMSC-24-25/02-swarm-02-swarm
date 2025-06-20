@@ -42,7 +42,6 @@ DistributedSimulatedAnnealing::DistributedSimulatedAnnealing(ObjectiveFunction& 
 
      
 {
-    assert(initialGuess.size() == dimension);
     assert(std::isfinite(lowerBound));
     assert(std::isfinite(upperBound));
     assert(lowerBound < upperBound);

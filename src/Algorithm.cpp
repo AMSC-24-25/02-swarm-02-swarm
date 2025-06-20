@@ -11,6 +11,7 @@
 #include "DistributedGeneticAlgorithm.hpp"
 #include "DistributedDifferentialEvolution.hpp"
 #include "DistributedSimulatedAnnealing.hpp"
+#include "DistributedMultiStochasticTunnelling.hpp"
 #endif	// USE_MPI
 
 #include "Algorithm.hpp"
@@ -104,18 +105,18 @@ namespace algorithm {
     std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,
                                                                            const size_t max_iterations, const size_t seed,
                                                                            const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
-                                                                           const  ObjectiveFunction& func, const double gamma,
+                                                                           const std::unique_ptr<ObjectiveFunction>& func, const double gamma,
                                                                            const double beta_adjust_factor, const bool verbose,double beta, const size_t tunnelling, const double beta_thresholding,
-                                                                           const size_t num_positions, const size_t time_step_updating) {
+                                                                           const size_t num_positions, const size_t time_step_updating, const size_t n_threads) {
 
         std::vector<Position> pos;
 
         for(size_t i = 0; i < num_positions; i++){
-            pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, i));
+            pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, *func, tunnelling, i));
         }
 
 
-        MultiStochasticTunnelling stun = MultiStochasticTunnelling(pos, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, func, beta_thresholding, num_positions, time_step_updating, dimensions);
+        MultiStochasticTunnelling stun = MultiStochasticTunnelling(pos, lower_bound, upper_bound, sigma_max, sigma_min, gamma, beta_adjust_factor, max_iterations, *func, beta_thresholding, num_positions, time_step_updating, dimensions, n_threads);
 
 
         const double beginning = omp_get_wtime();
@@ -622,7 +623,6 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
 
 
 
-/*
     std::pair<std::vector<double>, double> run_tunnelling_mpi(const size_t dimensions,
                                                               const size_t max_iterations, const size_t seed,
                                                               const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
@@ -633,7 +633,7 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         int world_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-        const size_t local_size = num_creatures / static_cast<size_t>(world_size);
+        //const size_t local_size = num_positions / static_cast<size_t>(world_size);
 
 
 
@@ -653,7 +653,7 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
 
 
         MPI_Barrier(MPI_COMM_WORLD);
-        const double end = MPI_Wtime();
+        const double beginning = MPI_Wtime();
 
         for(size_t i = 0; i < max_iterations; i++){
             if(i == floor(max_iterations*(1/3))){
@@ -663,13 +663,13 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
             }
             stun.iteration(seed, i);
 
-            if (verbose) {
+            /*if (verbose) {
                 std::cout<<"--------------------------------------------"<<std::endl;
                 std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
                 std::cout << "  Current minimum: " << std::endl;
-                utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
+                utils::print_point(dimensions, stun.pos[0].position, func(stun.pos.position));
                 std::cout << std::endl;
-            }
+            }*/
         }
 
         MPI_Barrier(MPI_COMM_WORLD);
@@ -687,7 +687,6 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
         return {stun.pos[0].best_position, stun.pos[0].f0};
 
     }
-    */
 
 
 #endif	// USE_MPI

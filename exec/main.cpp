@@ -20,11 +20,13 @@ enum class minimization_algorithm {
 	GENETIC_OPENMP,
     DE_OPENMP,
 	SA_OPENMP,
+	ST_OPENMP,
 
 #if defined(USE_MPI) && USE_MPI == 1
 	GENETIC_MPI,
     DE_MPI,
-	SA_MPI
+	SA_MPI,
+	ST_MPI
 #endif	// USE_MPI
 
 };
@@ -46,6 +48,10 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
             os << "simulated_omp";
             break;	
 
+		case minimization_algorithm::ST_OPENMP:
+			os << "stochastic_omp";
+			break;
+
 #if defined(USE_MPI) && USE_MPI == 1
 		case minimization_algorithm::GENETIC_MPI:
 			os << "genetic_mpi";
@@ -56,6 +62,9 @@ std::ostream& operator<<(std::ostream& os, const minimization_algorithm algo) {
 		case minimization_algorithm::SA_MPI:
             os << "simulated_mpi";
             break;
+		case minimization_algorithm::ST_MPI:
+			os << "stochastic_mpi";
+			break;
 #endif	// USE_MPI
 
 		default:
@@ -207,6 +216,8 @@ int main(const int argc, const char** argv) {
                 algo = minimization_algorithm::DE_OPENMP;
             }else if (algo_name == "simulated_omp") {
 				algo = minimization_algorithm::SA_OPENMP;
+            }else if (algo_name == "stochastic_omp"){
+				algo = minimization_algorithm::ST_OPENMP;
 			}
 #if defined(USE_MPI) && USE_MPI == 1
 			else if (algo_name == "genetic_mpi") {
@@ -332,7 +343,10 @@ int main(const int argc, const char** argv) {
     }else if (algo == minimization_algorithm::SA_OPENMP) {
   algorithm::run_simulated_annealing(dimensions, max_iterations, dwell, initial_temperature,
 									 temperature_scale, initial_step_size, step_size_scale, boltzmann_constant,	initial_guess,
-									lower_bound, upper_bound, func, seed, n_threads, verbose);}
+									lower_bound, upper_bound, func, seed, n_threads, verbose);
+	}else if(algo == minimization_algorithm::ST_OPENMP){
+		algorithm::run_multi_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound,  upper_bound, 1.0, 1.e-3, func, 0.000001, 0.7, verbose, 50.0, 6, 0.2, 100, 150, n_threads);
+	}
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		MPI_Init(NULL, NULL);
