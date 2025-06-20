@@ -25,12 +25,12 @@ TEST(SaConvergenceMPI, Sphere) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     const size_t dimensions = 2;
-    const size_t max_iterations = 2000;
-    const size_t dwell = 1000;
-    const double initial_temperature = 10.0;
+    const size_t max_iterations = 1000;
+    const size_t dwell = 200;
+    const double initial_temperature = 8.0;
     const double temperature_scale = 0.95;
-    const double initial_step_size = 1.0;
-    const double step_size_scale = 0.95;
+    const double initial_step_size = 2.0;
+    const double step_size_scale = 0.98;
     const double boltzmann_k = 1.0;
     const double lower_bound = -10.0;
     const double upper_bound = 10.0;
@@ -44,7 +44,7 @@ TEST(SaConvergenceMPI, Sphere) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, lower_bound, upper_bound,
-            s, seed, true
+            s, seed, false
         );
     if(rank==0){
         EXPECT_LE(absolute_error(0.0, result.second), 1e-3);
@@ -61,10 +61,10 @@ TEST(SaConvergenceMPI, EuclideanDistance) {
 
     const size_t dimensions = 2;
     const size_t max_iterations = 3000;
-    const size_t dwell = 3000;
+    const size_t dwell = 500;
     const double initial_temperature = 10.0;
     const double temperature_scale = 0.99;
-    const double initial_step_size = 0.05;
+    const double initial_step_size = 0.1;
     const double step_size_scale = 0.99;
     const double boltzmann_k = 1.0;
     const double lower_bound = -10.0;
@@ -79,7 +79,7 @@ TEST(SaConvergenceMPI, EuclideanDistance) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, lower_bound, upper_bound,
-            e, seed, true
+            e, seed, false
         );
 
     if(rank==0){
@@ -98,11 +98,11 @@ TEST(SaConvergenceMPI, Rosenbrock) {
 
     const size_t dimensions = 2;
     const size_t max_iterations = 1000;
-    const size_t dwell = 100;
-    const double initial_temperature = 10.0;
-    const double temperature_scale = 0.95;
-    const double initial_step_size = 1.0;
-    const double step_size_scale = 0.95;
+    const size_t dwell = 200;
+    const double initial_temperature = 15.0;
+    const double temperature_scale = 0.93;
+    const double initial_step_size = 0.5;
+    const double step_size_scale = 0.99;
     const double boltzmann_k = 1.0;
     const double lower_bound = -10.0;
     const double upper_bound = 10.0;
@@ -117,7 +117,7 @@ TEST(SaConvergenceMPI, Rosenbrock) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, lower_bound, upper_bound,
-            r, seed, true
+            r, seed, false
         );
 
     if(rank==0){    
@@ -138,12 +138,12 @@ TEST(SaConvergenceMPI, Rastrigin) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
     const size_t dimensions = 2;
-    const size_t max_iterations = 2000;
-    const size_t dwell = 1000;
-    const double initial_temperature = 5.0;
-    const double temperature_scale = 0.98;
-    const double initial_step_size = 0.2;
-    const double step_size_scale = 0.98;
+    const size_t max_iterations = 5000;
+    const size_t dwell = 500;
+    const double initial_temperature = 20.0;
+    const double temperature_scale = 0.97;
+    const double initial_step_size = 0.3;
+    const double step_size_scale = 0.99;
     const double boltzmann_k = 1.0;
     const double lower_bound = -5.12;
     const double upper_bound = 5.12;
@@ -158,7 +158,7 @@ TEST(SaConvergenceMPI, Rastrigin) {
             initial_temperature, temperature_scale,
             initial_step_size, step_size_scale,
             boltzmann_k, lower_bound, upper_bound,
-            r, seed, true
+            r, seed, false
         );
     if(rank==0){
         EXPECT_LE(absolute_error(0.0, result.second), 3e-3);
