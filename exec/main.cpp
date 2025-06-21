@@ -21,6 +21,7 @@ enum class minimization_algorithm {
     DE_OPENMP,
 	SA_OPENMP,
 	ST_OPENMP,
+	FIREFLY_BFGS,
 
 #if defined(USE_MPI) && USE_MPI == 1
 	GENETIC_MPI,
@@ -131,6 +132,14 @@ int main(const int argc, const char** argv) {
 	double step_size_scale = 0.98;
 	double boltzmann_constant = 1.0;
 	std::vector<double> initial_guess(dimensions, 5.0);
+
+	/* FireFly_BFGS   PARAMETERS*/
+#ifdef USE_EIGEN
+	double firefly_alpha = 0.3;
+	double firefly_beta  = 0.5;
+	double firefly_gamma = 0.05;
+	bool use_cuda = false;
+#endif // USE_EIGEN
     /* -------------------------------*/
 
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
@@ -152,7 +161,7 @@ int main(const int argc, const char** argv) {
 			std::cout << " -a,  --algorithm     Sets the minimization algorithm to be used." << std::endl;
 			std::cout << "                      Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
 					  << minimization_algorithm::GENETIC_OPENMP << ", " << minimization_algorithm::DE_OPENMP << ", " 
-					  << minimization_algorithm::SA_OPENMP
+					  << minimization_algorithm::SA_OPENMP <<", " <<minimization_algorithm::FIREFLY_BFGS
 #if defined(USE_MPI) && USE_MPI == 1
 					  << ", " << minimization_algorithm::GENETIC_MPI << ", " << minimization_algorithm::DE_MPI  << ", "
 	   << minimization_algorithm::SA_MPI
@@ -218,7 +227,9 @@ int main(const int argc, const char** argv) {
 				algo = minimization_algorithm::SA_OPENMP;
             }else if (algo_name == "stochastic_omp"){
 				algo = minimization_algorithm::ST_OPENMP;
-			}
+            } else if (algo_name == "firefly_bfgs") {
+            	algo = minimization_algorithm::FIREFLY_BFGS;
+            }
 #if defined(USE_MPI) && USE_MPI == 1
 			else if (algo_name == "genetic_mpi") {
 				algo = minimization_algorithm::GENETIC_MPI;
@@ -347,6 +358,33 @@ int main(const int argc, const char** argv) {
 	}else if(algo == minimization_algorithm::ST_OPENMP){
 		algorithm::run_multi_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound,  upper_bound, 1.0, 1.e-3, func, 0.000001, 0.7, verbose, 50.0, 6, 0.2, 100, 150, n_threads);
 	}
+#ifdef USE_EIGEN
+	else if (algo == minimization_algorithm::FIREFLY_BFGS) {
+		auto [best, val] = algorithm::run_firefly_bfgs(
+			dimensions,                  // Number of dimensions
+			num_points,                  // Number of fireflies
+			max_iterations,              // Number of iterations
+			seed,
+			lower_bound,
+			upper_bound,
+			func,                        // Funzione obiettivo (unique_ptr)
+			n_threads,                   // Numero di thread
+			verbose ,                     // Verbose
+			// parametri use_cuda, alpha, beta, gamma
+			use_cuda,
+			firefly_alpha,
+			firefly_beta,
+			firefly_gamma
+
+
+		);
+		// Output (stile framework)
+		std::cout << "Firefly+BFGS final minimum value: " << val << std::endl;
+		std::cout << "Best solution: ";
+		for (auto v : best) std::cout << v << " ";
+		std::cout << std::endl;
+	}
+#endif // USE_EIGEN
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		MPI_Init(NULL, NULL);

@@ -96,6 +96,24 @@ std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimension
 														  const std::unique_ptr<ObjectiveFunction>& func,
 														  const size_t n_threads, const bool verbose);
 
+
+#ifdef USE_EIGEN
+std::pair<std::vector<double>, double> run_firefly_bfgs(size_t dimensions,
+														size_t num_fireflies,
+														size_t max_iterations,
+														size_t seed,
+														double lower_bound,
+														double upper_bound,
+														const std::unique_ptr<ObjectiveFunction>& func,
+														size_t n_threads,
+														bool verbose,
+														bool use_cuda = false,
+														double alpha = 0.3,
+														double beta = 0.5,
+														double gamma = 0.05
+													);
+#endif // USE_EIGEN
+
 #if defined(USE_MPI) && USE_MPI == 1
 
 /*

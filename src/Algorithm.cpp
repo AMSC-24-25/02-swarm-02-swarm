@@ -29,6 +29,9 @@
 #include "Position.hpp"
 #include "State.hpp"
 #include "SimulatedAnnealing.hpp"
+#include "FireflyAlgorithm.h"
+#include "FireflyAlgorithm_Cuda.h"
+#include "BFGSOptimizer.h"
 
 namespace algorithm {
 
@@ -215,7 +218,6 @@ std::pair<std::vector<double>, double> run_simulated_annealing(
                                                                     const size_t n_threads,
                                                                     const bool verbose)
 {
-
 const size_t n_particles= n_threads; // Number of threads is equal to the number of particles
 
 std::vector<std::unique_ptr<State>> bestStates(n_particles);
@@ -321,6 +323,74 @@ const double start_time = omp_get_wtime();
 
         return {ga.bestCreature.position, ga.bestCreature.fitness};
     }
+
+
+
+
+
+
+#ifdef USE_EIGEN
+std::pair<std::vector<double>, double> run_firefly_bfgs(
+	size_t dimensions,
+	size_t num_fireflies,
+	size_t max_iterations,
+	size_t seed,
+	double lower_bound,
+	double upper_bound,
+	const std::unique_ptr<ObjectiveFunction>& func,
+	size_t n_threads,
+	bool verbose,
+	bool use_cuda,
+	double alpha,
+	double beta,
+	double gamma
+) {
+
+
+	omp_set_num_threads(n_threads);
+
+	auto objective = [&](const std::vector<double>& x) { return (*func)(x); };
+
+	std::vector<double> best;
+	double best_value = std::numeric_limits<double>::max();
+
+	// 1 - FIRELY ALGORITHM
+	if (use_cuda) {
+#ifdef ENABLE_CUDA
+		FireflyAlgorithm_Cuda algo(num_fireflies, dimensions, alpha, beta, gamma);
+		algo.setObjectiveFunction(objective);
+		best = algo.optimize(max_iterations);
+		best_value = (*func)(best);
+#else
+		throw std::runtime_error("CUDA support not enabled in this build!");
+#endif
+	} else {
+		FireflyAlgorithm algo(num_fireflies, dimensions, alpha, beta, gamma,lower_bound, upper_bound, seed);
+		algo.setObjectiveFunction(objective);
+		best = algo.optimize(max_iterations);
+		best_value = (*func)(best);
+	}
+
+	// 2 - BFGS OPTIMIZER
+	BFGSOptimizer bfgs(dimensions);
+	bfgs.setObjective(objective);
+	std::vector<double> refined = bfgs.optimize(best, max_iterations);
+	double refined_value = (*func)(refined);
+
+	if (verbose) {
+		std::cout << "Firefly best: ";
+		for (auto v : best) std::cout << v << " ";
+		std::cout << "  value = " << best_value << std::endl;
+		std::cout << "After BFGS: ";
+		for (auto v : refined) std::cout << v << " ";
+		std::cout << "  value = " << refined_value << std::endl;
+	}
+
+	// Restituisci la soluzione raffinata e il valore
+	return {refined, refined_value};
+}
+#endif //USE_EIGEN
+
 
 #if defined(USE_MPI) && USE_MPI == 1
     std::pair<std::vector<double>, double> run_genetic_mpi(const size_t dimensions, const size_t num_creatures,
