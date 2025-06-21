@@ -127,28 +127,37 @@ The algorithm was tested with varying numbers of threads and different populatio
 
 ![](benchResult/figuresFinals/time_vs_creatures.png)
 
-This plot shows how the execution time (in seconds, log scale) varies as the number of creatures increases, for 1, 8, and 16 threads:
+This chart shows how much faster the algorithm runs when we use more threads, keeping the total number of creatures the same.
 
-- With **1 thread**, the time grows consistently with the number of creatures.
-- With **8 and 16 threads**, the performance improves significantly when the number of creatures is sufficiently large.
-- For **small numbers of creatures**, multithreading introduces overhead that can outweigh the benefits of parallelization.
-- The curves flatten in the low-creature region for 8 and 16 threads, showing that overhead dominates until the workload becomes heavy enough.
+- **4 creatures**: Too few tasks. More threads just add overhead, so it gets slower.  
+- **512 creatures**: A small boost up to 2–4 threads, but after that extra threads don’t help.  
+- **16 384 creatures**: About 1.5× faster with 4 threads. Adding more threads gives smaller and smaller returns.  
+- **524 288 creatures**: Best case—around 2× speedup with 4 threads. Beyond 4 threads, overhead and memory contention start to slow things down.
+
+> **Key point:** You need enough work per thread to see a real gain. Very small problems don’t speed up; medium-to-large ones do, up to about 4–8 threads.
+
+
 
 ####  Strong Speedup vs Number of Threads
 
+In this plot we measure **strong scaling** by fixing the total population size and varying the number of threads. The speedup is defined as  
+\[
+S(t) = \frac{t_{1}}{t_{n}},
+\]
+where \(t_{1}\) is the wall-clock time with a single thread and \(t_{n}\) with \(n\) threads.
+
+
 ![](benchResult/figuresFinals/speedup_vs_threads.png)
+This plot shows how long the algorithm takes for different population sizes, using 1, 2, 4, or 8 threads.
 
-This plot shows **strong scaling**, i.e., how speedup changes as the number of threads increases, for a fixed number of creatures (4, 512, and 1024):
+- **Small populations** (up to ~64 creatures): 1 thread is fastest because creating threads adds extra work.  
+- **Medium populations**: 2 and 4 threads start to outperform 1 thread, showing clear speedup.  
+- **Large populations** (above ~65 000 creatures): All curves run in a straight line on the log–log plot, meaning time grows roughly in proportion to the number of creatures.  
+- **8 threads** is a bit slower than 4 threads in the middle range, but for very large sizes it follows the same trend.
 
-- **4 creatures:** Speedup decreases with more threads due to overhead dominating such a small workload.
-- **512 creatures:** Modest speedup is observed, showing that parallelism becomes more effective.
-- **1024 creatures:** Best performance scaling, achieving a speedup > 2.5× with 16 threads.
+> **Bottom line:** Runtime scales linearly with problem size, and multithreading helps once the population is big enough.```
 
-####  Conclusions
 
-- Parallel execution is effective only when the number of creatures is large enough to amortize thread management overhead.
-- For small problem sizes, single-threaded execution remains more efficient.
-- The algorithm demonstrates **scalability potential**, especially on larger workloads.
 
 
 ## Multiprocessing version (MPI)
