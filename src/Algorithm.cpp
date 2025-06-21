@@ -164,10 +164,10 @@ namespace algorithm {
         std::vector<Candidate> deCandidates;
 
         for (size_t i = 0; i < num_candidates; i++) {
-            deCandidates.push_back(Candidate(dimensions, lower_bound, upper_bound, seed + i,*func));
+            deCandidates.emplace_back(dimensions, lower_bound, upper_bound, seed + i,*func);
         }
         DifferentialEvolution de = DifferentialEvolution(deCandidates, dimensions,lower_bound,upper_bound,seed,max_gen,F,CR,*func,n_threads);
-
+        de.findSol();
         const double beginning = omp_get_wtime();
 
         size_t iteration=0;
@@ -175,26 +175,27 @@ namespace algorithm {
             iteration++;
             de.updateCandidate();
             de.findSol();
+            const auto& best = de.getBestCandidate();
             if (verbose) {
                 std::cout << "Iteration n. " << iteration << " / " << max_gen << std::endl;
                 std::cout << "  Current minimum: " << std::endl;
-                utils::print_point(dimensions, de.bestCandidate->candidate, de.bestCandidate->f0);
+                utils::print_point(dimensions, best.candidate, best.f0);
                 std::cout << std::endl;
             }
         }
 
         const double end = omp_get_wtime();
-
+        const auto& best = de.getBestCandidate();
         if (verbose) {
             std::cout << std::endl;
             std::cout << "Minimum found:" << std::endl;
-            utils::print_point(dimensions, de.bestCandidate->candidate, de.bestCandidate->f0);
+            utils::print_point(dimensions, best.candidate, best.f0);
             std::cout << "  Total execution time: " << std::fixed << std::setprecision(6) << (end - beginning) << " seconds"
                       << std::endl;
             std::cout << std::endl;
         }
 
-        return {de.bestCandidate->candidate, de.bestCandidate->f0};
+        return { best.candidate, best.f0 };
     }
 
 std::pair<std::vector<double>, double> run_simulated_annealing(
