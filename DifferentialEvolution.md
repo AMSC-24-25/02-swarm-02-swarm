@@ -140,11 +140,11 @@ This chart shows how much faster the algorithm runs when we use more threads, ke
 
 ####  Strong Speedup vs Number of Threads
 
-In this plot we measure **strong scaling** by fixing the total population size and varying the number of threads. The speedup is defined as  
-\[
-S(t) = \frac{t_{1}}{t_{n}},
-\]
-where \(t_{1}\) is the wall-clock time with a single thread and \(t_{n}\) with \(n\) threads.
+In this plot we measure **strong scaling** by fixing the total population size and varying the number of threads. 
+**Speedup**  
+**S(t)** = `t_1 / t_n`  
+where `t_1` is the time with one thread and `t_n` with _n_ threads.
+
 
 
 ![](benchResult/figuresFinals/speedup_vs_threads.png)
