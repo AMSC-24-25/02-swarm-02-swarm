@@ -1,0 +1,27 @@
+2025-06-21T16:04:34+00:00
+Running ./build/bench
+Run on (8 X 2096.07 MHz CPU s)
+CPU Caches:
+  L1 Data 32 KiB (x4)
+  L1 Instruction 64 KiB (x4)
+  L2 Unified 512 KiB (x4)
+  L3 Unified 4096 KiB (x1)
+Load Average: 0.00, 0.07, 0.07
+***WARNING*** Library was built as DEBUG. Timings may be affected.
+name,iterations,real_time,cpu_time,time_unit,bytes_per_second,items_per_second,label,error_occurred,error_message,"Iteration/s"
+"SAOpenMP_Rosenbrock/threads:1/max_iterations:200/manual_time",3,1.84715e+08,1.84722e+08,ns,,,,,,1322.39
+"SAOpenMP_Rosenbrock/threads:2/max_iterations:200/manual_time",13,3.94271e+07,3.81114e+07,ns,,,,,,5884.62
+"SAOpenMP_Rosenbrock/threads:4/max_iterations:200/manual_time",57,1.00592e+07,1.00433e+07,ns,,,,,,26879.9
+"SAOpenMP_Rosenbrock/threads:8/max_iterations:200/manual_time",319,2.18612e+06,2.1877e+06,ns,,,,,,95033.1
+"SAOpenMP_Rosenbrock/threads:1/max_iterations:512/manual_time",3,3.87566e+08,3.87578e+08,ns,,,,,,1279.57
+"SAOpenMP_Rosenbrock/threads:2/max_iterations:512/manual_time",5,1.07476e+08,1.07484e+08,ns,,,,,,5395
+"SAOpenMP_Rosenbrock/threads:4/max_iterations:512/manual_time",30,2.42884e+07,2.32736e+07,ns,,,,,,23997.5
+"SAOpenMP_Rosenbrock/threads:8/max_iterations:512/manual_time",122,5.58132e+06,5.58322e+06,ns,,,,,,91065.9
+"SAOpenMP_Rosenbrock/threads:1/max_iterations:1000/manual_time",1,5.6389e+08,5.63908e+08,ns,,,,,,1773.4
+"SAOpenMP_Rosenbrock/threads:2/max_iterations:1000/manual_time",3,1.87463e+08,1.7024e+08,ns,,,,,,6200.22
+"SAOpenMP_Rosenbrock/threads:4/max_iterations:1000/manual_time",15,4.46402e+07,4.2729e+07,ns,,,,,,20263.1
+"SAOpenMP_Rosenbrock/threads:8/max_iterations:1000/manual_time",65,1.11428e+07,1.11458e+07,ns,,,,,,96681.6
+"SAOpenMP_Rosenbrock/threads:1/max_iterations:2000/manual_time",1,1.12272e+09,1.12274e+09,ns,,,,,,1781.39
+"SAOpenMP_Rosenbrock/threads:2/max_iterations:2000/manual_time",3,3.20118e+08,2.83553e+08,ns,,,,,,5648.28
+"SAOpenMP_Rosenbrock/threads:4/max_iterations:2000/manual_time",6,8.72743e+07,8.49127e+07,ns,,,,,,22681.1
+"SAOpenMP_Rosenbrock/threads:8/max_iterations:2000/manual_time",30,2.05259e+07,2.05282e+07,ns,,,,,,98017.8
