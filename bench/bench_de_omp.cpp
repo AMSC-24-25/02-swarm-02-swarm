@@ -4,11 +4,13 @@
 #include <chrono>
 #include "Algorithm.hpp"
 #include "Rosenbrock.hpp"
+#include "omp.h"
 
 static void DeOpenMP_Rosenbrock(benchmark::State& state) {
-    const size_t dimensions = 2;
+    const size_t dimensions = 5;
     const size_t num_creatures = state.range(0);
-    const size_t num_threads = state.range(1);
+    const int    num_threads   = state.threads();   // prendo i thread da ThreadRange
+    omp_set_num_threads(num_threads);
 
     const size_t max_iterations = 100;
     const size_t seed = 42;
@@ -36,10 +38,9 @@ static void DeOpenMP_Rosenbrock(benchmark::State& state) {
 }
 
 BENCHMARK(DeOpenMP_Rosenbrock)
-    ->ArgNames({"creatures","threads"})
-    // creatures: 4, 8, 16, 32, 64, 128, 256, 512, 1024
-    ->Ranges({{4, 1024},    // range di creatures, raddoppia automaticamente
-              {1, 16}})     // range di threads: 1,2,4,8,16
+    ->ArgName("creatures")         // usa un solo argomento di range
     ->RangeMultiplier(2)
+    ->Range(4, 1000000)             // creatures = 4, 8, 16, …, 65536
+    ->ThreadRange(1, 16)           // threads   = 1, 2, 4, 8, 16
     ->UseManualTime();
 

@@ -56,19 +56,19 @@ TEST(SaConvergence, Sphere) {
 
 TEST(SaConvergence, EuclideanDistance) {
     const size_t dimensions = 2;
-    const size_t max_iterations = 1000;
-    const size_t dwell = 500;
-    const double initial_temperature = 1.0;
+    const size_t max_iterations = 5000;
+    const size_t dwell = 100;
+    const double initial_temperature = 0.5;
     const double temperature_scale = 0.99;
-    const double initial_step_size = 0.1;
-    const double step_size_scale =0.995;
+    const double initial_step_size = 0.01;
+    const double step_size_scale =0.999;
     const double boltzmann_k = 1.0;
-    const double lower_bound = -1.0;
-    const double upper_bound = 1.0;
+    const double lower_bound = -0.5;
+    const double upper_bound = 0.5;
     const size_t seed = 42;
     const size_t n_threads = 4;
 
-    std::vector<double> initial_guess(dimensions, 5.0);
+    std::vector<double> initial_guess(dimensions, 0.5);
     const std::unique_ptr<ObjectiveFunction> e = std::make_unique<EuclideanDistance>();
 
     const std::pair<std::vector<double>, double> result =

@@ -37,13 +37,12 @@ class MultiStochasticTunnelling{
 
     double mapped_function_value(const std::vector<double>&  posi, size_t i);
 
-    bool delta_condition(double delt, size_t i);
+    bool delta_condition(double delt);
 
-    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, size_t i);
+    bool metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta);
 
     double compute_sigma(size_t i);
 
-    void update_beta_thresholding(size_t k);
 };
 
 

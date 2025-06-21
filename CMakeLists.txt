@@ -61,7 +61,7 @@ if(USE_MPI)
     list(APPEND SOURCES src/DistributedGeneticAlgorithm.cpp)
     list(APPEND SOURCES src/DistributedDifferentialEvolution.cpp)
     list(APPEND SOURCES src/DistributedSimulatedAnnealing.cpp)
-    #list(APPEND SOURCES src/DistributedMultiStochasticTunnelling.cpp) #decommenta se esiste
+    list(APPEND SOURCES src/DistributedMultiStochasticTunnelling.cpp) #decommenta se esiste
 endif()
 
 if(ENABLE_CUDA)
@@ -140,7 +140,7 @@ if(ENABLE_TESTS)
     add_test(genetic_convergence_omp)
     add_test(multi_tunnelling_convergence)
     add_test(de_convergence)
-    #add_test(sa_convergence) #decommenta se hai il test
+    add_test(sa_convergence) 
 
     if(USE_MPI)
         add_executable(test_genetic_convergence_mpi test/test_genetic_convergence_mpi.cpp)
