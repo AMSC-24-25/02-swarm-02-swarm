@@ -1,3 +1,4 @@
+#ifdef USE_EIGEN
 #ifndef BFGS_OPTIMIZER_H
 #define BFGS_OPTIMIZER_H
 
@@ -20,3 +21,4 @@ private:
 };
 
 #endif // BFGS_OPTIMIZER_H
+#endif // USE_EIGEN

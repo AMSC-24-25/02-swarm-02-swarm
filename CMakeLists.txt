@@ -10,6 +10,8 @@ option(ENABLE_TESTS "Configures the test suite." ON)
 option(ENABLE_BENCHMARKS "Configures the benchmark suite." ON)
 option(USE_MPI "Enables usage of MPI algorithms." OFF)
 option(ENABLE_CUDA "Enable CUDA support for FireflyAlgorithm_Cuda" OFF)
+# For Eigen
+option(USE_EIGEN "Enable Eigen3 support" OFF)
 
 # Default build type
 if(NOT CMAKE_BUILD_TYPE)
@@ -22,8 +24,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG -march=native -mtune=native" CACHE STR
 
 include(cmake/modules/CPM.cmake)
 
-# Eigen include (se serve)
-include_directories(/usr/include/eigen3)
+
 
 find_package(OpenMP REQUIRED)
 
@@ -80,6 +81,14 @@ endif()
 add_library(02-swarm ${SOURCES})
 target_include_directories(02-swarm PUBLIC include)
 
+
+# For Eigen
+if(USE_EIGEN)
+    find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+    target_link_libraries(02-swarm PUBLIC Eigen3::Eigen)
+    target_compile_definitions(02-swarm PUBLIC USE_EIGEN=1)
+endif()
+
 # Warnings: solo su C++ non su CUDA!
 target_compile_options(02-swarm
         PUBLIC
@@ -87,6 +96,7 @@ target_compile_options(02-swarm
 )
 
 target_link_libraries(02-swarm PUBLIC OpenMP::OpenMP_CXX)
+
 
 if(ENABLE_CUDA)
     target_include_directories(02-swarm PUBLIC ${CUDA_INCLUDE_DIRS})
@@ -229,4 +239,10 @@ if(USE_MPI)
     message(STATUS "MPIEXEC_EXECUTABLE       : ${MPIEXEC_EXECUTABLE}")
 endif()
 message(STATUS "ENABLE_CUDA              : ${ENABLE_CUDA}")
+if(USE_EIGEN)
+    message(STATUS "Eigen support            : ENABLED")
+else()
+    message(STATUS "Eigen support            : DISABLED")
+    message(STATUS "To enable Eigen, configure with -DUSE_EIGEN=ON")
+endif()
 message(STATUS "")

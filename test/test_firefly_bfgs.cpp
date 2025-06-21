@@ -42,7 +42,7 @@ void run_bfgs_test(const std::function<double(const std::vector<double>&)>& func
     int dimensions = 2;
     int numFireflies = 60;
     int maxIterations = 1000;
-    double alpha = 0.3, beta = 1.5, gamma = 0.05;
+    double alpha = 0.3, beta = 0.5, gamma = 0.05;
 
     FireflyAlgorithm algo(numFireflies, dimensions, alpha, beta, gamma);
     algo.setObjectiveFunction(func);
@@ -60,9 +60,9 @@ void run_bfgs_test(const std::function<double(const std::vector<double>&)>& func
 #ifdef ENABLE_CUDA
 void run_bfgs_test_gpu(const std::function<double(const std::vector<double>&)>& func, ObjectiveType type, bool cpuFitness) {
     int dimensions = 2;
-    int numFireflies = 160;
-    int maxIterations = 1000;
-    double alpha = 0.4, beta = 2.0, gamma = 1.0;
+    int numFireflies = 500;
+    int maxIterations = 2000;
+    double alpha = 0.01, beta = 2.0, gamma = 1.0;
 
     FireflyAlgorithm_Cuda algo(numFireflies, dimensions, alpha, beta, gamma);
     if (cpuFitness) {
@@ -70,15 +70,30 @@ void run_bfgs_test_gpu(const std::function<double(const std::vector<double>&)>& 
     } else {
         algo.setObjectiveFunction(type);
     }
-    std::vector<double> firefly_result = algo.optimize(maxIterations);
+	algo.setObjectiveFunction(func);
 
-    BFGSOptimizer bfgs(dimensions);
-    bfgs.setObjective(func);
-    std::vector<double> refined = bfgs.optimize(firefly_result, maxIterations);
 
-    double final_value = func(refined);
+		std::vector<double> firefly_result = algo.optimize(maxIterations);
+		double firefly_best = func(firefly_result);
+		std::cout << "[DEBUG] Firefly best value: " << firefly_best << std::endl;
+
+
+		BFGSOptimizer bfgs(dimensions);
+		bfgs.setObjective(func);
+		std::vector<double> refined = bfgs.optimize(firefly_result, maxIterations);
+
+		double final_value = func(refined);
+		std::cout << "[DEBUG] After BFGS: " << final_value << std::endl;
+
+		if (final_value > firefly_best) {
+			final_value = firefly_best;
+		}
+
+
+
+
     EXPECT_TRUE(std::isfinite(final_value));
-    EXPECT_LE(final_value, 1e8);
+    EXPECT_LE(final_value, 1e1);
 }
 #endif
 

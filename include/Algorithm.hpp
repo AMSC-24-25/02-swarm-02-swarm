@@ -108,9 +108,9 @@ std::pair<std::vector<double>, double> run_firefly_bfgs(size_t dimensions,
 														size_t n_threads,
 														bool verbose,
 														bool use_cuda = false,
-														double alpha = 0.4,
-														double beta = 7.0,
-														double gamma = 1.0
+														double alpha = 0.3,
+														double beta = 0.5,
+														double gamma = 0.05
 													);
 
 #if defined(USE_MPI) && USE_MPI == 1

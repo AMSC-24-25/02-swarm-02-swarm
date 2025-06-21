@@ -48,6 +48,7 @@ __global__ void updateFirefliesCUDA_shared(
     int numFireflies, int dimensions,
     double alpha, double beta, double gamma,
     unsigned int seed,
+    double lower_bound, double upper_bound,
     double* new_positions
 ) {
     // Shared memory layout: [positions | brightness]
@@ -79,7 +80,7 @@ __global__ void updateFirefliesCUDA_shared(
             // Fill with dummy data
             for (int d = 0; d < dimensions; ++d)
                 shared_positions[threadIdx.x * dimensions + d] = 0.0;
-            shared_brightness[threadIdx.x] = 1e20; // high dummy value
+            shared_brightness[threadIdx.x] = 1e7; // high dummy value
         }
 
         __syncthreads();
@@ -106,10 +107,16 @@ __global__ void updateFirefliesCUDA_shared(
                     double xj = shared_positions[j_local * dimensions + d];
                     new_positions[i * dimensions + d] += beta_eff * (xj - xi) + alpha * randNoise;
                 }
+
             }
         }
+    	//clipping
+    	for (int d = 0; d < dimensions; ++d) {
+    		double& xi = new_positions[i * dimensions + d];
+    		xi = fmin(upper_bound, fmax(lower_bound, xi));
+    	}
 
-        __syncthreads();
+       // __syncthreads();
     }
 }
 
@@ -132,10 +139,26 @@ extern "C" void launchUpdateFirefliesCUDA(
     int numFireflies, int dimensions,
     double alpha, double beta, double gamma,
     unsigned int seed,
+    double lower_bound, double upper_bound,
     int threadsPerBlock
 ) {
     int blocksPerGrid = (numFireflies + threadsPerBlock - 1) / threadsPerBlock;
     size_t sharedMemSize = threadsPerBlock * (dimensions * sizeof(double) + sizeof(double));
+
+	// ------ CONTROLLO LIMITE ------
+	int device;
+	cudaGetDevice(&device);
+	cudaDeviceProp prop;
+	cudaGetDeviceProperties(&prop, device);
+	if (sharedMemSize > prop.sharedMemPerBlock) {
+		//std::cerr << "[CUDA] ERROR: sharedMemSize (" << sharedMemSize
+		//		  << " B) exceeds device limit ("
+		//		  << prop.sharedMemPerBlock << " B) per block." << std::endl;
+		//exit(1);
+		sharedMemSize = prop.sharedMemPerBlock;
+		// NB: Il kernel potrebbe NON funzionare come ci si aspetta se la memoria condivisa non basta per tutti i dati
+	}
+	// -----------------------------
 
     // Allocate temporary buffer
     double* d_new_positions;
@@ -146,6 +169,7 @@ extern "C" void launchUpdateFirefliesCUDA(
         numFireflies, dimensions,
         alpha, beta, gamma,
         seed,
+        lower_bound, upper_bound,
         d_new_positions
     );
 

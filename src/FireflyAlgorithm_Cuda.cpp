@@ -8,8 +8,8 @@
 #include <omp.h>
 
 // Constructor: calls base constructor (which already calls initializeFireflies)
-FireflyAlgorithm_Cuda::FireflyAlgorithm_Cuda(int nFireflies, int dim, double a, double b, double g)
-    : FireflyAlgorithm(nFireflies,dim, a, b, g) {
+FireflyAlgorithm_Cuda::FireflyAlgorithm_Cuda(int nFireflies, int dim, double a, double b, double g,double lower, double upper, size_t s)
+    : FireflyAlgorithm(nFireflies,dim, a, b, g, lower, upper, s) {
     // nothing else needed here
 }
 
@@ -19,6 +19,7 @@ extern "C" void launchUpdateFirefliesCUDA(
     int numFireflies, int dimensions,
     double alpha, double beta, double gamma,
     unsigned int seed,
+    double lower_bound, double upper_bound,
     int threadsPerBlock
 );
 
@@ -88,6 +89,7 @@ std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
                 numFireflies, dimensions,
                 alpha, beta, gamma,
                 static_cast<unsigned int>(time(NULL)) + iter,
+                lower_bound, upper_bound,
                 threadsPerBlock
             );
         } else {
@@ -104,6 +106,7 @@ std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
                 numFireflies, dimensions,
                 alpha, beta, gamma,
                 static_cast<unsigned int>(time(NULL)) + iter,
+                lower_bound, upper_bound,
                 threadsPerBlock
             );
         }
