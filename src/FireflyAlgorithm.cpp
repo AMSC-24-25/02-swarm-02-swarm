@@ -5,8 +5,8 @@
 #include <random>
 
 // Constructor
-FireflyAlgorithm::FireflyAlgorithm(int nFireflies, int dim, double a, double b, double g)
-	: numFireflies(nFireflies), dimensions(dim), alpha(a), beta(b), gamma(g) {
+FireflyAlgorithm::FireflyAlgorithm(int nFireflies, int dim, double a, double b, double g, double lower, double upper, size_t s)
+	: numFireflies(nFireflies), dimensions(dim), alpha(a), beta(b), gamma(g),lower_bound(lower), upper_bound(upper), seed(s) {
 	initializeFireflies();
 }
 
@@ -21,9 +21,17 @@ void FireflyAlgorithm::initializeFireflies() {
     fireflies.clear();
     fireflies.resize(numFireflies, Firefly(dimensions));  // Initial fill
 
+	std::uniform_real_distribution<double> dist(lower_bound, upper_bound);
+
 #pragma omp parallel for
     for (int i = 0; i < numFireflies; ++i) {
+    	std::mt19937 thread_rng(seed + i); // SEED UNICO PER OGNI FIRELY
+    	std::vector<double> pos(dimensions);
+    	for (int d = 0; d < dimensions; ++d) {
+    		pos[d] = dist(thread_rng);
+    	}
         fireflies[i] = Firefly(dimensions);
+    	fireflies[i].setPosition(pos);
         fireflies[i].setBrightness(std::numeric_limits<double>::max());
     }
 }
@@ -42,12 +50,12 @@ double FireflyAlgorithm::euclideanDistance(const Firefly& a, const Firefly& b) {
 
 // Update fireflies based on attractiveness and random perturbation
 void FireflyAlgorithm::updateFireflies() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    //std::random_device rd;
+    std::mt19937 gen(seed); //per riproducibilita'
     std::uniform_real_distribution<> randomNoise(-1.0, 1.0);
 
     for (int i = 0; i < numFireflies; ++i) {
-        for (int j = 0; j < dimensions; ++j) {
+        for (int j = 0; j < numFireflies; ++j) {
             if (fireflies[j].getBrightness() < fireflies[i].getBrightness()) {
                 double r = euclideanDistance(fireflies[i], fireflies[j]);
                 double beta_effective = beta * exp(-gamma * r * r);
@@ -59,6 +67,10 @@ void FireflyAlgorithm::updateFireflies() {
                     newPosition[d] += beta_effective * (targetPosition[d] - newPosition[d])
                                     + alpha * randomNoise(gen);
                 }
+            	// CLIPPING
+            	for (int d = 0; d < dimensions; ++d) {
+            		newPosition[d] = std::max(lower_bound, std::min(upper_bound, newPosition[d]));
+            	}
 
                 fireflies[i].setPosition(newPosition);
             }

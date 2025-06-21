@@ -11,8 +11,8 @@ static void FireflyBFGS_Rosenbrock(benchmark::State& state) {
 	const size_t num_threads  = state.range(1);     // Secondo range: threads
 	const size_t max_iterations = 100;
 	const size_t seed = 42;
-	const double lower_bound = -100.0;
-	const double upper_bound = 100.0;
+	const double lower_bound = -5.0;
+	const double upper_bound = 5.0;
 
 	// Parametri firefly
 	const double alpha = 0.4;

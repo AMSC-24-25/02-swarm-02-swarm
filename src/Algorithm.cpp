@@ -381,11 +381,6 @@ std::pair<std::vector<double>, double> run_firefly_bfgs(
 	double gamma
 ) {
 
-    	//utilizzo fantoccio, (per ora) da integrare in fireFly
-    	lower_bound = lower_bound - upper_bound + seed;
-    	if (lower_bound > seed) {
-    		//
-    	}
 
 	omp_set_num_threads(n_threads);
 
@@ -405,7 +400,7 @@ std::pair<std::vector<double>, double> run_firefly_bfgs(
 		throw std::runtime_error("CUDA support not enabled in this build!");
 #endif
 	} else {
-		FireflyAlgorithm algo(num_fireflies, dimensions, alpha, beta, gamma);
+		FireflyAlgorithm algo(num_fireflies, dimensions, alpha, beta, gamma,lower_bound, upper_bound, seed);
 		algo.setObjectiveFunction(objective);
 		best = algo.optimize(max_iterations);
 		best_value = (*func)(best);

@@ -159,7 +159,7 @@ int main(const int argc, const char** argv) {
 			std::cout << " -a,  --algorithm     Sets the minimization algorithm to be used." << std::endl;
 			std::cout << "                      Must be one of: " << minimization_algorithm::SWARM_SEARCH << ", "
 					  << minimization_algorithm::GENETIC_OPENMP << ", " << minimization_algorithm::DE_OPENMP << ", " 
-					  << minimization_algorithm::SA_OPENMP
+					  << minimization_algorithm::SA_OPENMP <<", " <<minimization_algorithm::FIREFLY_BFGS
 #if defined(USE_MPI) && USE_MPI == 1
 					  << ", " << minimization_algorithm::GENETIC_MPI << ", " << minimization_algorithm::DE_MPI  << ", "
 	   << minimization_algorithm::SA_MPI

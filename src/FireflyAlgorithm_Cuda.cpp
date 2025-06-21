@@ -1,4 +1,4 @@
-#ifdef ENABLE_CUDA
+//#ifdef ENABLE_CUDA
 
 #include "FireflyAlgorithm_Cuda.h"
 #include <cuda_runtime.h>
@@ -132,4 +132,4 @@ std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
     return fireflies[bestIndex].getPosition();
 }
 
-#endif // ENABLE_CUDA
+//#endif // ENABLE_CUDA
