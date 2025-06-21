@@ -1,6 +1,6 @@
 # Firefly + BFGS Optimization with CPU & GPU Acceleration
 
-This project implements a hybrid metaheuristic optimization algorithm that combines the Firefly Algorithm (FA) with the BFGS (quasi-Newton method) for high-precision refinement
+A hybrid metaheuristic optimization algorithm that combines the Firefly Algorithm (FA) with the BFGS (quasi-Newton method) for high-precision refinement
 
 #### Firefly Algorithm Update Rule
 
