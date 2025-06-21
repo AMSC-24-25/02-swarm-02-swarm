@@ -140,7 +140,17 @@ int main(const int argc, const char** argv) {
 	double firefly_gamma = 0.05;
 	bool use_cuda = false;
 #endif // USE_EIGEN
-    /* -------------------------------*/
+
+    /* STOCHASTIC TUNNELLING PARAMETERS*/
+	double sigma_max = 1.0;
+	double sigma_min = 1.e-4;
+	const double gamma = 0.0001;
+	const double beta_adjust_factor = 0.9;
+	double beta = 500.0;
+	const size_t tunnelling = 10;
+	const double beta_tresholding = 0.2;
+    const size_t time_step_updating = 150;
+	/*----------------------------------------*/
 
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
 	size_t seed = dev();
@@ -356,7 +366,8 @@ int main(const int argc, const char** argv) {
 									 temperature_scale, initial_step_size, step_size_scale, boltzmann_constant,	initial_guess,
 									lower_bound, upper_bound, func, seed, n_threads, verbose);
 	}else if(algo == minimization_algorithm::ST_OPENMP){
-		algorithm::run_multi_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound,  upper_bound, 1.0, 1.e-3, func, 0.000001, 0.7, verbose, 50.0, 6, 0.2, 100, 150, n_threads);
+		algorithm::run_multi_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound, upper_bound, sigma_max, sigma_min,
+		 func, gamma, beta_adjust_factor, verbose, beta, tunnelling, beta_tresholding, num_points, time_step_updating, n_threads);
 	}
 #ifdef USE_EIGEN
 	else if (algo == minimization_algorithm::FIREFLY_BFGS) {

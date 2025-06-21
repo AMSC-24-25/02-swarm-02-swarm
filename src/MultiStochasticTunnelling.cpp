@@ -62,7 +62,6 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
     #pragma omp parallel for reduction(min:best_fit)
 
     for(size_t i = 0; i < num_positions; i++){
-        //std::cout<<pos[i].f0<<std::endl;à
         #pragma omp critical
         {
           if(pos[i].f0 < best_fit){
@@ -83,19 +82,21 @@ void MultiStochasticTunnelling::iteration(const size_t seed, const size_t k){
     #pragma omp for schedule(static)
     for(size_t i = 0; i < num_positions; i++){
 
-  /*  std::cout<<"current position: "<<pos[i].position[0]<<" "<<pos[i].position[1]<<std::endl;
-  std::cout<<"value func: "<<func(pos[i].position)<<" value mapped: "<<mapped_function_value(pos[i].position, i)<<std::endl;
-  */
+
       candidate_positions[i] = pos[i].generate_new_position(lower_bound, upper_bound, seed + thread_id, sigma);
       delta[i] = mapped_function_value(candidate_positions[i], i) - mapped_function_value(pos[i].position, i);
 
-  /*std::cout<<"new position: "<<candidate_positions[i][0]<<" "<<candidate_positions[i][1]<<std::endl;
-  std::cout<<"new value func: "<<func(candidate_positions[i])<<" new value mapped: "<<mapped_function_value(candidate_positions[i], i)<<std::endl;*/
 
 
-      if(delta_condition(delta[i], i) or metropolis_condition(delta[i], seed + thread_id, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position), i)){
+
+      if(delta_condition(delta[i]) or metropolis_condition(delta[i], seed + thread_id, pos[i].beta, func(candidate_positions[i]) - func(pos[i].position), func(pos[i].best_position) - func(pos[i].position))){
+          pos[i].update_window_tunnelling(1);
           pos[i].update_position(candidate_positions[i], func);
+      }else{
+          pos[i].update_window_tunnelling(0);
       }
+      pos[i].update_betan(beta_adjust_factor, beta_thresholding);
+
     }    
   }
 }
@@ -106,61 +107,37 @@ double MultiStochasticTunnelling::mapped_function_value(const std::vector<double
   return (1.0 - std::exp(-gamma * (func(posi) - pos[i].f0)));
 }
 
-bool MultiStochasticTunnelling::delta_condition(double delt, size_t i){
+bool MultiStochasticTunnelling::delta_condition(double delt){
   if(delt <= 0){
-    pos[i].update_window_tunnelling(1);
-    pos[i].update_betan(beta_adjust_factor, beta_thresholding);
     return true;
   }else{
-    pos[i].update_window_tunnelling(0);
-    pos[i].update_betan(beta_adjust_factor, beta_thresholding);
     return false;
   }
 }
 
-bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta, size_t i) {
+bool MultiStochasticTunnelling::metropolis_condition(const double delta_f_stun, const size_t seed, const double beta, const double delta_f, const double old_delta) {
         static std::mt19937 gen(seed); 
         
         std::uniform_real_distribution<double> dist(0.0, 1.0);
         
         double random_value = dist(gen);
 
-        //std::cout<<"gamma * delta_f: "<<gamma*delta_f<<std::endl;
-
         if(gamma*delta_f >= 1.e-6){
 
           double exp_value = std::exp(-beta * delta_f_stun);
 
-          //std::cout<<"beta: "<<beta<<std::endl;
-
-          //std::cout<<"percentage: "<<exp_value<<std::endl;
 
           bool ris = random_value < exp_value;
 
-          if(ris == true){
-            pos[i].update_window_tunnelling(1);
-          }else{
-            pos[i].update_window_tunnelling(0);
-          }
 
-          pos[i].update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }else{
           
           double exp_value = std::exp(-beta * gamma * std::exp(gamma * old_delta));
 
-          //std::cout<<"percentage approximated: "<<exp_value<<std::endl;
         
           bool ris = random_value < exp_value;
-
-          if(ris == true){
-            pos[i].update_window_tunnelling(1);
-          }else{
-            pos[i].update_window_tunnelling(0);
-          }
-
-          pos[i].update_betan(beta_adjust_factor, beta_thresholding);
 
           return ris;
         }
@@ -170,13 +147,4 @@ double MultiStochasticTunnelling::compute_sigma(size_t i){
   return sigma_max - (((sigma_max - sigma_min)/ max_iter))*i;
 }
 
-void MultiStochasticTunnelling::update_beta_thresholding(size_t k){
-  if(k == 1){
-    beta_thresholding = beta_thresholding * 2/3;
-  }
-
-  if(k==2){
-    beta_thresholding = beta_thresholding / 2;
-  }
-}
 

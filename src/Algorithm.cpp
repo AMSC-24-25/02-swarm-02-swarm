@@ -105,7 +105,7 @@ namespace algorithm {
 
 
 
-    std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,
+   std::pair<std::vector<double>, double> run_multi_stochastic_tunnelling(const size_t dimensions,
                                                                            const size_t max_iterations, const size_t seed,
                                                                            const double lower_bound, const double upper_bound, const double sigma_max, const double sigma_min,
                                                                            const std::unique_ptr<ObjectiveFunction>& func, const double gamma,
@@ -126,20 +126,7 @@ namespace algorithm {
 
 
         for(size_t i = 0; i < max_iterations; i++){
-            if(i == floor(max_iterations*(1/3))){
-                stun.update_beta_thresholding(1);
-            }else if(i == floor(max_iterations*(2/3))){
-                stun.update_beta_thresholding(2);
-            }
             stun.iteration(seed, i);
-
-            /*if (verbose) {
-                std::cout<<"--------------------------------------------"<<std::endl;
-                std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-                std::cout << "  Current minimum: " << std::endl;
-                utils::print_point(dimensions, stun.pos.position, func(stun.pos.position));
-                std::cout << std::endl;
-            }*/
         }
 
         const double end = omp_get_wtime();
@@ -669,13 +656,12 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
         MPI_Comm_size(MPI_COMM_WORLD, &world_size);
         int world_rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &world_rank);
-        //const size_t local_size = num_positions / static_cast<size_t>(world_size);
+
 
 
 
         std::vector<Position> pos;
 
-        // The root process resizes its local vector
         if (world_rank == 0) {
             for(size_t i = 0; i < num_positions; i++){
                 pos.push_back(Position(dimensions,lower_bound, upper_bound, seed, beta, func, tunnelling, i));
@@ -692,20 +678,13 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
         const double beginning = MPI_Wtime();
 
         for(size_t i = 0; i < max_iterations; i++){
-            if(i == floor(max_iterations*(1/3))){
+            if(i == floor(max_iterations*(1.0/3.0))){
                 stun.update_beta_thresholding(1);
-            }else if(i == floor(max_iterations*(2/3))){
+            }else if(i == floor(max_iterations*(2.0/3.0))){
                 stun.update_beta_thresholding(2);
             }
             stun.iteration(seed, i);
 
-            /*if (verbose) {
-                std::cout<<"--------------------------------------------"<<std::endl;
-                std::cout << "Iteration n. " << (i + 1) << " / " << max_iterations << std::endl;
-                std::cout << "  Current minimum: " << std::endl;
-                utils::print_point(dimensions, stun.pos[0].position, func(stun.pos.position));
-                std::cout << std::endl;
-            }*/
         }
 
         MPI_Barrier(MPI_COMM_WORLD);
@@ -723,7 +702,6 @@ std::pair<std::vector<double>, double> run_sa_mpi(const size_t dimensions,
         return {stun.pos[0].best_position, stun.pos[0].f0};
 
     }
-
 
 #endif	// USE_MPI
 
