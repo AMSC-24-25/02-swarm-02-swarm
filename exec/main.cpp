@@ -134,9 +134,9 @@ int main(const int argc, const char** argv) {
 	std::vector<double> initial_guess(dimensions, 5.0);
 
 	/* FireFly_BFGS   PARAMETERS*/
-	double firefly_alpha = 0.4;
-	double firefly_beta  = 7.0;
-	double firefly_gamma = 1.0;
+	double firefly_alpha = 0.3;
+	double firefly_beta  = 0.5;
+	double firefly_gamma = 0.05;
 	bool use_cuda = false;
     /* -------------------------------*/
 

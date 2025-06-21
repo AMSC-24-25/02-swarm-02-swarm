@@ -1,3 +1,5 @@
+#ifdef USE_EIGEN
+
 #include "BFGSOptimizer.h"
 #include <iostream>
 
@@ -68,3 +70,5 @@ std::vector<double> BFGSOptimizer::optimize(const std::vector<double>& x0, int m
     std::vector<double> result(x.data(), x.data() + x.size());
     return result;
 }
+
+#endif //USE_EIGEN

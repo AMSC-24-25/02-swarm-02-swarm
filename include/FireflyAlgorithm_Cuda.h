@@ -11,6 +11,7 @@ extern "C" void launchUpdateFirefliesCUDA(
     int numFireflies, int dimensions,
     double alpha, double beta, double gamma,
     unsigned int seed,
+    double lower_bound, double upper_bound,
     int threadsPerBlock
 );
 
@@ -27,7 +28,7 @@ enum FitnessMode {
 // 🔹 Ereditiamo da FireflyAlgorithm
 class FireflyAlgorithm_Cuda : public FireflyAlgorithm {
 public:
-    FireflyAlgorithm_Cuda(int numFireflies, int dimensions, double alpha, double beta, double gamma);
+    FireflyAlgorithm_Cuda(int numFireflies, int dimensions, double alpha, double beta, double gamma,  double lower_bound = -5, double upper_bound = 5, size_t seed = 42);
 
     void setObjectiveFunction(ObjectiveType type); // overload
     void setObjectiveFunction(std::function<double(const std::vector<double>&)> func);

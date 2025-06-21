@@ -50,8 +50,8 @@ double FireflyAlgorithm::euclideanDistance(const Firefly& a, const Firefly& b) {
 
 // Update fireflies based on attractiveness and random perturbation
 void FireflyAlgorithm::updateFireflies() {
-    //std::random_device rd;
-    std::mt19937 gen(seed); //per riproducibilita'
+    std::random_device rd;
+    std::mt19937 gen(rd()); //per riproducibilita'con solo seed
     std::uniform_real_distribution<> randomNoise(-1.0, 1.0);
 
     for (int i = 0; i < numFireflies; ++i) {

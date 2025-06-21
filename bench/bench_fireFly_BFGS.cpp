@@ -44,7 +44,7 @@ static void FireflyBFGS_Rosenbrock(benchmark::State& state) {
 
 BENCHMARK(FireflyBFGS_Rosenbrock)
 	->ArgNames({"fireflies","threads"})
-	->Ranges({{4, 1024},    // fireflies: da 4 a 1024, raddoppia
-			  {1, 16}})     // threads: 1,2,4,8,16
+	->Ranges({{4, 200},    // fireflies: da 4 a 200, raddoppia
+			  {1, 8}})     // threads: 1,2,4,8,16
 	->RangeMultiplier(2)
 	->UseManualTime();
