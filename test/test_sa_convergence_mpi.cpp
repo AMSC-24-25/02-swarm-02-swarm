@@ -141,9 +141,9 @@ TEST(SaConvergenceMPI, Rastrigin) {
     const size_t max_iterations = 5000;
     const size_t dwell = 500;
     const double initial_temperature = 20.0;
-    const double temperature_scale = 0.97;
+    const double temperature_scale = 0.95; //0.97;
     const double initial_step_size = 0.3;
-    const double step_size_scale = 0.99;
+    const double step_size_scale = 0.97; //0.99;
     const double boltzmann_k = 1.0;
     const double lower_bound = -5.12;
     const double upper_bound = 5.12;
