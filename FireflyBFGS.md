@@ -41,9 +41,10 @@ $$
 
 
 🔧 CMake Build
-To build with CUDA support (dafault is OFF):
+
+To build with CUDA support (by dafault Cuda is OFF):
 ```bash
-cmake .. -DENABLE_CUDA=ON
+cmake -S . -B build -DENABLE_CUDA=ON
 ```
 
 ### Example Execution
