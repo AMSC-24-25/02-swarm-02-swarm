@@ -3,28 +3,39 @@
 This project implements a hybrid metaheuristic optimization algorithm that combines the Firefly Algorithm (FA) with the BFGS (quasi-Newton method) for high-precision refinement
 
 #### Firefly Algorithm Update Rule
-```latex
-x_i(t+1) = x_i(t) + \beta_0 e^{-\gamma r_{ij}^2} (x_j(t) - x_i(t)) + \alpha \cdot \varepsilon
-```
 
-Where:
-- `β₀`: base attractiveness  
-- `γ`: light absorption coefficient  
-- `r_ij`: Euclidean distance between fireflies `i` and `j`  
-- `α`: randomness factor  
-- `rand()`: random vector in [-0.5, 0.5]
+$$
+x_i(t+1) = x_i(t) + \beta_0 e^{-\gamma r_{ij}^2} (x_j(t) - x_i(t)) + \alpha \cdot \varepsilon
+$$
+where: 
+$$
+\begin{aligned}
+x_i(t) &\quad \text{Position of firefly } i \text{ at iteration } t \\
+x_j(t) &\quad \text{Position of a brighter firefly } j \\
+\beta_0 &\quad \text{Attractiveness at distance } 0 \\
+\gamma &\quad \text{Light absorption coefficient} \\
+r_{ij} &\quad \text{Euclidean distance between } x_i \text{ and } x_j \\
+\alpha &\quad \text{Randomness scaling factor} \\
+\varepsilon &\quad \text{Random vector from } \mathcal{U}(-0.5, 0.5)
+\end{aligned}
+$$
 
 BFGS refines the best solution found by FA using a gradient-based update:
 
-```latex
+$$
 x_{k+1} = x_k - H_k \nabla f(x_k)
-
-```
+$$
 
 Where:
-- `H_k`: approximation of the inverse Hessian  
-- `∇f(x_k)`: gradient at point `x_k`
 
+$$
+\begin{aligned}
+x_k &\quad \text{Current solution at iteration } k \\
+\nabla f(x_k) &\quad \text{Gradient of the objective function at } x_k \\
+H_k &\quad \text{Approximate inverse Hessian matrix} \\
+x_{k+1} &\quad \text{Updated (refined) solution}
+\end{aligned}
+$$
 
 ---
 
