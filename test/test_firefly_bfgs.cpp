@@ -1,3 +1,4 @@
+#ifdef USE_EIGEN
 #include <gtest/gtest.h>
 #include <vector>
 #include <cmath>
@@ -8,7 +9,7 @@
 
 
 #ifdef ENABLE_CUDA
-#include "../include/FireflyAlgorithm_Cuda.h"
+#include "FireflyAlgorithm_Cuda.h"
 #endif
 
 static double sphere(const std::vector<double>& x) {
@@ -110,3 +111,4 @@ TEST(FireflyBFGS_GPU, SphereCPUFit)     { run_bfgs_test_gpu(sphere, SPHERE, true
 TEST(FireflyBFGS_GPU, RastriginCPUFit)  { run_bfgs_test_gpu(rastrigin, RASTRIGIN, true); }
 TEST(FireflyBFGS_GPU, RosenbrockCPUFit) { run_bfgs_test_gpu(rosenbrock, ROSENBROCK, true); }
 #endif
+#endif //USE_EIGEN

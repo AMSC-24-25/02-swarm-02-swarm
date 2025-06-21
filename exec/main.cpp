@@ -134,10 +134,12 @@ int main(const int argc, const char** argv) {
 	std::vector<double> initial_guess(dimensions, 5.0);
 
 	/* FireFly_BFGS   PARAMETERS*/
+#ifdef USE_EIGEN
 	double firefly_alpha = 0.3;
 	double firefly_beta  = 0.5;
 	double firefly_gamma = 0.05;
 	bool use_cuda = false;
+#endif // USE_EIGEN
     /* -------------------------------*/
 
 	std::unique_ptr<ObjectiveFunction> func = std::make_unique<Sphere>();
@@ -355,7 +357,9 @@ int main(const int argc, const char** argv) {
 									lower_bound, upper_bound, func, seed, n_threads, verbose);
 	}else if(algo == minimization_algorithm::ST_OPENMP){
 		algorithm::run_multi_stochastic_tunnelling(dimensions, max_iterations, seed, lower_bound,  upper_bound, 1.0, 1.e-3, func, 0.000001, 0.7, verbose, 50.0, 6, 0.2, 100, 150, n_threads);
-	}else if (algo == minimization_algorithm::FIREFLY_BFGS) {
+	}
+#ifdef USE_EIGEN
+	else if (algo == minimization_algorithm::FIREFLY_BFGS) {
 		auto [best, val] = algorithm::run_firefly_bfgs(
 			dimensions,                  // Number of dimensions
 			num_points,                  // Number of fireflies
@@ -380,6 +384,7 @@ int main(const int argc, const char** argv) {
 		for (auto v : best) std::cout << v << " ";
 		std::cout << std::endl;
 	}
+#endif // USE_EIGEN
 #if defined(USE_MPI) && USE_MPI == 1
 	else if (algo == minimization_algorithm::GENETIC_MPI) {
 		MPI_Init(NULL, NULL);
