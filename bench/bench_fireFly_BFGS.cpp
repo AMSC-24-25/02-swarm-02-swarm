@@ -1,4 +1,4 @@
-
+#ifdef USE_EIGEN
 #include <benchmark/benchmark.h>
 #include <random>
 #include <chrono>
@@ -48,3 +48,5 @@ BENCHMARK(FireflyBFGS_Rosenbrock)
 			  {1, 8}})     // threads: 1,2,4,8,16
 	->RangeMultiplier(2)
 	->UseManualTime();
+
+#endif // USE_EIGEN

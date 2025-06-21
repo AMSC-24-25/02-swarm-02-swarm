@@ -97,7 +97,7 @@ std::pair<std::vector<double>, double> run_genetic_openmp(const size_t dimension
 														  const size_t n_threads, const bool verbose);
 
 
-
+#ifdef USE_EIGEN
 std::pair<std::vector<double>, double> run_firefly_bfgs(size_t dimensions,
 														size_t num_fireflies,
 														size_t max_iterations,
@@ -112,6 +112,7 @@ std::pair<std::vector<double>, double> run_firefly_bfgs(size_t dimensions,
 														double beta = 0.5,
 														double gamma = 0.05
 													);
+#endif // USE_EIGEN
 
 #if defined(USE_MPI) && USE_MPI == 1
 

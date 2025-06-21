@@ -364,7 +364,7 @@ const double start_time = omp_get_wtime();
 
 
 
-
+#ifdef USE_EIGEN
 std::pair<std::vector<double>, double> run_firefly_bfgs(
 	size_t dimensions,
 	size_t num_fireflies,
@@ -424,6 +424,7 @@ std::pair<std::vector<double>, double> run_firefly_bfgs(
 	// Restituisci la soluzione raffinata e il valore
 	return {refined, refined_value};
 }
+#endif //USE_EIGEN
 
 
 #if defined(USE_MPI) && USE_MPI == 1
