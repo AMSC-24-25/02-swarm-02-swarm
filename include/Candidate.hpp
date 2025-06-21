@@ -19,8 +19,8 @@ class Candidate {
 	const ObjectiveFunction& func;
 
 	public:
-	Candidate(const size_t dimension, const double lower_bound, const double upper_bound, const size_t seed, const ObjectiveFunction& func);
-	Candidate(const std::vector<double> candidate_, const ObjectiveFunction& func);
+	Candidate(size_t dimensions_, double lower_bound_, double upper_bound_, size_t seed_, const ObjectiveFunction& func_);
+	Candidate(const std::vector<double>& candidate_, const ObjectiveFunction& func);
 	void updatePosition(const std::vector<double>& position);
 
 };
