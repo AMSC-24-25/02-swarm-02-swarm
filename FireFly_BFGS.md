@@ -3,8 +3,8 @@
 This project implements a hybrid metaheuristic optimization algorithm that combines the Firefly Algorithm (FA) with the BFGS (quasi-Newton method) for high-precision refinement
 
 #### Firefly Algorithm Update Rule
-```
-x_i(t+1) = x_i(t) + β₀ * exp(-γ * r_ij²) * (x_j(t) - x_i(t)) + α * rand()
+```latex
+x_i(t+1) = x_i(t) + \beta_0 e^{-\gamma r_{ij}^2} (x_j(t) - x_i(t)) + \alpha \cdot \varepsilon
 ```
 
 Where:
@@ -16,8 +16,9 @@ Where:
 
 BFGS refines the best solution found by FA using a gradient-based update:
 
-```
-x_{k+1} = x_k - H_k * ∇f(x_k)
+```latex
+x_{k+1} = x_k - H_k \nabla f(x_k)
+
 ```
 
 Where:
