@@ -3,6 +3,8 @@
 #include <iostream>
 #include <limits>
 #include <random>
+#include <chrono>
+#include <iomanip>
 
 // Constructor
 FireflyAlgorithm::FireflyAlgorithm(int nFireflies, int dim, double a, double b, double g, double lower, double upper, size_t s)
@@ -80,6 +82,7 @@ void FireflyAlgorithm::updateFireflies() {
 
 // Main optimization loop
 std::vector<double> FireflyAlgorithm::optimize(int maxIterations) {
+	auto start = std::chrono::high_resolution_clock::now();
     for (int iter = 0; iter < maxIterations; ++iter) {
 
 #pragma omp parallel for
@@ -88,6 +91,29 @@ std::vector<double> FireflyAlgorithm::optimize(int maxIterations) {
         }
 
         updateFireflies();
+
+
+    	//Trova la firefly migliore dell'iterazione
+    	const Firefly* best = &fireflies[0];
+    	for (const auto& f : fireflies) {
+    		if (f.getBrightness() < best->getBrightness()) {
+    			best = &f;
+    		}
+    	}
+
+    	//Output formattato
+    	std::cout << "Iteration n. " << iter + 1 << " / " << maxIterations << "\n";
+    	std::cout << "  Current minimum:\n";
+    	std::cout << "  f(";
+    	const std::vector<double>& pos = best->getPosition();
+    	for (size_t i = 0; i < pos.size(); ++i) {
+    		std::cout << std::scientific << std::setprecision(6) << pos[i];
+    		if (i < pos.size() - 1) std::cout << ", ";
+    	}
+    	std::cout << ") = " << std::scientific << std::setprecision(6)
+				  << best->getBrightness() << "\n";
+
+
     }
 
     // Return the best firefly found
@@ -97,5 +123,10 @@ std::vector<double> FireflyAlgorithm::optimize(int maxIterations) {
             bestIndex = i;
         }
     }
+	auto end = std::chrono::high_resolution_clock::now();
+	double elapsed = std::chrono::duration<double>(end - start).count();
+	std::cout << "Total execution time: " << std::fixed << std::setprecision(6)
+			  << elapsed << " seconds" << std::endl;
+	std::cout << std::endl;
     return fireflies[bestIndex].getPosition();
 }

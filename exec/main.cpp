@@ -379,7 +379,9 @@ int main(const int argc, const char** argv) {
 
 		);
 		// Output (stile framework)
+		std::cout << std::endl;
 		std::cout << "Firefly+BFGS final minimum value: " << val << std::endl;
+		std::cout << std::endl;
 		std::cout << "Best solution: ";
 		for (auto v : best) std::cout << v << " ";
 		std::cout << std::endl;

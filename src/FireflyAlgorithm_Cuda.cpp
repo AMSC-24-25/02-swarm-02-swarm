@@ -4,6 +4,9 @@
 #include <cuda_runtime.h>
 #include <iostream>
 #include <ctime>
+#include <chrono>
+#include <iomanip>
+
 #include <limits>
 #include <omp.h>
 
@@ -42,6 +45,8 @@ void FireflyAlgorithm_Cuda::setObjectiveFunction(std::function<double(const std:
 
 // Main optimization loop using CUDA
 std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
+	auto start = std::chrono::high_resolution_clock::now();
+
     const int sizePos = numFireflies * dimensions;
     const size_t sizePosBytes = sizePos * sizeof(double);
     const size_t sizeBrightBytes = numFireflies * sizeof(double);
@@ -92,6 +97,27 @@ std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
                 lower_bound, upper_bound,
                 threadsPerBlock
             );
+
+        	// Trova bestIndex
+        	int bestIndex = 0;
+        	for (int i = 1; i < numFireflies; ++i) {
+        		if (h_brightness[i] < h_brightness[bestIndex])
+        			bestIndex = i;
+        	}
+
+        	//  Stampa risultato dell’iterazione
+        	std::cout << "Iteration n. " << iter + 1 << " / " << maxIterations << "\n";
+        	std::cout << "  Current minimum:\n";
+        	std::cout << "  f(";
+        	for (int d = 0; d < dimensions; ++d) {
+        		std::cout << std::scientific << std::setprecision(6)
+						  << h_positions[bestIndex * dimensions + d];
+        		if (d < dimensions - 1) std::cout << ", ";
+        	}
+        	std::cout << ") = " << std::scientific << std::setprecision(6)
+					  << h_brightness[bestIndex] << std::endl;
+
+
         } else {
             // Caso GPU puro: come ora
             launchEvaluateBrightnessCUDA(
@@ -128,9 +154,17 @@ std::vector<double> FireflyAlgorithm_Cuda::optimize(int maxIterations) {
     }
 
     int bestIndex = 0;
-    for (int i = 1; i < numFireflies; ++i)
-        if (fireflies[i].getBrightness() < fireflies[bestIndex].getBrightness())
-            bestIndex = i;
+    for (int i = 1; i < numFireflies; ++i) {
+	    if (fireflies[i].getBrightness() < fireflies[bestIndex].getBrightness())
+	    	bestIndex = i;
+    }
+
+
+	auto end = std::chrono::high_resolution_clock::now();
+	double elapsed = std::chrono::duration<double>(end - start).count();
+	std::cout << "Total execution time: " << std::fixed << std::setprecision(6)
+			  << elapsed << " seconds" << std::endl;
+	std::cout << std::endl;
 
     return fireflies[bestIndex].getPosition();
 }
