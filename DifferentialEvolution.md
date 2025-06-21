@@ -125,7 +125,7 @@ The algorithm was tested with varying numbers of threads and different populatio
 
 ####  Time vs Number of Creatures
 
-![](benchResult/figures/time_vs_creatures.png)
+![](benchResult/figuresFinals/time_vs_creatures.png)
 
 This plot shows how the execution time (in seconds, log scale) varies as the number of creatures increases, for 1, 8, and 16 threads:
 
@@ -136,7 +136,7 @@ This plot shows how the execution time (in seconds, log scale) varies as the num
 
 ####  Strong Speedup vs Number of Threads
 
-![](benchResult/figures/speedup_vs_threads.png)
+![](benchResult/figuresFinals/speedup_vs_threads.png)
 
 This plot shows **strong scaling**, i.e., how speedup changes as the number of threads increases, for a fixed number of creatures (4, 512, and 1024):
 
